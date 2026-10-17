@@ -92,7 +92,6 @@ tr.base td{background:var(--accent-soft);font-weight:600}
 .legend{display:flex;gap:16px;font-size:.8rem;color:var(--muted);margin:4px 0 10px;flex-wrap:wrap}
 .legend i{display:inline-block;width:22px;height:0;border-top:2px solid;vertical-align:middle;margin-right:6px}
 .diff.ok{color:var(--ok)} .diff.warn{color:var(--warn)} .diff.bad{color:var(--bad);font-weight:700}
-#evalout{white-space:pre-wrap;font-size:.9rem;line-height:1.7;margin-top:10px;max-width:80ch}
 .tip{position:fixed;pointer-events:none;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-size:.78rem;font-family:var(--f-mono);color:var(--fg);box-shadow:0 2px 8px rgba(0,0,0,.15);z-index:10}
 .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
 .tabs button{appearance:none;border:1px solid transparent;border-bottom:none;background:transparent;color:var(--muted);font-family:var(--f-body);font-size:.95rem;font-weight:700;padding:9px 18px;border-radius:8px 8px 0 0;cursor:pointer;margin-bottom:-1px}
@@ -227,11 +226,7 @@ body[data-mode="theory"] .grid{display:none}
     <button class="btn ghost" id="cmpfill" type="button">計算値を入れる</button>
     <button class="btn ghost" id="cmprec" type="button">記録した設定（10/14）を入れる</button>
     <button class="btn ghost" id="cmpclear" type="button">入力を消す</button>
-    <button class="btn" id="ocrbtn" type="button" hidden>スクショから読み取る</button>
-    <input type="file" id="ocrfile" accept="image/png,image/jpeg,image/webp" multiple hidden>
   </div>
-  <p class="note" id="ocrhint" style="margin:-4px 0 6px" hidden>スクショを使用する場合、「カメラ感度」「射撃時のカメラ感度」「ジャイロセンサ感度(通常時)」「ジャイロセンサ感度(射撃時)」の見出しが写るようにしてください。複数枚まとめて選べます（基本設定の画面を撮ってください）。</p>
-  <div id="ocrmsg" class="note" style="margin:0 0 10px"></div>
   <div class="cmpgrid">
     <div class="cmpin tbl"><table>
       <thead><tr><th>設定</th><th>カメラ</th><th>スコープ</th><th>ジャイロ<br>カメラ</th><th>ジャイロ<br>スコープ</th></tr></thead>
@@ -248,13 +243,6 @@ body[data-mode="theory"] .grid{display:none}
     <tbody id="cmpdiff"></tbody>
   </table></div>
   <p class="note" style="margin:6px 0 0">差＝（ゲーム内の設定 ÷ 計算値 − 1）。±5%以内は緑、±15%以内は黄、それ以上は赤。</p>
-  <div style="margin-top:14px">
-    <div class="f" style="margin-bottom:8px"><label for="evalnote">Claudeへの補足（任意）</label>
-      <input type="text" id="evalnote" maxlength="200" style="width:100%;box-sizing:border-box;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);font-family:var(--f-body)" placeholder="例：指は振り向きとフリック、ジャイロで微調整・追いエイム・リコイル制御"></div>
-    <button class="btn" id="evalbtn" type="button">Claudeに評価してもらう</button>
-    <div id="evalmsg" class="note" style="margin-top:6px"></div>
-    <div id="evalout"></div>
-  </div>
 </section>
 
 <section class="panel ms m-dev" aria-label="端末間の感度換算">
@@ -893,106 +881,6 @@ document.querySelectorAll(".grid input,.grid select").forEach(e=>e.addEventListe
 {const base=calc; calc=function(){base();renderCompare()};}
 renderCompare();
 {let m="calc";try{m=localStorage.getItem("pubg-sens-mode")||"calc"}catch(e){} setMode(m);}
-
-/* ---- Claudeに評価してもらう ---- */
-let sampleFn=null;
-(async()=>{try{sampleFn=window.claude?.use?await claude.use("sample"):null}catch(e){sampleFn=null}
-  if(!sampleFn){$("evalbtn").disabled=true;$("evalmsg").textContent="この開き方ではClaudeの評価は使えません（claude.aiで開くと使えます）。"}})();
-$("evalbtn").addEventListener("click",async()=>{
-  if(!sampleFn) return;
-  const G=gameVals(), C=calcVals(), i=readInputs();
-  if(!G.some(r=>r.some(v=>v!=null))){$("evalmsg").textContent="先にゲーム内の設定を入力してください。";return}
-  const fmt=v=>v==null?"未入力":(+v).toFixed(1);
-  const rows=CR.map((r,k)=>`${r}: `+CC.map((c,j)=>`${c} 計算${fmt(C[k][j])}/ゲーム${fmt(G[k][j])}`).join("、")).join("\n");
-  const wep=readTable("out2").map(r=>`${r[0]}: カメラ${r[1]} スコープ${r[2]} ジャイロカメラ${r[3]} ジャイロスコープ${r[4]}`).join("\n");
-  const prompt=`あなたはPUBGモバイルの感度設定に詳しいアドバイザーです。以下は、モニターディスタンス方式の感度計算機で出した計算値と、プレイヤーがゲーム内で実際に設定している値です。日本語で、ゲーム内の設定を評価してください。
-
-# 前提
-- 計算値は「どのスコープでもクロスヘアから同じ割合（MD）離れた敵に、同じ指の量・同じ端末の傾きでエイムできる」ようにそろえた値。
-- カメラ＝指でのスコープ中操作、スコープ＝射撃中の指、ジャイロ カメラ／スコープ＝ジャイロの通常時／射撃時。単位はゲーム内の%。
-- 計算条件: 基礎スコープ ${BASE_NAMES[i.base]||i.base}、基礎感度 カメラ${i.sens}／ジャイロ${i.gsens}、MD ${i.md}%、TPPディスタンス ${i.dist}m、視野角 TPP${i.tpp}°／FPP${i.fpp}°、感度調整 カメラ${i.kc}／スコープ${i.ka}、ジャイロのスコープなし適正化 ${i.gfix?"ON":"OFF"}、水平スライド加速（指）${i.accel||"不明"}。
-- プレイヤーの補足: ${$("evalnote").value.trim()||"なし"}
-
-# 値（スコープ別）
-${rows}
-
-# 参考: 武器別レッドドットの計算値
-${wep}
-
-# 出力形式
-1. 総評（2〜3文）
-2. 計算値と大きくずれている項目と、そのずれで起きやすいこと（箇条書き、最大5つ）
-3. おすすめの調整（具体的な数値つき、最大5つ。計算値に完全に合わせる必要はなく、意図的な調整に見えるものはその理由も推測して残してよい）
-全体で500字程度。前置きや挨拶は不要。`;
-  $("evalbtn").disabled=true; $("evalmsg").textContent="評価しています…"; $("evalout").textContent="";
-  try{
-    const res=await sampleFn(prompt,{onText:({text})=>{$("evalout").textContent=text},cache:false});
-    $("evalout").textContent=res.text; $("evalmsg").textContent="評価はClaudeの意見です。最後は訓練場で感覚を確かめてください。";
-  }catch(e){
-    $("evalmsg").textContent=e&&e.code==="not_granted"?"Claudeの利用が許可されていません。":e&&e.code==="rate_limited"?"少し時間をおいてからもう一度お試しください。":"評価を取得できませんでした。";
-  }
-  $("evalbtn").disabled=false;
-});
-
-/* ---- ゲーム内のスクショから比較欄を読み取る ---- */
-(async()=>{
-  let sm=null; try{sm=window.claude?.use?await claude.use("sample"):null}catch(e){}
-  if(!sm) return;
-  let lim=null; try{lim=await sm.limits()}catch(e){}
-  if(!lim||!lim.images) return;
-  const btn=$("ocrbtn"), inp=$("ocrfile"); btn.hidden=false; $("ocrhint").hidden=false;
-  if(lim.images.mediaTypes) inp.accept=lim.images.mediaTypes.join(",");
-  const COL={camera:0,ads:1,gyro:2,gyro_ads:3}, ROW={"TPP":0,"FPP":1,"1x":2,"2x":3,"3x":4,"4x":5,"6x":6,"8x":7};
-  const PROMPT=`添付はスマホゲーム「PUBGモバイル」の感度設定画面のスクリーンショットです。画面に表示されている感度の数値（%）を読み取ってください。
-
-セクション見出しと対応:
-- 「カメラ感度」→ camera
-- 「射撃時のカメラ感度」（旧称 ADS感度）→ ads
-- 「ジャイロセンサ感度(通常時)」または「ジャイロ感度」→ gyro
-- 「ジャイロセンサ感度(射撃時)」（旧称 ADSジャイロ感度）→ gyro_ads
-見出しが画面外の行は、画面の並びや前後の見出しから判断し、判断できなければ section を "unknown" にしてください。
-
-行ラベルと対応:
-- 「TPP スコープ無し」→ TPP、「FPP スコープ無し」→ FPP
-- 「レッドドット、ホロサイト、エイムアシスト、キャンテッドサイト」→ 1x（ラベルが数値に重なって「…サイ 257%」のように見えても数値は257）
-- 「2xスコープ」→ 2x、「3xスコープ、Win94」→ 3x、「4xスコープ、VSS」→ 4x、「6xスコープ」→ 6x、「8xスコープ」→ 8x
-- 「カメラ感度(フリールック)」「降下カメラ」などそれ以外の行は無視
-
-画面に写っている行だけを返し、推測で埋めないこと。数値は%を除いた整数。
-次のJSONだけを返してください:
-{"sections":[{"section":"camera|ads|gyro|gyro_ads|unknown","rows":{"TPP":36,"FPP":28}}]}`;
-  btn.addEventListener("click",()=>inp.click());
-  inp.addEventListener("change",async()=>{
-    const files=[...inp.files]; inp.value=""; if(!files.length) return;
-    const per=Math.max(1,lim.images.maxCount||1), groups=[];
-    for(let k=0;k<files.length;k+=per) groups.push(files.slice(k,k+per));
-    btn.disabled=true; $("ocrmsg").textContent=`読み取り中…（${files.length}枚）`;
-    document.querySelectorAll(".cmpin input.filled").forEach(e=>e.classList.remove("filled"));
-    let filled=0, unknown=0, failed=0;
-    for(const grp of groups){
-      try{
-        const res=await sm.json(PROMPT,{images:grp,modelTier:"default",cache:false});
-        (res&&res.sections||[]).forEach(sec=>{
-          const c=COL[sec.section];
-          Object.entries(sec.rows||{}).forEach(([k,v])=>{
-            const r=ROW[k], n=Math.round(+v);
-            if(r===undefined||!isFinite(n)) return;
-            if(c===undefined){unknown++;return}
-            const e=$(`cmp_${r}_${c}`); e.value=n; e.classList.add("filled"); filled++;
-          });
-        });
-      }catch(e){
-        failed++;
-        if(e&&e.code==="not_granted"){$("ocrmsg").textContent="Claudeへの画像の送信が許可されていません。";btn.disabled=false;return}
-        if(e&&e.code==="rate_limited"){$("ocrmsg").textContent="少し時間をおいてからもう一度お試しください。";btn.disabled=false;return}
-      }
-    }
-    saveCmp(); renderCompare(); btn.disabled=false;
-    $("ocrmsg").textContent=`${filled}項目を読み取りました（読み取った欄は枠の色が変わっています）。`+
-      (unknown?`見出しが写っておらずどの欄か判断できなかった値が${unknown}個あります。見出しが入るように撮り直してください。`:"")+
-      (failed?`読み取れなかった画像があります。`:"")+"念のため、数値がゲーム画面と同じか確認してください。";
-  });
-})();
 
 /* ---- 端末間の感度換算 ---- */
 function convRows(rows,f){return rows.map(r=>`<tr><td>${r[0]}</td><td class="c">${(+r[1]).toFixed(2)}</td><td class="c"><b>${(r[1]*f).toFixed(2)}</b></td><td class="a">${(+r[2]).toFixed(2)}</td><td class="a"><b>${(r[2]*f).toFixed(2)}</b></td></tr>`).join("")}
