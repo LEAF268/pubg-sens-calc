@@ -311,6 +311,9 @@ body[data-mode="theory"] .grid{display:none}
         <label class="check" style="margin-top:6px;justify-content:flex-start;gap:8px"><input type="checkbox" id="spdginvx"><span>左右を反転</span></label>
         <label class="check" style="justify-content:flex-start;gap:8px"><input type="checkbox" id="spdginvy"><span>上下を反転</span></label>
         <small>回り方は実測値（TPPで100%あたり端末1°→0.645°、スコープ中はスコープごとの実測比、レッドドットで約0.43倍）。右手を上げて視点が左に動くときは「左右を反転」に✓。測定中は画面上部に、ジャイロで動いた左右・上下の速さ（°/秒）が出るので、両方が反応しているか確かめられます。画面は開始したときの横向きで固定されます（大きく傾けても回りません）。</small></div>
+      <div class="f"><label for="spdland">横画面の向き</label>
+        <select id="spdland"><option value="right">右に回す（充電端子が左）</option><option value="left">左に回す（充電端子が右）</option><option value="auto">自動（開始したときの向き）</option></select>
+        <small>ゲームと同じ向きを選んでください。測定中はこの向きで固定され、端末を大きく傾けても画面は回りません。</small></div>
       <div class="f"><label for="spddur">時間</label>
         <select id="spddur"><option value="30">30秒</option><option value="60">60秒</option></select></div>
     </div>
@@ -972,7 +975,17 @@ function renderSpdRes(){
   /* 画面の自動回転：開始時の横向きにロック。ロックできずに上下逆に回ったときは、表示を180°回して元の見え方に戻す */
   function lockOri(){ const t=holdA===90?"landscape-primary":holdA===270?"landscape-secondary":"landscape";
     try{ screen.orientation?.lock?.(t).catch(()=>screen.orientation?.lock?.("landscape").catch(()=>{})) }catch(e){} }
-  function onRot(){ if(!run) return; const d=(curAngle()-holdA+360)%360;
+  let locking=false;
+  function landTarget(){ const v=$("spdland").value; return v==="right"?"landscape-secondary":v==="left"?"landscape-primary":null; }
+  /* 選んだ横向きにして固定 → 固定できたらその向きをジャイロの基準にする */
+  function enterLand(){ const t=landTarget(); locking=true;
+    const done=()=>{ locking=false; holdA=curAngle(); flip=false; fs.style.transform=""; setTimeout(resize,50); };
+    try{ const r=fs.requestFullscreen&&fs.requestFullscreen();
+      if(!r){ done(); return; }
+      r.then(()=>{ const lk=screen.orientation?.lock?.(t||(holdA===90?"landscape-primary":holdA===270?"landscape-secondary":"landscape"));
+        if(lk&&lk.then) lk.then(()=>setTimeout(done,150)).catch(()=>{ screen.orientation?.lock?.("landscape").catch(()=>{}); done(); }); else done(); }).catch(done);
+    }catch(e){ done(); } }
+  function onRot(){ if(!run||locking) return; const d=(curAngle()-holdA+360)%360;
     flip=d===180; fs.style.transform=flip?"rotate(180deg)":"";
     msg.textContent=(d===90||d===270)&&run?"横向きに戻してください（画面の自動回転をオフにすると確実です）":(started?"":msg.textContent);
     setTimeout(resize,50); }
@@ -1093,7 +1106,7 @@ function renderSpdRes(){
   fireBtn.addEventListener("pointerup",dragEnd); fireBtn.addEventListener("pointercancel",dragEnd);
   $("spdfsz").addEventListener("input",()=>{ FL.s=+$("spdfsz").value; applyFL(); saveFL(); });
   function openEdit(){ if(run) return; editing=true; fs.classList.add("editing"); $("spdedit").hidden=false; msg.textContent=""; fs.hidden=false; document.body.style.overflow="hidden";
-    try{ const r=fs.requestFullscreen&&fs.requestFullscreen(); r&&r.then(()=>screen.orientation?.lock?.("landscape").catch(()=>{})).catch(()=>{}) }catch(e){}
+    try{ const r=fs.requestFullscreen&&fs.requestFullscreen(); r&&r.then(()=>screen.orientation?.lock?.(landTarget()||"landscape").catch(()=>{})).then(()=>setTimeout(resize,200)).catch(()=>{}) }catch(e){}
     hfov=+$("tpp").value||80; cfg={view:"tpp"}; resize(); tg=[]; draw(); }
   function closeEdit(){ editing=false; fs.classList.remove("editing"); $("spdedit").hidden=true; fs.hidden=true; document.body.style.overflow=""; saveFL();
     try{ if(document.fullscreenElement) document.exitFullscreen() }catch(e){} }
@@ -1110,8 +1123,7 @@ function renderSpdRes(){
     $("spdhits").textContent=0; $("spdshots").textContent=0; $("spdtime").textContent=DUR.toFixed(1);
     $("spdcfg").textContent=`${$("spdview").selectedOptions[0].textContent}・感度${sens}・加速${cfg.acc}`+(cfg.gyro==="ON"?`・ジャイロ${cfg.gsens}%`:"");
     msg.textContent="画面をスライドすると開始します"; try{document.activeElement&&document.activeElement.blur()}catch(e){} fs.hidden=false; document.body.style.overflow="hidden";
-    holdA=curAngle(); flip=false; fs.style.transform="";
-    try{ const r=fs.requestFullscreen&&fs.requestFullscreen(); r&&r.then(()=>{ holdA=curAngle(); lockOri(); }).catch(()=>{}) }catch(e){}
+    holdA=curAngle(); flip=false; fs.style.transform=""; enterLand();
     resize(); for(let i=0;i<3;i++) spawn(); raf=requestAnimationFrame(loop); }
   function finish(){ if(!run) return; run=false; cancelAnimationFrame(raf); flush(); pid=null; stopSensors(); flip=false; fs.style.transform="";
     try{ screen.orientation?.unlock?.() }catch(e){}
@@ -1138,6 +1150,8 @@ function renderSpdRes(){
     let gs=r?+r[3]:0; if(v!=="tpp"&&v!=="rd"){ const w=readTable("out2").find(x=>x[0].includes(v==="rdsmg"?"SMG":v==="rdhg"?"ハンドガン":"トミー")); if(w&&+w[3]>0) gs=+w[3]; }
     if(gs>0) $("spdgsens").value=Math.round(gs); }catch(e){} }
   $("spdview").addEventListener("change",defSens);
+  try{ const v=localStorage.getItem("pubgsens-land"); if(v) $("spdland").value=v; }catch(e){}
+  $("spdland").addEventListener("change",()=>{ try{ localStorage.setItem("pubgsens-land",$("spdland").value) }catch(e){} });
   $("spdgyro").addEventListener("change",()=>{ $("spdgbox").hidden=$("spdgyro").value!=="ON"; });
   $("spdacc").value=$("accel").value==="OFF"?"OFF":"ON";
   setTimeout(defSens,0);
