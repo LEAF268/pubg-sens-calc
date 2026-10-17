@@ -1,0 +1,1255 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>PUBGモバイル感度計算機</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: 左に入力パネル、右に出力表（狭い画面では縦積み）。下に計算式の解説 */
+:root{
+  --bg:#eef1ec; --panel:#ffffff; --fg:#1d2420; --muted:#5d6a62; --line:#d3dad4;
+  --accent:#4f6b2c; --accent-soft:#e3ebd6; --cam:#b2363a; --ads:#1f6f8b; --gyro:#7a5a10; --s-calc:#0b74a8; --s-game:#b0651a; --ok:#2f7a3a; --warn:#9a6a00; --bad:#b2363a;
+  --f-display:"Chakra Petch","Noto Sans JP",system-ui,sans-serif;
+  --f-body:"Noto Sans JP",system-ui,-apple-system,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141815; --panel:#1d231f; --fg:#e4e9e3; --muted:#98a59c; --line:#323b35;
+  --accent:#a9c97a; --accent-soft:#2a3424; --cam:#f08a8c; --ads:#6fc2dd; --gyro:#e0b95a; --s-calc:#3a9ad0; --s-game:#bd7a2e; --ok:#7cc48a; --warn:#e0b95a; --bad:#f08a8c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141815; --panel:#1d231f; --fg:#e4e9e3; --muted:#98a59c; --line:#323b35;
+  --accent:#a9c97a; --accent-soft:#2a3424; --cam:#f08a8c; --ads:#6fc2dd; --gyro:#e0b95a; --s-calc:#3a9ad0; --s-game:#bd7a2e; --ok:#7cc48a; --warn:#e0b95a; --bad:#f08a8c; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 48px}
+.wrap{max-width:1040px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
+.wrap>*{min-width:0}
+header h1{font-family:var(--f-display);font-size:1.75rem;margin:0;letter-spacing:.02em;text-wrap:balance}
+header p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+.grid{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
+.panel h2{font-family:var(--f-display);font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+.fields{display:grid;gap:14px}
+.f label{display:flex;justify-content:space-between;font-size:.85rem;font-weight:500}
+.f label output{font-family:var(--f-mono);color:var(--accent);font-weight:600}
+.f small{display:block;color:var(--muted);font-size:.75rem;line-height:1.4;margin-top:2px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input[type=number],select{width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);font-family:var(--f-mono);font-size:.95rem}
+.check{display:flex;gap:8px;align-items:flex-start;font-size:.85rem}
+.check input{accent-color:var(--accent);margin-top:5px}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;min-width:420px}
+th,td{padding:7px 10px;text-align:right;border-bottom:1px dashed var(--line)}
+th{font-size:.75rem;font-weight:500;color:var(--muted);vertical-align:bottom}
+td:first-child,th:first-child{text-align:left;font-family:var(--f-mono);color:var(--fg)}
+td{font-family:var(--f-mono);font-size:.95rem}
+td.c{color:var(--cam)} td.a{color:var(--ads)} td.g{color:var(--gyro)}
+tr.base td{background:var(--accent-soft);font-weight:600}
+.detail{margin-top:14px;font-size:.85rem;display:grid;gap:4px;color:var(--muted)}
+.detail b{color:var(--fg);font-family:var(--f-mono)}
+.formula{display:grid;gap:12px;font-size:.9rem;max-width:72ch}
+.formula h3{font-size:.95rem;margin:8px 0 0}
+.formula p{margin:0}
+.eq{font-family:var(--f-mono);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;overflow-x:auto;white-space:pre;font-size:.85rem}
+.note{font-size:.8rem;color:var(--muted)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.saverow{display:flex;gap:8px;flex-wrap:wrap}
+.saverow input{flex:1 1 200px;min-width:0;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:.95rem}
+.btn{padding:7px 14px;border-radius:6px;border:1px solid var(--accent);background:var(--accent);color:var(--panel);font-family:var(--f-body);font-size:.85rem;font-weight:700;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:default}
+.spdbox{margin:12px 0;border:1px solid var(--line);border-radius:8px;padding:8px 12px}
+.spdbox summary{cursor:pointer;font-weight:700;font-size:.92rem}
+.spdhow{margin:8px 0;padding-left:1.3em}
+.spdfs{position:fixed;inset:0;z-index:1000;background:#1b2330;touch-action:none;user-select:none;-webkit-user-select:none;overscroll-behavior:none}
+.spdfs[hidden]{display:none}
+.spdfs canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.spdhud{position:absolute;left:14px;top:10px;font:600 .9rem var(--f-mono);color:#e8eef5;text-shadow:0 1px 2px #000;pointer-events:none}
+.spdmsg{position:absolute;left:0;right:0;top:42%;text-align:center;font-size:1rem;font-weight:700;color:#fff;text-shadow:0 1px 3px #000;pointer-events:none;padding:0 10px}
+.spdedit{position:absolute;left:50%;top:12px;transform:translateX(-50%);display:flex;gap:10px;align-items:center;background:rgba(0,0,0,.55);color:#fff;padding:8px 12px;border-radius:8px;font-size:.85rem;z-index:2;max-width:calc(100% - 24px);flex-wrap:wrap;justify-content:center}
+.spdedit[hidden]{display:none}
+.spdedit input[type=range]{width:160px}
+.spdfs.editing .spdfire{outline:3px dashed #ffd84a;outline-offset:4px;cursor:move}
+.spdfs.editing .spdhud,.spdfs.editing .spdend{display:none}
+.spdfire{position:absolute;left:12%;top:72%;transform:translate(-50%,-50%);width:84px;height:84px;border-radius:50%;border:3px solid rgba(255,255,255,.7);background:rgba(178,54,58,.55);color:#fff;font-weight:700;font-size:1rem;touch-action:none}
+.spdfire:active{background:rgba(178,54,58,.85)}
+.spdend{position:absolute;right:12px;top:8px;padding:6px 14px;border-radius:6px;border:1px solid rgba(255,255,255,.6);background:rgba(0,0,0,.35);color:#fff;font-weight:700}
+#savemsg{font-size:.8rem;color:var(--muted);min-height:1.2em;margin-top:6px}
+.cmpgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:760px){.cmpgrid{grid-template-columns:minmax(0,1fr)}}
+.cmpin input{width:58px;padding:4px 5px;border:1px solid var(--line);border-radius:5px;background:var(--bg);color:var(--fg);font-family:var(--f-mono);font-size:.85rem;text-align:right}
+.cmpin table{min-width:330px}
+.cmpin td:first-child,#cmpdiff td:first-child{white-space:nowrap}
+.cmpin input{appearance:textfield;-moz-appearance:textfield}
+.cmpin input::-webkit-inner-spin-button,.cmpin input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+@media (max-width:520px){.cmpin input{width:44px;padding:4px 3px}.cmpin th,.cmpin td{padding:6px 4px}}
+.charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:520px){.charts{grid-template-columns:minmax(0,1fr)}}
+.chart{border:1px solid var(--line);border-radius:8px;padding:8px;min-width:0}
+.chart h4{margin:0 0 4px;font-size:.8rem}
+.chart svg{width:100%;height:auto;display:block}
+.chart svg text{fill:var(--muted);font-family:var(--f-mono);font-size:10px}
+.legend{display:flex;gap:16px;font-size:.8rem;color:var(--muted);margin:4px 0 10px;flex-wrap:wrap}
+.legend i{display:inline-block;width:22px;height:0;border-top:2px solid;vertical-align:middle;margin-right:6px}
+.diff.ok{color:var(--ok)} .diff.warn{color:var(--warn)} .diff.bad{color:var(--bad);font-weight:700}
+#evalout{white-space:pre-wrap;font-size:.9rem;line-height:1.7;margin-top:10px;max-width:80ch}
+.tip{position:fixed;pointer-events:none;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-size:.78rem;font-family:var(--f-mono);color:var(--fg);box-shadow:0 2px 8px rgba(0,0,0,.15);z-index:10}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
+.tabs button{appearance:none;border:1px solid transparent;border-bottom:none;background:transparent;color:var(--muted);font-family:var(--f-body);font-size:.95rem;font-weight:700;padding:9px 18px;border-radius:8px 8px 0 0;cursor:pointer;margin-bottom:-1px}
+.tabs button[aria-selected="true"]{background:var(--panel);color:var(--accent);border-color:var(--line)}
+.ms{display:none}
+body[data-mode="calc"] .m-calc,body[data-mode="cmp"] .m-cmp,body[data-mode="dev"] .m-dev,body[data-mode="acc"] .m-acc{display:block}
+body[data-mode="calc"] .formula.m-calc{display:grid}
+.tabs{flex-wrap:wrap;overflow-x:auto}
+.formula details>summary{cursor:pointer;font-family:var(--f-display);font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);list-style:none}
+.formula details>summary::-webkit-details-marker{display:none}
+.formula details>summary::before{content:"▸ ";} .formula details[open]>summary::before{content:"▾ ";}
+.formula details{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;min-width:0}
+.formula{grid-template-columns:minmax(0,1fr)}
+.formula .eq{max-width:100%;box-sizing:border-box}
+.formula details>summary{overflow-wrap:anywhere}
+.cmpin input.filled{border-color:var(--s-game);box-shadow:0 0 0 2px color-mix(in srgb,var(--s-game) 35%,transparent)}
+.devgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:520px){.devgrid{grid-template-columns:minmax(0,1fr)}}
+.devgrid select,.devgrid input{margin-top:4px}
+.devres{margin:12px 0;font-size:.9rem}
+.devres b{font-family:var(--f-mono);color:var(--accent);font-size:1.1rem}
+.adv>summary{cursor:pointer;font-size:.85rem;font-weight:700;color:var(--accent);list-style:none;padding:6px 0;border-top:1px dashed var(--line)}
+.adv>summary::-webkit-details-marker{display:none}
+.adv>summary::before{content:"▸ "} .adv[open]>summary::before{content:"▾ "}
+@media (max-width:520px){.tabs button{padding:8px 9px;font-size:.82rem}}
+body[data-mode="theory"] .m-theory{display:block}
+body[data-mode="theory"] .grid{display:none}
+.theory{max-width:80ch;font-size:.92rem}
+.theory>*{margin:0 0 10px}
+.theory h3{font-size:1rem;margin:22px 0 8px;padding-top:10px;border-top:1px solid var(--line);scroll-margin-top:12px}
+.theory h4{font-size:.9rem;margin:16px 0 6px;color:var(--accent)}
+.theory p{margin:0 0 10px}
+.theory .eq{margin:0 0 10px}
+.theory table.sm{min-width:0}
+.theory table.sm td,.theory table.sm th{font-size:.85rem;padding:6px 8px}
+.theory table.sm td{text-align:right}
+.theory table.sm td:first-child,.theory table.sm th:first-child{text-align:left}
+.diag .d-dim{stroke:var(--muted);stroke-width:1}
+.theory .steps{padding-left:1.3em;margin:0 0 10px}
+.theory .steps li{margin:3px 0}
+.toc{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:.82rem;margin:4px 0 6px}
+.toc a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent)}
+.diag{width:100%;max-width:520px;height:auto;display:block;margin:4px 0 10px}
+.diag .d-axis{stroke:var(--line);stroke-width:1.5}
+.diag .d-cam{fill:var(--ads)} .diag .d-chr{fill:var(--accent)} .diag .d-en{fill:var(--cam)}
+.diag .d-l1{stroke:var(--ads);stroke-width:1.5;stroke-dasharray:5 4} .diag .d-l2{stroke:var(--accent);stroke-width:2}
+.diag .d-arc1{fill:none;stroke:var(--ads);stroke-width:1.5} .diag .d-arc2{fill:none;stroke:var(--accent);stroke-width:1.5}
+.diag .d-t{fill:var(--muted);font-size:12px} .diag .d-s{font-size:12px;fill:var(--fg)}
+</style>
+</head><body>
+
+<div class="wrap">
+<header>
+  <h1>PUBGモバイル感度計算機</h1>
+  <p>モニターディスタンス（MD）方式。どのスコープでも「クロスヘアから同じ割合だけ離れた敵」に同じ指の量でエイムできるよう換算します。</p>
+</header>
+
+<div class="tabs" role="tablist" aria-label="表示の切り替え">
+  <button type="button" role="tab" id="tab-calc" data-mode="calc">計算機</button>
+  <button type="button" role="tab" id="tab-cmp" data-mode="cmp">感度比較</button>
+  <button type="button" role="tab" id="tab-dev" data-mode="dev">端末換算</button>
+  <button type="button" role="tab" id="tab-acc" data-mode="acc">加速ON⇔OFF</button>
+  <button type="button" role="tab" id="tab-theory" data-mode="theory">理論・検証</button>
+</div>
+
+<div class="grid">
+  <section class="panel" aria-label="入力">
+    <h2>入力</h2>
+    <div class="fields">
+      <div class="f"><label for="base">基礎スコープ</label>
+        <select id="base"></select>
+        <small>TPP・FPPスコープなしを選ぶと、その値を基準に他のスコープを計算します（ジャイロの補正とTPP倍率は自動で考慮）。</small></div>
+      <div class="f"><label for="sens">基礎スコープ感度（カメラ・スコープ）</label>
+        <input type="number" id="sens" value="50" min="1" max="300" step="1"></div>
+      <div class="f"><label for="gsens">基礎スコープ感度（ジャイロ）</label>
+        <input type="number" id="gsens" value="52" min="1" max="400" step="1"></div>
+      <div class="f"><label for="accel">水平スライド加速（指）</label>
+        <select id="accel"><option value="OFF">OFF</option><option value="ON">ON</option></select>
+        <small>計算には影響しません。保存・画像に記録するための項目です。</small></div>
+      <details class="adv"><summary>詳細設定（MD・視野角・感度調整・武器別の視野角）</summary>
+      <div class="fields" style="margin-top:12px">
+      <div class="f"><label for="md">モニターディスタンス <output id="mdo"></output></label>
+        <input type="range" id="md" min="1" max="100" value="50">
+        <small>画面中心から端までを100%として、エイムを合わせたい敵の位置</small></div>
+      <div class="f"><label for="dist">TPPディスタンス（m）</label>
+        <input type="number" id="dist" value="10" min="4" max="300" step="1">
+        <small>TPP腰撃ちとFPP腰撃ちの感覚がそろう敵までの距離</small></div>
+      <div class="f"><label for="fpp">FPP視野角 <output id="fppo"></output></label>
+        <input type="range" id="fpp" min="70" max="103" value="80"></div>
+      <div class="f"><label for="tpp">TPP視野角 <output id="tppo"></output></label>
+        <input type="range" id="tpp" min="70" max="103" value="80"></div>
+      <div class="f"><label for="kc">感度調整（カメラ） <output id="kco"></output></label>
+        <input type="range" id="kc" min="0.5" max="1.5" step="0.01" value="1.00">
+        <small>上げると高倍率が遅く・腰撃ちが速くなる（精密寄り）</small></div>
+      <div class="f"><label for="ka">感度調整（スコープ＝射撃中） <output id="kao"></output></label>
+        <input type="range" id="ka" min="0.5" max="1.5" step="0.01" value="0.90">
+        <small>下げると高倍率が速くなる（倍フルの縦ブレを抑えやすい）</small></div>
+      <div class="f"><label for="fovsmg">レッドドット視野角（SMG・ショットガン）</label>
+        <input type="number" id="fovsmg" value="56.3" min="30" max="103" step="0.1">
+        <small>基準値：56.3°（UZI・UMP45・Vector・S686・S1897・S12K の設定から算出）</small></div>
+      <div class="f"><label for="fovtg">レッドドット視野角（トミーガン）</label>
+        <input type="number" id="fovtg" value="75.6" min="30" max="103" step="0.1">
+        <small>基準値：75.6°（トミーガンのジャイロ設定 398 から算出）</small></div>
+      <div class="f"><label for="fovhg">レッドドット視野角（ハンドガンなど）</label>
+        <input type="number" id="fovhg" value="61.2" min="30" max="103" step="0.1">
+        <small>基準値：61.2°（P92・P1911・Deagle などの設定から算出）。AR・DMRの基準は 52°（固定）です。基礎感度はAR・DMRの値で入力し、視野角が広い武器のレッドドットは下の別枠に出ます。</small></div>
+      <label class="check"><input type="checkbox" id="gfix" checked><span>ジャイロをスコープごとの実測値で補正（TPP・FPP ×0.43、8倍 ×1.11 など）</span></label>
+      </div></details>
+    </div>
+  </section>
+
+  <section class="panel" aria-label="出力">
+    <h2>出力</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>スコープ</th><th>カメラ</th><th>スコープ</th><th>ジャイロ<br>カメラ</th><th>ジャイロ<br>スコープ</th></tr></thead>
+      <tbody id="out"></tbody>
+    </table></div>
+    <h2 style="margin-top:20px">武器別レッドドット（1x）</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>武器</th><th>カメラ</th><th>スコープ</th><th>ジャイロ<br>カメラ</th><th>ジャイロ<br>スコープ</th></tr></thead>
+      <tbody id="out2"></tbody>
+    </table></div>
+    <p class="note" style="margin:6px 0 0">TPP・FPPスコープなしと2倍以上のスコープは、上の表（AR・DMR）と同じ値を使います。</p>
+    <div class="detail" id="detail"></div>
+  </section>
+</div>
+
+<section class="panel ms m-cmp" aria-label="感度比較">
+  <h2>感度比較</h2>
+  <p class="note" style="margin:0 0 10px">ゲーム内で設定している感度を入力すると、上の計算値とグラフで比べられます。空欄の項目は比較しません。</p>
+  <div class="saverow" style="margin-bottom:10px">
+    <button class="btn ghost" id="cmpfill" type="button">計算値を入れる</button>
+    <button class="btn ghost" id="cmprec" type="button">記録した設定（10/14）を入れる</button>
+    <button class="btn ghost" id="cmpclear" type="button">入力を消す</button>
+    <button class="btn" id="ocrbtn" type="button" hidden>スクショから読み取る</button>
+    <input type="file" id="ocrfile" accept="image/png,image/jpeg,image/webp" multiple hidden>
+  </div>
+  <p class="note" id="ocrhint" style="margin:-4px 0 6px" hidden>スクショを使用する場合、「カメラ感度」「射撃時のカメラ感度」「ジャイロセンサ感度(通常時)」「ジャイロセンサ感度(射撃時)」の見出しが写るようにしてください。複数枚まとめて選べます（基本設定の画面を撮ってください）。</p>
+  <div id="ocrmsg" class="note" style="margin:0 0 10px"></div>
+  <div class="cmpgrid">
+    <div class="cmpin tbl"><table>
+      <thead><tr><th>設定</th><th>カメラ</th><th>スコープ</th><th>ジャイロ<br>カメラ</th><th>ジャイロ<br>スコープ</th></tr></thead>
+      <tbody id="cmpbody"></tbody>
+    </table></div>
+    <div>
+      <div class="legend"><span><i style="border-color:var(--s-calc);border-top-style:dashed"></i>計算値</span><span><i style="border-color:var(--s-game)"></i>ゲーム内の設定</span></div>
+      <div class="charts" id="charts"></div>
+    </div>
+  </div>
+  <h3 style="font-size:.9rem;margin:16px 0 6px">計算値との差</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>スコープ</th><th>カメラ</th><th>スコープ</th><th>ジャイロ<br>カメラ</th><th>ジャイロ<br>スコープ</th></tr></thead>
+    <tbody id="cmpdiff"></tbody>
+  </table></div>
+  <p class="note" style="margin:6px 0 0">差＝（ゲーム内の設定 ÷ 計算値 − 1）。±5%以内は緑、±15%以内は黄、それ以上は赤。</p>
+  <div style="margin-top:14px">
+    <div class="f" style="margin-bottom:8px"><label for="evalnote">Claudeへの補足（任意）</label>
+      <input type="text" id="evalnote" maxlength="200" style="width:100%;box-sizing:border-box;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);font-family:var(--f-body)" placeholder="例：指は振り向きとフリック、ジャイロで微調整・追いエイム・リコイル制御"></div>
+    <button class="btn" id="evalbtn" type="button">Claudeに評価してもらう</button>
+    <div id="evalmsg" class="note" style="margin-top:6px"></div>
+    <div id="evalout"></div>
+  </div>
+</section>
+
+<section class="panel ms m-dev" aria-label="端末間の感度換算">
+  <h2>端末間の感度換算</h2>
+  <p class="note" style="margin:0 0 10px">PUBGモバイルの指の感度は「画面1pxあたりの回転量」で決まるため、画面の細かさ（ppi）が違う端末では、同じ感度でも指を動かす距離に対する回り方が変わります。今の指の感覚のまま別の端末に移すための換算です。</p>
+  <div class="devgrid">
+    <div class="f"><label for="devfrom">今の端末</label>
+      <select id="devfrom"></select>
+      <input type="number" id="ppifrom" min="100" max="800" step="1" placeholder="ppiを入力" hidden></div>
+    <div class="f"><label for="devto">換算先の端末</label>
+      <select id="devto"></select>
+      <input type="number" id="ppito" min="100" max="800" step="1" placeholder="ppiを入力" hidden></div>
+  </div>
+  <div id="devres" class="devres"></div>
+  <div class="tbl"><table>
+    <thead><tr><th>スコープ</th><th>カメラ<br>今の端末</th><th>カメラ<br>換算先</th><th>スコープ<br>今の端末</th><th>スコープ<br>換算先</th></tr></thead>
+    <tbody id="devout"></tbody>
+  </table></div>
+  <h3 style="font-size:.9rem;margin:14px 0 6px">武器別レッドドット（1x）</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>武器</th><th>カメラ<br>換算前</th><th>カメラ<br>換算後</th><th>スコープ<br>換算前</th><th>スコープ<br>換算後</th></tr></thead>
+    <tbody id="devwout"></tbody>
+  </table></div>
+  <div class="saverow" style="margin-top:10px;align-items:center">
+    <label for="devone" style="font-size:.85rem">1つの値だけ換算</label>
+    <input type="number" id="devone" min="1" max="400" step="1" value="15" style="flex:0 0 90px">
+    <span id="devoneout" style="font-family:var(--f-mono);font-weight:700"></span>
+  </div>
+  <p class="note" style="margin:8px 0 0">・換算するのは指で操作する感度（カメラ・スコープ）だけです。ジャイロ感度は端末の傾きで動くため、画面のppiでは変わりません。<br>・水平スライド加速の境目も「px/秒」で決まっているため、ppiの高い端末ほど同じ指の速さで加速が強めにかかります。<br>・上の表は計算機の出力（AR・DMR）を換算したものです。数値の根拠はLegion Tab Y700 Gen3とGalaxy S25での実測で、iPhone・iPadでも同じ仕組みかは未検証です。</p>
+</section>
+
+<section class="panel ms m-acc" aria-label="水平スライド加速の換算">
+  <h2>水平スライド加速 ON ⇔ OFF の換算</h2>
+  <p class="note" style="margin:0 0 10px">水平スライド加速ONは、指を速く動かすほど回る量が増えます（約1倍→最大約2.5倍）。ONの感度をOFFに切り替えても振り向き・フリックの量が変わらないように換算します。</p>
+  <div class="devgrid">
+    <div class="f"><label for="accdir">換算の向き</label>
+      <select id="accdir"><option value="on2off">加速ONの感度 → OFFの感度</option><option value="off2on">加速OFFの感度 → ONの感度</option></select></div>
+    <div class="f"><label for="accdev">使う端末</label>
+      <select id="accdev"></select>
+      <input type="number" id="accppi" min="100" max="800" step="1" placeholder="ppiを入力" hidden></div>
+    <div class="f"><label for="accmode">指の速さ</label>
+      <select id="accmode"><option value="dist">普段のプレイの速さ（実測データで平均）</option><option value="my">自分で測った速さ（下の測定）</option><option value="fixed">速さを指定する</option></select>
+      <small>実測データは、Legion Tab Y700 Gen3での普段のエイム（約5分）の指の速さの分布です。</small>
+      <input type="hidden" id="accmy" value=""></div>
+    <div class="f" id="accspdbox" hidden><label for="accspd">指の速さ <output id="accspdo"></output></label>
+      <input type="range" id="accspd" min="1" max="40" step="0.5" value="6">
+      <small>目安：ゆっくり 2〜4 ／ 普通 5〜9 ／ 速いフリック 15以上（cm/秒）</small></div>
+  </div>
+  <details class="spdbox" id="spdbox">
+    <summary>指の速さを測る（的当て・30秒）</summary>
+    <p class="note" style="margin:8px 0 6px">ゲームと同じ感度・加速の設定で画面いっぱいの的当てをして、普段の指の速さを測ります。視点の回り方は実測値（感度36で 端末1pxあたり約0.064°、感度に比例・スコープ共通）から計算し、加速ONなら実測した加速カーブもかけます。</p>
+    <div class="devgrid">
+      <div class="f"><label for="spdview">視点</label>
+        <select id="spdview"><option value="tpp">TPP（スコープなし）</option><option value="rd">レッドドット（AR・DMR）</option><option value="rdsmg">レッドドット（SMG・ショットガン）</option><option value="rdhg">レッドドット（ハンドガンなど）</option><option value="rdtg">レッドドット（トミーガン）</option></select></div>
+      <div class="f"><label for="spdsens">ゲーム内のカメラ感度（この視点）</label>
+        <input type="number" id="spdsens" min="1" max="400" step="1" value="36">
+        <small>感度設定の「カメラ」（射撃していないとき）の値です。</small></div>
+      <div class="f"><label for="spdacc">ゲーム内の水平スライド加速</label>
+        <select id="spdacc"><option value="ON">ON</option><option value="OFF">OFF</option></select></div>
+      <div class="f"><label for="spdgyro">ジャイロ</label>
+        <select id="spdgyro"><option value="OFF">OFF</option><option value="ON">ON（常にオン）</option></select>
+        <small>ONにすると端末を傾けて視点を動かせます（指の速さの測定には影響しません）。</small></div>
+      <div class="f" id="spdgbox" hidden><label for="spdgsens">ゲーム内のジャイロ感度（この視点・%）</label>
+        <input type="number" id="spdgsens" min="1" max="800" step="1" value="200">
+        <label class="check" style="margin-top:6px;justify-content:flex-start;gap:8px"><input type="checkbox" id="spdginvx"><span>左右を反転</span></label>
+        <label class="check" style="justify-content:flex-start;gap:8px"><input type="checkbox" id="spdginvy"><span>上下を反転</span></label>
+        <small>回り方は実測値（TPPで100%あたり端末1°→0.645°、スコープ中はスコープごとの実測比、レッドドットで約0.43倍）。端末を右に回して視点が左に動くときは「左右を反転」に✓。</small></div>
+      <div class="f"><label for="spddur">時間</label>
+        <select id="spddur"><option value="30">30秒</option><option value="60">60秒</option></select></div>
+    </div>
+    <ol class="note spdhow">
+      <li>ゲームで使う端末で開き、上の「使う端末」をその端末に合わせます。</li>
+      <li>「測定開始」で画面いっぱいの的当て画面になります。端末を横向きにして、ゲームと同じ持ち方をしてください。</li>
+      <li>右手の親指のスライドで視点を動かし、照準を的に合わせて左下の「撃つ」をタップ（左手の親指）。スライドを始めると時間が進みます。</li>
+    </ol>
+    <div class="saverow" style="margin-top:8px">
+      <button class="btn" id="spdstart" type="button">測定開始</button>
+      <button class="btn ghost" id="spdlayout" type="button">撃つボタンの位置・大きさ</button>
+    </div>
+    <div id="spdres" class="note" style="margin-top:6px"></div>
+    <p class="note" style="margin:6px 0 0">・測った結果はこのブラウザに保存され、「指の速さ」で「自分で測った速さ」を選ぶと換算に使われます。画像で保存すると、測った結果も画像に入ります。<br>・同じ端末・同じ加速設定で測り直すと結果が合算されます（2〜3回で安定します）。設定を変えて測ると新しい結果に置き換わります。<br>・感度の数値と回転量は比例します（TPP 18〜288で実測）。同じ数値ならTPP〜8倍スコープまで1pxあたりの回転量は同じです（全スコープ36で実測）。</p>
+  </details>
+  <div class="spdfs" id="spdfs" hidden>
+    <canvas id="spdcv"></canvas>
+    <div class="spdhud"><span id="spdtime">30.0</span> 秒　命中 <span id="spdhits">0</span>／<span id="spdshots">0</span>　<span id="spdcfg"></span>　<span id="spdgst"></span></div>
+    <div class="spdmsg" id="spdmsg">画面をスライドすると開始します</div>
+    <button class="spdfire" id="spdfire" type="button">撃つ</button>
+    <div class="spdedit" id="spdedit" hidden><span>撃つボタンをドラッグで移動</span><label>大きさ <input type="range" id="spdfsz" min="48" max="200" step="2" value="84"></label><button type="button" class="btn" id="spdeditok" style="padding:5px 12px">完了</button><button type="button" class="btn ghost" id="spdeditreset" style="padding:5px 12px;color:#fff;border-color:#fff">初期位置</button></div>
+    <button class="spdend" id="spdend" type="button">終了</button>
+  </div>
+  <div id="accres" class="devres"></div>
+  <div class="tbl"><table>
+    <thead><tr><th>スコープ</th><th>カメラ<br>換算前</th><th>カメラ<br>換算後</th><th>スコープ<br>換算前</th><th>スコープ<br>換算後</th></tr></thead>
+    <tbody id="accout"></tbody>
+  </table></div>
+  <h3 style="font-size:.9rem;margin:14px 0 6px">武器別レッドドット（1x）</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>武器</th><th>カメラ<br>換算前</th><th>カメラ<br>換算後</th><th>スコープ<br>換算前</th><th>スコープ<br>換算後</th></tr></thead>
+    <tbody id="accwout"></tbody>
+  </table></div>
+  <div class="saverow" style="margin-top:10px;align-items:center">
+    <label for="accone" style="font-size:.85rem">1つの値だけ換算</label>
+    <input type="number" id="accone" min="1" max="400" step="1" value="15" style="flex:0 0 90px">
+    <span id="acconeout" style="font-family:var(--f-mono);font-weight:700"></span>
+  </div>
+  <p class="note" style="margin:8px 0 0">・加速は速さで倍率が変わるため、どの速さでもONと同じになるOFFの値はありません。「普段の速さで平均すると同じ量回る」値です。OFFにするとゆっくりした操作は今より速く、速いフリックは今より遅くなります。<br>・倍率の式：端末のpx/秒で 約610まで1倍 → 約1,330で2.2倍 → それ以上はゆるやかに約2.5倍まで（Legion Tab Y700 Gen3・Galaxy S25の実測、TPP〜8倍で共通）。<br>・換算するのは指の感度（カメラ・スコープ）だけです。ジャイロには水平スライド加速はかかりません。</p>
+</section>
+
+<section class="panel ms m-calc m-cmp m-dev m-acc" aria-label="画像で保存">
+  <h2>画像で保存</h2>
+  <div class="saverow">
+    <input type="text" id="savename" maxlength="40" placeholder="名前（画像のタイトル・ファイル名になります）">
+    <button class="btn" id="imgbtn" type="button">画像で保存</button>
+    <button class="btn ghost" id="imgload" type="button">画像から読み込む</button>
+    <input type="file" id="imgfile" accept="image/png" hidden>
+  </div>
+  <div id="savemsg"></div>
+  <p class="note" style="margin:6px 0 0"><span id="imgnote"></span>保存した画像を「画像から読み込む」で選ぶと、保存したときの入力に戻ります。</p>
+</section>
+
+<section class="panel ms m-calc" aria-label="理論と検証へのリンク">
+  <p class="note" style="margin:0">計算式・実測データ・検証の方法は「理論・検証」タブにまとめています。</p>
+</section>
+
+<section class="panel ms m-theory theory" aria-label="理論と検証">
+  <h2>理論と検証</h2>
+  <p>この計算機で使っている考え方、計算式、定数、それを確かめた実測データをすべてまとめたページです。実測はすべて Legion Tab Y700 Gen3（343ppi）での画面録画で行いました。端末換算と加速の確認だけ Galaxy S25（416ppi）も使っています。</p>
+
+  <nav class="toc" aria-label="目次">
+    <a href="#th-1">1. 全体の流れ</a><a href="#th-2">2. MD方式</a><a href="#th-3">3. 視野角</a><a href="#th-4">4. 感度調整 k</a><a href="#th-5">5. TPPスコープなし</a><a href="#th-6">6. ジャイロ</a><a href="#th-7">7. 端末換算</a><a href="#th-8">8. 加速ON⇔OFF</a><a href="#th-9">9. 指の速さの測定</a><a href="#th-10">10. 実測データ一覧</a><a href="#th-11">11. 解析の方法</a><a href="#th-12">12. 未検証・今後</a>
+  </nav>
+
+  <h3 id="th-1">1. 全体の流れ</h3>
+  <p>PUBGモバイルの指の感度は「画面を1px動かしたときに何度回るか」で決まります。スコープの倍率が上がっても、ゲーム側でその分を補正する仕組みはありません（10章の実測）。そのため、同じ数値のままだと高倍率ほど回りすぎます。この計算機は、基礎スコープで慣れた感覚を他のスコープにそのまま移せるよう、各スコープの感度を次の順で計算します。</p>
+  <ol class="steps">
+    <li>MD（モニターディスタンス）の位置にいる敵が、クロスヘアから何度離れているかをスコープごとに求める（2章）</li>
+    <li>その角度の比で感度を割り振り、好みに応じて感度調整 k で強弱をつける（2・4章）</li>
+    <li>TPPスコープなしは、カメラがキャラの後ろにある分を補正する（5章）</li>
+    <li>ジャイロは、スコープごとに実測した「端末1°あたりの回転量」の差を打ち消す（6章）</li>
+    <li>必要なら、端末の画面の細かさ（7章）や水平スライド加速（8章）の違いを換算する</li>
+  </ol>
+
+  <h3 id="th-2">2. MD方式（モニターディスタンス）</h3>
+  <p>視野角 F の画面で、画面中心から端までを100%として MD の位置に映る敵は、クロスヘアから角度 θ だけ離れています。</p>
+  <div class="eq">θ(F) = atan( MD × tan(F / 2) )</div>
+  <p>この敵に照準を合わせるには θ だけ回す必要があります。感度（1pxあたりの回転量）を θ に比例させれば、どのスコープでも「画面上で同じ割合だけ離れた敵」に同じ指の量で合わせられます。</p>
+  <div class="eq">S(x) = S(基礎) × ( θ(x) / θ(基礎) ) ^ k</div>
+  <p class="note">MDを小さくするとクロスヘア近くの微調整、大きくすると画面の端の敵への振り向きの感覚がそろいます。初期値は50%です。</p>
+
+  <h3 id="th-3">3. 視野角</h3>
+  <div class="tbl"><table class="sm">
+    <thead><tr><th>スコープ</th><th>視野角</th><th>出どころ</th></tr></thead>
+    <tbody>
+      <tr><td>TPP・FPPスコープなし</td><td>設定値（70〜103°）</td><td>ゲーム内の視野角の設定</td></tr>
+      <tr><td>レッドドット・ホロ（AR・DMR）</td><td>52°</td><td>元の計算式の値</td></tr>
+      <tr><td>2倍／3倍／4倍</td><td>40° ／ 26.67° ／ 19°</td><td>元の計算式の値</td></tr>
+      <tr><td>6倍／8倍</td><td>13.33° ／ 10°</td><td>元の計算式の値</td></tr>
+      <tr><td>レッドドット（SMG・ショットガン）</td><td>56.3°</td><td>設定からの逆算（未実測）</td></tr>
+      <tr><td>レッドドット（ハンドガンなど）</td><td>61.2°</td><td>設定からの逆算（未実測）</td></tr>
+      <tr><td>レッドドット（トミーガン）</td><td>75.6°</td><td>設定からの逆算（未実測）</td></tr>
+    </tbody></table></div>
+  <p class="note">武器別レッドドットの3つは、元の計算機の作成者の設定（ジャイロのレッドドット 257 → 281／309／398、カメラ 15 → 16／18）から逆算した値です。実測は今後行う予定です（12章）。2倍以上のスコープには武器による差がないので共通の値を使います。</p>
+
+  <h3 id="th-4">4. 感度調整 k</h3>
+  <p>2章の式の指数 k です。k=1 なら全スコープで同じ感覚になります。k を上げると倍率の差が強調されて、高倍率は遅く、腰撃ちは速くなります。カメラ（射撃していないとき）とスコープ（射撃中）で別々に設定でき、初期値はカメラ 1.00、スコープ 0.90 です。スコープを1より下げると高倍率が少し速くなり、倍率スコープでフルオートを撃つときの縦の反動を抑えやすくなります。</p>
+
+  <h3 id="th-5">5. TPPスコープなし（カメラ位置の補正）</h3>
+  <p>TPPのカメラはキャラクターの後ろにあり、キャラクターを中心に回ります。そのため同じ敵でも、カメラから見た角度より「キャラクターから見た角度（実際に回す量）」の方が大きくなります。差は敵が近いほど大きくなります。</p>
+  <svg class="diag" viewBox="0 0 520 226" role="img" aria-label="TPPのカメラ位置の図。カメラがキャラクターの d メートル後ろにあり、敵までの角度はカメラから見たθcamよりキャラクターから見たθcharの方が大きい">
+    <line x1="40" y1="170" x2="480" y2="170" class="d-axis"/>
+    <circle cx="60" cy="170" r="7" class="d-cam"/><text x="60" y="196" class="d-t" text-anchor="middle">カメラ</text>
+    <circle cx="150" cy="170" r="7" class="d-chr"/><text x="150" y="196" class="d-t" text-anchor="middle">キャラ</text>
+    <circle cx="470" cy="40" r="7" class="d-en"/><text x="470" y="24" class="d-t" text-anchor="middle">敵</text>
+    <line x1="60" y1="170" x2="470" y2="40" class="d-l1"/><line x1="150" y1="170" x2="470" y2="40" class="d-l2"/>
+    <line x1="60" y1="208" x2="150" y2="208" class="d-dim"/><text x="105" y="222" class="d-t" text-anchor="middle">d = 2.25m</text>
+    <path d="M 120 170 A 60 60 0 0 0 117 151" class="d-arc1"/><text x="126" y="146" class="d-s">θcam</text>
+    <path d="M 210 170 A 60 60 0 0 0 205 147" class="d-arc2"/><text x="216" y="146" class="d-s">θchar</text>
+    <text x="320" y="222" class="d-t" text-anchor="middle">D = TPPディスタンス（キャラ〜敵）</text>
+  </svg>
+  <div class="eq">θcam  = atan( MD × tan(TPP視野角 / 2) )
+θchar = atan( D·sinθcam / (D·cosθcam − d) )    d = 2.25m（実測）
+S(TPP) = S(基礎) × ( θcam / θ(基礎) ) ^ k × θchar / θcam</div>
+  <p>D は「TPP腰撃ちとFPP腰撃ちの感覚がそろう敵までの距離」です。初期値は10mです。FPPはカメラが目の位置にあるので、この補正はかかりません。TPP視野角とFPP視野角が同じなら S(TPP) = S(FPP) × θchar/θcam になります。</p>
+  <p class="note">元の計算式は d = 3m でした。自分の録画で4つの距離（10・25・50・100m）を測り、2.25mに置き換えています（10章-4）。</p>
+
+  <h3 id="th-6">6. ジャイロ</h3>
+  <p>ジャイロも2章と同じ式で、ジャイロの基礎感度から計算します。ただしジャイロは、同じ感度の数値でもスコープによって端末1°あたりの回転量が違います（10章-5）。補正オンのときは、その実測の比を打ち消します。</p>
+  <div class="eq">G(x) = 式の値(x) × R(基礎) / R(x)
+R = 端末1°あたりの回転量（レッドドット＝1）
+  TPP・FPPスコープなし 2.342 ／ レッドドット 1 ／ 2倍 0.993 ／ 3倍 0.955
+  4倍 0.951 ／ 6倍 0.941 ／ 8倍 0.899</div>
+  <p class="note">例：基礎がレッドドットなら、TPPスコープなしは式の値 ×0.43、8倍は ×1.11 になります。FPPスコープなしはTPPと同じ比とみなしています（FPPは未実測）。元の計算式の補正は 0.42 という1つの定数でしたが、スコープごとの実測値に置き換えました。</p>
+
+  <h3 id="th-7">7. 端末換算</h3>
+  <p>指の感度は「画面1pxあたり」なので、画面が細かい（ppiが高い）端末ほど、同じ指の距離で動くpx数が増えて速く回ります。指の距離あたりの回転量をそろえるには、ppiの比を掛けます。</p>
+  <div class="eq">換算後の感度 = 今の感度 × 今の端末のppi ÷ 換算先のppi</div>
+  <p class="note">例：Legion Tab Y700 Gen3（343ppi）→ Galaxy S25（416ppi）は ×0.825。換算するのは指の感度（カメラ・スコープ）だけです。ジャイロは端末の傾きで動くので、ppiの影響を受けません。</p>
+
+  <h3 id="th-8">8. 水平スライド加速 ON ⇔ OFF</h3>
+  <p>加速ONでは、指の速さ（端末px/秒）に応じて回転量に倍率がかかります。実測から次のカーブにしています（TPP〜8倍で共通、2端末で一致）。</p>
+  <div class="eq">v ＜ 610 px/秒        → 1倍
+610 〜 1,330 px/秒    → 1 + (v − 610) / 720 × 1.2   （1倍 → 2.2倍）
+1,330 px/秒 以上      → 2.2 + 0.3 × min(1, ln(v/1330) / ln 5.3)（最大約2.5倍）</div>
+  <p>倍率は速さで変わるので、どの速さでもONと同じになるOFFの値はありません。そこで「普段の指の速さの分布」で倍率を平均し、ONと同じ量だけ回るOFFの値を出します。</p>
+  <div class="eq">平均倍率 M = Σ 倍率(速さ) × その速さで動いた距離 ÷ Σ 動いた距離
+OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
+  <p class="note">速さの分布は、cm/秒 × 端末のppi ÷ 2.54 で端末px/秒に直してから倍率を計算します。同じ指の速さでも、ppiの高い端末の方が加速が強くかかります。</p>
+
+  <h3 id="th-9">9. 指の速さの測定（的当て）</h3>
+  <p>加速の換算に使う「自分の指の速さ」を測る機能です。視点の回り方はゲームの実測値を再現しています。</p>
+  <div class="eq">回転量 = 指の移動(端末px) × 0.064° × (感度 / 36) × 加速倍率(ONのとき)
+ジャイロ = 端末の回転(°) × 0.645 × (ジャイロ感度 / 100) ÷ R(TPP) × R(視点)</div>
+  <p class="note">指の横方向の動きを約1/60秒ごとに速さにして、動いた距離で重みをつけた分布を作ります（録画の解析と同じ考え方）。ジャイロは、ブラウザがセンサーを読める https のページ（GitHub Pagesなど）でだけ動きます。</p>
+
+  <h3 id="th-10">10. 実測データ一覧</h3>
+  <p class="note">n はスワイプ（または解析区間）の数です。1pxは端末の画面の物理pxです。録画は2560×1440で、ゲーム画面の部分は 端末px × 0.9 で記録されています。</p>
+
+  <h4>10-1. 感度の数値と回転量（加速OFF・ジャイロOFF・TPP）</h4>
+  <div class="tbl"><table class="sm">
+    <thead><tr><th>感度</th><th>n</th><th>1pxあたりの回転</th><th>感度36に直した値</th></tr></thead>
+    <tbody>
+      <tr><td>18</td><td>10</td><td>0.0321°</td><td>0.0643°</td></tr>
+      <tr><td>36</td><td>4</td><td>0.0615°</td><td>0.0615°</td></tr>
+      <tr><td>72（73の可能性あり）</td><td>13</td><td>0.1289°</td><td>0.0644°</td></tr>
+      <tr><td>144</td><td>21</td><td>0.257°</td><td>0.0642°</td></tr>
+      <tr><td>288</td><td>3</td><td>0.520°</td><td>0.0649°</td></tr>
+    </tbody></table></div>
+  <p class="note">中央値です。回転量は画面上部の方位の数字（1°単位）から読んでいます。感度36はnが少なく方位の読み取り誤差が大きいので、他の4つ（0.064）を採用しました。結論：<b>感度の数値と回転量は比例し、感度36で 1pxあたり約0.064°</b>。</p>
+
+  <h4>10-2. スコープによる違い（全スコープ感度36）</h4>
+  <div class="tbl"><table class="sm">
+    <thead><tr><th>スコープ（感度36）</th><th>n</th><th>1pxあたりの回転（中央値）</th><th>範囲</th></tr></thead>
+    <tbody>
+      <tr><td>TPPスコープなし</td><td>5</td><td>0.0643°</td><td>0.056〜0.075</td></tr>
+      <tr><td>レッドドット</td><td>4</td><td>0.0656°</td><td>0.054〜0.068</td></tr>
+      <tr><td>2倍</td><td>4</td><td>0.0644°</td><td>0.061〜0.081</td></tr>
+      <tr><td>3倍</td><td>7</td><td>0.0647°</td><td>0.057〜0.074</td></tr>
+      <tr><td>4倍</td><td>6</td><td>0.0633°</td><td>0.060〜0.068</td></tr>
+      <tr><td>6倍（検証9）</td><td>2</td><td>0.0741°</td><td>0.074〜0.075</td></tr>
+      <tr><td>6倍（検証11で録り直し）</td><td>5</td><td>0.0649°</td><td>0.064〜0.069</td></tr>
+      <tr><td>8倍</td><td>9</td><td>0.0646°</td><td>0.062〜0.077</td></tr>
+      <tr><td>全体（検証9）</td><td>37</td><td>0.0646°</td><td>標準偏差 0.0058</td></tr>
+    </tbody></table></div>
+  <p class="note">6倍は検証9ではn=2で高めに出たため、検証11で録り直しました（n=5で他のスコープと同じ値）。回転量は方位の数字（1°単位）から読むので、1本ごとに±10%ほどのばらつきがあります。結論：<b>同じ数値ならどのスコープでも1pxあたりの回転量はほぼ同じ</b>で、ズーム分の補正はかかっていません。</p>
+
+  <h4>10-3. 水平スライド加速のカーブ</h4>
+  <p>加速ONとOFFで同じような操作を録画して、指の速さ（端末px/秒）ごとの回転量の比を出しました。2端末で同じカーブになり、TPPと各スコープでも差はありませんでした。8章の式はこの結果です。</p>
+  <div class="tbl"><table class="sm">
+    <thead><tr><th>録画</th><th>端末</th><th>加速</th><th>解析したスワイプ</th><th>回転量を読めたもの</th></tr></thead>
+    <tbody>
+      <tr><td>検証1</td><td>Legion</td><td>ON</td><td>88</td><td>72</td></tr>
+      <tr><td>検証2</td><td>Legion</td><td>OFF</td><td>54</td><td>31</td></tr>
+      <tr><td>検証3</td><td>Legion</td><td>ON</td><td>675</td><td>501</td></tr>
+      <tr><td>検証4</td><td>Legion</td><td>OFF</td><td>276</td><td>201</td></tr>
+      <tr><td>検証6</td><td>Galaxy S25</td><td>ON</td><td>36</td><td>31</td></tr>
+      <tr><td>検証7</td><td>Galaxy S25</td><td>OFF</td><td>19</td><td>17</td></tr>
+      <tr><td>合計</td><td></td><td></td><td>1,148</td><td>853</td></tr>
+    </tbody></table></div>
+
+  <h4>10-4. TPPのカメラ位置（加速OFF・ジャイロOFF・感度50・TPP/FPP視野角90°）</h4>
+  <p>画面の端に置いた的を照準まで動かすのに必要な指の移動量（中央値、端末px）。的までの距離は、的の上の距離表示とエネミーマーカーの距離が一致する位置で合わせています。</p>
+  <div class="tbl"><table class="sm">
+    <thead><tr><th>距離</th><th>右 (n)</th><th>左 (n)</th><th>100mとの比</th><th>2.25mでの計算値</th></tr></thead>
+    <tbody>
+      <tr><td>TPP 10m（検証2）</td><td>610 (4)</td><td>551 (3)</td><td>1.183 ／ 1.181</td><td>1.18</td></tr>
+      <tr><td>TPP 25m（検証3）</td><td>546 (13)</td><td>496 (9)</td><td>1.058 ／ 1.063</td><td>1.06</td></tr>
+      <tr><td>TPP 50m（検証3）</td><td>526 (12)</td><td>477 (13)</td><td>1.020 ／ 1.023</td><td>1.02</td></tr>
+      <tr><td>TPP 100m（検証2）</td><td>516 (20)</td><td>467 (15)</td><td>1</td><td>—</td></tr>
+      <tr><td>FPP 10m（検証2）</td><td>498 (7)</td><td>451 (5)</td><td>0.97</td><td>（補正なし）</td></tr>
+    </tbody></table></div>
+  <p class="note">4つの距離をまとめて当てはめると d = 2.26m（10mだけから求めた値は2.25m、90%の範囲で約2.0〜2.7m）。25mと50mは同じ録画の中の比（右1.038・左1.040）でも、計算値 1.039 と一致しました。左右で約10%差があるのは端に置くときの癖によるもので、同じ向き同士の比では打ち消されます。カメラ位置の検証1は的の判別ができず不採用、検証2の25m・50mは開始位置がそろっていなかったため不採用にしました。</p>
+
+  <h4>10-5. ジャイロ（phyphoxで端末の傾きを同時に記録）</h4>
+  <div class="tbl"><table class="sm">
+    <thead><tr><th>ジャイロ感度（TPP）</th><th>n（解析点）</th><th>端末1°あたり</th><th>100%あたり</th></tr></thead>
+    <tbody>
+      <tr><td>50%</td><td>83</td><td>0.332°</td><td>0.663</td></tr>
+      <tr><td>100%</td><td>62</td><td>0.635°</td><td>0.635</td></tr>
+      <tr><td>150%</td><td>68</td><td>0.975°</td><td>0.650</td></tr>
+      <tr><td>200%</td><td>79</td><td>1.288°</td><td>0.644</td></tr>
+      <tr><td>250%</td><td>55</td><td>1.587°</td><td>0.635</td></tr>
+      <tr><td>300%</td><td>52</td><td>1.892°</td><td>0.631</td></tr>
+      <tr><td>350%</td><td>109</td><td>2.212°</td><td>0.632</td></tr>
+      <tr><td>400%</td><td>35</td><td>2.496°</td><td>0.624</td></tr>
+    </tbody></table></div>
+  <p class="note">感度と回転量は比例し、100%あたり約0.645°（指の測定機能で使用）。</p>
+  <div class="tbl"><table class="sm">
+    <thead><tr><th>ジャイロ200%（検証2）</th><th>ゲーム内の回る速さ</th><th>n（10秒区間）</th><th>端末1°あたり（中央値）</th></tr></thead>
+    <tbody>
+      <tr><td>ゆっくり</td><td>約12〜19°/秒</td><td>11</td><td>1.284°</td></tr>
+      <tr><td>速く</td><td>約33〜116°/秒</td><td>9</td><td>1.288°</td></tr>
+    </tbody></table></div>
+  <p class="note">速さが数倍違っても倍率は同じでした（速さに依存しない）。区間は5秒ずつずらした10秒間で、端末の角度とゲーム内の方位の読み取りが合わなかった区間（当てはまりの良さ75%未満、または明らかな外れ値）は除いています。</p>
+  <div class="tbl"><table class="sm">
+    <thead><tr><th>スコープ</th><th>採用値</th><th>R</th><th>n</th><th>区間の中央値（範囲）</th></tr></thead>
+    <tbody>
+      <tr><td>TPPスコープなし</td><td>1.30°</td><td>2.342</td><td>4</td><td>1.321（1.23〜1.34）</td></tr>
+      <tr><td>レッドドット</td><td>0.555°</td><td>1</td><td>7</td><td>0.551（0.51〜0.59）</td></tr>
+      <tr><td>2倍</td><td>0.551°</td><td>0.993</td><td>6</td><td>0.557（0.52〜0.57）</td></tr>
+      <tr><td>3倍</td><td>0.530°</td><td>0.955</td><td>11</td><td>0.535（0.49〜0.55）</td></tr>
+      <tr><td>4倍</td><td>0.528°</td><td>0.951</td><td>10</td><td>0.524（0.51〜0.55）</td></tr>
+      <tr><td>6倍</td><td>0.522°</td><td>0.941</td><td>8</td><td>0.528（0.48〜0.55）</td></tr>
+      <tr><td>8倍</td><td>0.499°</td><td>0.899</td><td>12</td><td>0.494（0.48〜0.52）</td></tr>
+    </tbody></table></div>
+  <p class="note">ジャイロ200%での端末1°あたりの回転量です。n は10秒区間の数です。採用値は、スコープごとの区間をまとめて当てはめた値です。5秒ずつずらした10秒区間ごとの値（右の2列）とも1.5%以内で一致しています。R はレッドドットを1とした比です。</p>
+
+  <h4>10-6. 普段の指の速さ（加速ONでの録画）</h4>
+  <div class="tbl"><table class="sm">
+    <thead><tr><th>録画</th><th>視点</th><th>n</th><th>指の総移動</th><th>速さの中央値</th><th>平均倍率 M</th></tr></thead>
+    <tbody>
+      <tr><td>普段のエイム（約5分）</td><td>TPP</td><td>303</td><td>330cm</td><td>10.9cm/秒</td><td>1.88</td></tr>
+      <tr><td></td><td>スコープ中</td><td>256</td><td>213cm</td><td>5.9cm/秒</td><td>1.48</td></tr>
+      <tr><td></td><td>全体</td><td>573</td><td>556cm</td><td>7.8cm/秒</td><td>1.72</td></tr>
+      <tr><td>練習の録画（ジャイロON）</td><td>TPP</td><td>143</td><td>187cm</td><td>14.9cm/秒</td><td>1.96</td></tr>
+      <tr><td></td><td>レッドドット</td><td>31</td><td>38cm</td><td>12.0cm/秒</td><td>1.94</td></tr>
+    </tbody></table></div>
+  <p class="note">「普段のプレイの速さ」の初期値には、上の「普段のエイム・全体」の分布を使っています。練習の録画のレッドドットは、データ量（38cm）が少なめです。</p>
+
+  <h3 id="th-11">11. 解析の方法</h3>
+  <ul class="steps">
+    <li><b>指の動き</b>：開発者向けオプションの「ポインタの位置」を表示して録画し、画面の縦線の位置を1フレームずつ追跡しました。カメラ位置の検証3からは、指を離したときに上部に出る「dX」（端末px、小数第1位）を文字認識で直接読んでいます。</li>
+    <li><b>回転量</b>：画面上部の方位の数字を読み取り、スワイプの前後の差から求めました（1°単位）。</li>
+    <li><b>ジャイロ</b>：phyphoxで端末の角度を記録し、その画面ごと録画しました。端末の角度とゲーム内の方位を時刻で合わせ、比を当てはめています。外れ値は除いています。</li>
+    <li><b>代表値</b>：ばらつきや読み取りミスに強い中央値を使っています。</li>
+  </ul>
+
+  <h3 id="th-12">12. 未検証の部分と今後</h3>
+  <ul class="steps">
+    <li>武器別レッドドットの視野角（56.3／61.2／75.6°）は設定から逆算した値で、まだ実測していません。</li>
+    <li>FPPスコープなしのジャイロ倍率は、TPPと同じとみなしています。</li>
+    <li>実測は Legion Tab Y700 Gen3 と Galaxy S25 だけです。iPhone・iPadで同じ仕組みかは確かめていません。</li>
+    <li>スコープの視野角（52／40／26.67／19／13.33／10°）は元の計算式の値です。</li>
+  </ul>
+  <p class="note">この計算機は、動画で公開されていた計算方法を元にしています（MD 25%・50%、感度調整 1.0／1.15／0.87 の各表と小数第2位まで一致することを確認）。その後、TPPのカメラ位置とジャイロの補正などの定数は、自分の録画による実測値に置き換えています。</p>
+</section>
+</div>
+
+<script>
+// ジャイロの実測（感度200%・端末1°あたりのゲーム内回転を、レッドドットを1とした比）。FPPはTPPと同じとみなす。
+const GYRO_REL={TPP:1.30/0.555,FPP:1.30/0.555,"1x":1,SMG:1,HG:1,TG:1,"2x":0.551/0.555,"3x":0.530/0.555,"4x":0.528/0.555,"6x":0.522/0.555,"8x":0.499/0.555};
+const SCOPES=[["1x","レッドドット・ホロ（1x）",52],["2x","2倍",40],["3x","3倍",80/3],["4x","4倍",19],["6x","6倍",40/3],["8x","8倍",10]];
+const $=id=>document.getElementById(id);
+const sel=$("base");
+[["TPP","TPPスコープなし"],["FPP","FPPスコープなし"],...SCOPES].forEach(([k,n])=>{const o=document.createElement("option");o.value=k;o.textContent=n;sel.appendChild(o)});
+sel.value="1x";
+const rad=d=>d*Math.PI/180, deg=r=>r*180/Math.PI;
+function calc(){
+  const md=+$("md").value/100, D=Math.max(+$("dist").value||10,3.5), fpp=+$("fpp").value, tpp=+$("tpp").value;
+  const kc=+$("kc").value, ka=+$("ka").value, S=+$("sens").value||0, G=+$("gsens").value||0, gfix=$("gfix").checked;
+  const base=sel.value;
+  $("mdo").textContent=Math.round(md*100)+"%"; $("fppo").textContent=fpp+"°"; $("tppo").textContent=tpp+"°";
+  $("kco").textContent=kc.toFixed(2); $("kao").textContent=ka.toFixed(2);
+  const th=f=>Math.atan(md*Math.tan(rad(f/2)));
+  const R={FPP:th(fpp),TPP:th(tpp)}; SCOPES.forEach(([k,,f])=>R[k]=th(f));
+  const fS=+$("fovsmg").value||56.3, fH=+$("fovhg").value||61.2, fT=+$("fovtg").value||75.6; R.SMG=th(fS); R.HG=th(fH); R.TG=th(fT);
+  const tc=th(tpp), ch=Math.atan(D*Math.sin(tc)/(D*Math.cos(tc)-2.25)), m=ch/tc;
+  // 基礎がTPP/FPPのときは、入力値からTPP倍率を外して基準に戻す。
+  // ジャイロは実測の回転量の比で補正：回りやすいスコープほど数値を下げる（値 × 基礎の比 ÷ そのスコープの比）
+  const bm=base==="TPP"?m:1, gf=x=>gfix?1/(GYRO_REL[x]||1):1;
+  const v=(s,k,b,ns,isG)=>(b/bm/(isG?gf(base):1))*Math.pow(R[s]/R[base],k)*(isG?gf(s):1);
+  const rows=[["TPP No","TPP",true,m],["FPP No","FPP",true,1],...SCOPES.map(([k])=>[k==="1x"?"1x（AR・DMR）":k,k,false,1])];
+  const cell=(s)=>`<td class="c">${v(s,kc,S,false,false).toFixed(2)}</td><td class="a">${v(s,ka,S,false,false).toFixed(2)}</td><td class="g">${v(s,kc,G,false,true).toFixed(2)}</td><td class="g">${v(s,ka,G,false,true).toFixed(2)}</td>`;
+  $("out2").innerHTML=`<tr><td>AR・DMR（52°）</td>${cell("1x")}</tr><tr><td>SMG・ショットガン（${fS}°）</td>${cell("SMG")}</tr><tr><td>ハンドガンなど（${fH}°）</td>${cell("HG")}</tr><tr><td>トミーガン（${fT}°）</td>${cell("TG")}</tr>`;
+  $("out").innerHTML=rows.map(([lab,s,ns,mul])=>`<tr class="${s===base?"base":""}"><td>${lab}</td>
+    <td class="c">${(v(s,kc,S,false,false)*mul).toFixed(2)}</td><td class="a">${(v(s,ka,S,false,false)*mul).toFixed(2)}</td>
+    <td class="g">${(v(s,kc,G,ns,true)*mul).toFixed(2)}</td><td class="g">${(v(s,ka,G,ns,true)*mul).toFixed(2)}</td></tr>`).join("");
+  $("detail").innerHTML=`<div>どのスコープでもクロスヘアから <b>${Math.round(md*100)}%</b> 離れた敵に同じ感覚でエイムできます。</div>
+    <div>TPP: カメラから <b>${deg(tc).toFixed(2)}°</b>、キャラクターから <b>${deg(ch).toFixed(2)}°</b> → TPP腰撃ち感度を <b>${m.toFixed(2)}倍</b></div>
+    <div>実際のゲームの設定は整数なので、四捨五入して入れてください。</div>`;
+}
+document.querySelectorAll(".grid input,.grid select").forEach(e=>e.addEventListener("input",calc));
+calc();
+
+/* ---- 画像保存まわりの共通処理 ---- */
+const IN_IDS=["base","sens","gsens","md","dist","fpp","tpp","kc","ka","fovsmg","fovtg","fovhg","gfix","accel"];
+const BASE_NAMES={TPP:"TPPスコープなし",FPP:"FPPスコープなし"}; SCOPES.forEach(([k,n])=>BASE_NAMES[k]=n);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function readInputs(){const o={};IN_IDS.forEach(id=>{const e=$(id);o[id]=e.type==="checkbox"?e.checked:e.value});return o}
+function readTable(id){return [...$(id).querySelectorAll("tr")].map(tr=>[...tr.children].map(td=>td.textContent))}
+function msg(t){$("savemsg").textContent=t}
+
+/* ---- 画像で保存（入力の要点＋2つの表だけをPNGに描く） ---- */
+const IMGF='"Noto Sans JP","Hiragino Sans","Yu Gothic",system-ui,sans-serif', IMGM='"JetBrains Mono",ui-monospace,Menlo,monospace';
+const IC={bg:"#ffffff",fg:"#1d2420",mu:"#5d6a62",ln:"#d3dad4",ac:"#4f6b2c",soft:"#eef1ec",cam:"#b2363a",ads:"#1f6f8b",gy:"#7a5a10",calc:"#0b74a8",game:"#b0651a",ok:"#2f7a3a",warn:"#9a6a00",bad:"#b2363a"};
+function infoRows(i){return [
+  [["基礎スコープ",BASE_NAMES[i.base]||i.base],["MD",i.md+"%"],["TPP視野角",i.tpp+"°"]],
+  [["基礎感度（カメラ）",i.sens],["TPPディスタンス",i.dist+"m"],["FPP視野角",i.fpp+"°"]],
+  [["基礎感度（ジャイロ）",i.gsens],["感度調整（カメラ）",(+i.kc).toFixed(2)],["ジャイロ適正化",i.gfix?"ON":"OFF"]],
+  [["水平スライド加速（指）",i.accel||"—"],["感度調整（スコープ）",(+i.ka).toFixed(2)],null]]}
+const HEAD_H=r=>40+(r.name?20:0)+14+19*4;
+// タイトル・日時・名前・入力の要点（計算機／比較で共通）
+function drawHead(g,r,W,P,title){
+  const i=r.inputs||{}; let y=P+26;
+  g.fillStyle=IC.fg; g.font=`700 22px ${IMGF}`; g.fillText(title,P,y);
+  g.font=`400 13px ${IMGF}`; g.fillStyle=IC.mu; const d=new Date(r.createdAt||Date.now());
+  g.textAlign="right"; g.fillText(d.toLocaleString("ja-JP"),W-P,y); g.textAlign="left";
+  if(r.name){ y+=20; g.fillStyle=IC.ac; g.font=`700 12.5px ${IMGF}`; g.fillText(r.name,P,y); }
+  y+=14;
+  const lx=[P,P+330,P+610], vx=[P+140,P+460,P+710];
+  infoRows(i).forEach(row=>{ y+=19; row.forEach((c,j)=>{ if(!c) return;
+    g.font=`400 11.5px ${IMGF}`; g.fillStyle=IC.mu; g.fillText(c[0],lx[j],y);
+    g.font=`600 12px ${/^[\d.%°m—ONF]+$/.test(String(c[1]))?IMGM:IMGF}`; g.fillStyle=IC.fg; g.fillText(String(c[1]),vx[j],y); }); });
+  return y;
+}
+function newCanvas(W,H){const sc=2,cv=document.createElement("canvas");cv.width=W*sc;cv.height=H*sc;const g=cv.getContext("2d");g.scale(sc,sc);g.fillStyle=IC.bg;g.fillRect(0,0,W,H);return [cv,g]}
+function drawImage(r){
+  const W=860, P=28, RH=30;
+  const main=r.main||[], wep=r.weapons||[];
+  const H=P+HEAD_H(r)+RH*(main.length+1)+40+RH*(wep.length+1)+P+10;
+  const [cv,g]=newCanvas(W,H);
+  let y=drawHead(g,r,W,P,"PUBGモバイル感度");
+  const cols=[P,P+250,P+390,P+530,P+680], colR=[0,P+330,P+470,P+620,W-P];
+  const table=(rows,first)=>{
+    y+=14;
+    g.fillStyle=IC.soft; g.fillRect(P,y,W-2*P,RH);
+    g.font=`700 12.5px ${IMGF}`; g.fillStyle=IC.mu;
+    [first,"カメラ","スコープ","ジャイロ カメラ","ジャイロ スコープ"].forEach((t,j)=>{ if(j===0) g.fillText(t,cols[0]+8,y+20); else {g.textAlign="right"; g.fillText(t,colR[j],y+20); g.textAlign="left";} });
+    y+=RH;
+    rows.forEach(c=>{
+      g.strokeStyle=IC.ln; g.beginPath(); g.moveTo(P,y+RH); g.lineTo(W-P,y+RH); g.stroke();
+      c.forEach((t,j)=>{
+        if(j===0){g.font=`500 13px ${IMGF}`; g.fillStyle=IC.fg; g.fillText(t,cols[0]+8,y+20)}
+        else {g.font=`600 14px ${IMGM}`; g.fillStyle=[0,IC.cam,IC.ads,IC.gy,IC.gy][j]; g.textAlign="right"; g.fillText(t,colR[j],y+20); g.textAlign="left"}
+      });
+      y+=RH;
+    });
+  };
+  table(main,"スコープ");
+  y+=26; g.fillStyle=IC.fg; g.font=`700 14px ${IMGF}`; g.fillText("武器別レッドドット（1x）",P,y);
+  table(wep,"武器");
+  return cv;
+}
+// 比較モードの画像：入力の要点＋計算値／ゲーム内の設定／差の表＋4つのグラフ
+function drawCompare(r){
+  const W=1100, P=28, RH=28, C=r.calc||[], G=r.game||[];
+  const CH=190, H=P+HEAD_H(r)+14+RH*2+RH*CR.length+30+CH+40+P;
+  const [cv,g]=newCanvas(W,H);
+  let y=drawHead(g,r,W,P,"PUBGモバイル感度 比較");
+  y+=14;
+  const L=P+92, GW=(W-P-L)/4;
+  g.fillStyle=IC.soft; g.fillRect(P,y,W-2*P,RH*2);
+  g.font=`700 12.5px ${IMGF}`; g.fillStyle=IC.mu; g.fillText("スコープ",P+8,y+RH+18);
+  CC.forEach((c,j)=>{const x=L+GW*j; g.textAlign="center"; g.fillStyle=IC.fg; g.fillText(c,x+GW/2,y+19);
+    g.font=`500 11.5px ${IMGF}`; g.fillStyle=IC.mu; g.textAlign="right";
+    ["計算","ゲーム","差"].forEach((t,k)=>g.fillText(t,x+[78,155,GW-12][k],y+RH+18)); g.font=`700 12.5px ${IMGF}`; g.textAlign="left";
+    if(j>0){g.strokeStyle=IC.ln;g.beginPath();g.moveTo(x,y+6);g.lineTo(x,y+RH*2+RH*CR.length-6);g.stroke()}});
+  y+=RH*2;
+  CR.forEach((lab,i)=>{
+    g.strokeStyle=IC.ln; g.beginPath(); g.moveTo(P,y+RH); g.lineTo(W-P,y+RH); g.stroke();
+    g.font=`500 13px ${IMGF}`; g.fillStyle=IC.fg; g.fillText(lab,P+8,y+19);
+    CC.forEach((_,j)=>{const x=L+GW*j, c=C[i]&&C[i][j], v=G[i]&&G[i][j];
+      g.textAlign="right"; g.font=`500 13px ${IMGM}`;
+      g.fillStyle=IC.calc; g.fillText(c==null||!isFinite(c)?"—":(+c).toFixed(1),x+78,y+19);
+      g.fillStyle=IC.game; g.font=`700 13px ${IMGM}`; g.fillText(v==null?"—":String(v),x+155,y+19);
+      if(v!=null&&c){const d=v/c-1,a=Math.abs(d); g.fillStyle=a<=.05?IC.ok:a<=.15?IC.warn:IC.bad; g.fillText(`${d>=0?"+":""}${(d*100).toFixed(0)}%`,x+GW-12,y+19)}
+      else {g.fillStyle=IC.mu; g.font=`500 13px ${IMGM}`; g.fillText("—",x+GW-12,y+19)}
+      g.textAlign="left"});
+    y+=RH;
+  });
+  // 凡例
+  y+=24; g.font=`500 12px ${IMGF}`;
+  g.strokeStyle=IC.calc; g.lineWidth=2; g.setLineDash([5,4]); g.beginPath(); g.moveTo(P,y-4); g.lineTo(P+24,y-4); g.stroke(); g.setLineDash([]);
+  g.fillStyle=IC.mu; g.fillText("計算値",P+30,y);
+  g.strokeStyle=IC.game; g.beginPath(); g.moveTo(P+90,y-4); g.lineTo(P+114,y-4); g.stroke(); g.fillText("ゲーム内の設定",P+120,y);
+  g.lineWidth=1; y+=12;
+  const cw=(W-2*P-3*12)/4;
+  CC.forEach((name,j)=>{
+    const x0=P+j*(cw+12), l=x0+30, rgt=x0+cw-8, t=y+26, b=y+CH-22;
+    g.strokeStyle=IC.ln; g.strokeRect(x0+.5,y+.5,cw-1,CH-1);
+    g.fillStyle=IC.fg; g.font=`700 12px ${IMGF}`; g.fillText(name,x0+8,y+16);
+    const cA=C.map(r=>r&&r[j]), gA=G.map(r=>r&&r[j]);
+    const vals=[...cA,...gA].filter(v=>v!=null&&isFinite(v)), max=Math.max(10,...vals)*1.1;
+    const xs=k=>l+k*(rgt-l)/(CR.length-1), ys=v=>t+(b-t)*(1-v/max);
+    const step=[5,10,20,25,50,100,200].find(s=>max/s<=5)||200;
+    g.font=`400 9px ${IMGM}`;
+    for(let v=0;v<=max;v+=step){g.strokeStyle=IC.ln;g.beginPath();g.moveTo(l,ys(v));g.lineTo(rgt,ys(v));g.stroke();g.fillStyle=IC.mu;g.textAlign="right";g.fillText(v,l-4,ys(v)+3);g.textAlign="left"}
+    ["TPP","FPP","1x","2x","3x","4x","6x","8x"].forEach((s,k)=>{g.fillStyle=IC.mu;g.textAlign="center";g.fillText(s,xs(k),b+14);g.textAlign="left"});
+    const line=(arr,col,dash,hollow)=>{g.strokeStyle=col;g.lineWidth=2;g.setLineDash(dash?[5,4]:[]);g.beginPath();let open=false;
+      arr.forEach((v,k)=>{if(v==null||!isFinite(v)){open=false;return} open?g.lineTo(xs(k),ys(v)):g.moveTo(xs(k),ys(v)); open=true}); g.stroke(); g.setLineDash([]);
+      arr.forEach((v,k)=>{if(v==null||!isFinite(v))return; g.beginPath(); g.arc(xs(k),ys(v),3.5,0,7); g.fillStyle=hollow?IC.bg:col; g.fill(); g.strokeStyle=hollow?col:IC.bg; g.stroke()}); g.lineWidth=1};
+    line(cA,IC.calc,true,true); line(gA,IC.game,false,false);
+  });
+  return cv;
+}
+
+// 端末換算・加速換算の画像
+const SET_IDS={dev:["devfrom","ppifrom","devto","ppito","devone"],acc:["accdir","accdev","accppi","accmy","accmode","accspd","accone"]};
+function readSet(m){const o={};SET_IDS[m].forEach(id=>o[id]=$(id).value);return o}
+function drawConv(r){
+  const W=860,P=28,RH=30, rows=r.rows||[], wrows=r.wrows||[], lines=r.lines||[], kv=r.kv||[];
+  const H=P+HEAD_H(r)+14+kv.length*19+10+lines.length*24+16+RH*(rows.length+1)+(wrows.length?40+RH*(wrows.length+1):0)+(r.one?40:0)+P+10;
+  const [cv,g]=newCanvas(W,H);
+  let y=drawHead(g,r,W,P,r.mode==="dev"?"PUBGモバイル感度 端末換算":"PUBGモバイル感度 加速ON⇔OFF換算");
+  // 換算の条件：基礎スコープなどと同じ列（項目名 P、値 P+140）にそろえる
+  kv.forEach(([k,v])=>{ y+=19;
+    g.font=`400 11.5px ${IMGF}`; g.fillStyle=IC.mu; g.fillText(k,P,y);
+    g.font=`600 12px ${/^[\d.%°m—ONF ]+$/.test(String(v))?IMGM:IMGF}`; g.fillStyle=IC.fg; g.fillText(String(v),P+140,y); });
+  y+=10;
+  lines.forEach(t=>{y+=24; g.font=`700 14px ${IMGF}`; g.fillStyle=IC.ac; g.fillText(t,P,y)});
+  y+=16;
+  const colR=[0,P+330,P+470,P+640,W-P];
+  const table=(data,first)=>{
+    const head=[first,"カメラ 換算前","カメラ 換算後","スコープ 換算前","スコープ 換算後"];
+    g.fillStyle=IC.soft; g.fillRect(P,y,W-2*P,RH); g.font=`700 12.5px ${IMGF}`; g.fillStyle=IC.mu;
+    head.forEach((t,j)=>{ if(!j) g.fillText(t,P+8,y+20); else {g.textAlign="right"; g.fillText(t,colR[j],y+20); g.textAlign="left"} });
+    y+=RH;
+    data.forEach(c=>{ g.strokeStyle=IC.ln; g.beginPath(); g.moveTo(P,y+RH); g.lineTo(W-P,y+RH); g.stroke();
+      c.forEach((t,j)=>{ if(!j){g.font=`500 13px ${IMGF}`; g.fillStyle=IC.fg; g.fillText(t,P+8,y+20)}
+        else {g.font=`${j%2===0?700:500} 14px ${IMGM}`; g.fillStyle=j<3?IC.cam:IC.ads; g.textAlign="right"; g.fillText(t,colR[j],y+20); g.textAlign="left"} });
+      y+=RH; });
+  };
+  table(rows,"スコープ");
+  if(wrows.length){ y+=26; g.fillStyle=IC.fg; g.font=`700 14px ${IMGF}`; g.fillText("武器別レッドドット（1x）",P,y); y+=14; table(wrows,"武器"); }
+  if(r.one){ y+=28; g.font=`700 13.5px ${IMGF}`; g.fillStyle=IC.fg; g.fillText(r.one,P,y); }
+  return cv;
+}
+async function saveImage(r){
+  try{ if(document.fonts?.ready) await document.fonts.ready }catch(e){}
+  const cv=r.mode==="cmp"?drawCompare(r):(r.mode==="dev"||r.mode==="acc")?drawConv(r):drawImage(r);
+  const raw=await new Promise(res=>cv.toBlob(res,"image/png"));
+  if(!raw){msg("画像を作れませんでした。");return}
+  const blob=await embedInputs(raw,{v:3,mode:r.mode||"calc",name:r.name||"",inputs:r.inputs||{},game:r.mode==="cmp"?r.game:undefined,settings:r.settings});
+  const safe=(r.name||"結果").replace(/[\\/:*?"<>|]/g,"_").slice(0,40);
+  const filename=`PUBG感度${({cmp:"比較",dev:"端末換算",acc:"加速換算"})[r.mode]||""}_${safe}.png`;
+  let dl=null; try{ dl=window.claude?.use? await claude.use("downloads"):null }catch(e){}
+  if(dl){
+    try{ await dl.save({filename,data:blob}); msg("画像を保存しました。") }
+    catch(e){ msg(e&&e.code==="declined"?"画像の保存をキャンセルしました。":"画像を保存できませんでした。") }
+    return;
+  }
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=filename;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+  msg("画像をダウンロードしました。");
+}
+/* ---- 入力値をPNGのテキスト領域(tEXt)に埋め込み、読み込み時に取り出す ---- */
+const KEY="pubgsens";
+const CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(b){let c=0xFFFFFFFF;for(let i=0;i<b.length;i++)c=CRC[(c^b[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0}
+const b64=s=>btoa(String.fromCharCode(...new TextEncoder().encode(s)));
+const unb64=s=>new TextDecoder().decode(Uint8Array.from(atob(s),c=>c.charCodeAt(0)));
+async function embedInputs(blob,obj){
+  const png=new Uint8Array(await blob.arrayBuffer());
+  const text=new TextEncoder().encode(KEY+"\0"+b64(JSON.stringify(obj)));
+  const chunk=new Uint8Array(12+text.length), dv=new DataView(chunk.buffer);
+  dv.setUint32(0,text.length); chunk.set([116,69,88,116],4); chunk.set(text,8);
+  dv.setUint32(8+text.length,crc32(chunk.subarray(4,8+text.length)));
+  // IHDRの直後に差し込む（先頭8バイト＋IHDR 25バイト）
+  const at=8+25, out=new Uint8Array(png.length+chunk.length);
+  out.set(png.subarray(0,at)); out.set(chunk,at); out.set(png.subarray(at),at+chunk.length);
+  return new Blob([out],{type:"image/png"});
+}
+function readEmbedded(buf){
+  const u=new Uint8Array(buf), dv=new DataView(buf);
+  if(u.length<8||u[1]!==80||u[2]!==78||u[3]!==71) return null;
+  let p=8;
+  while(p+12<=u.length){
+    const len=dv.getUint32(p), type=String.fromCharCode(...u.subarray(p+4,p+8));
+    if(type==="tEXt"){
+      const s=new TextDecoder("latin1").decode(u.subarray(p+8,p+8+len)), z=s.indexOf("\0");
+      if(s.slice(0,z)===KEY){ try{return JSON.parse(unb64(s.slice(z+1)))}catch(e){return null} }
+    }
+    if(type==="IEND") break;
+    p+=12+len;
+  }
+  return null;
+}
+$("imgload").addEventListener("click",()=>$("imgfile").click());
+$("imgfile").addEventListener("change",async ev=>{
+  const f=ev.target.files&&ev.target.files[0]; ev.target.value=""; if(!f) return;
+  try{
+    const d=readEmbedded(await f.arrayBuffer());
+    if(!d||!d.inputs){msg("この画像には入力データが入っていません。計算機の「画像で保存」で作った画像を選んでください（SNSやLINEで送り直した画像はデータが消えることがあります）。");return}
+    IN_IDS.forEach(id=>{const e=$(id),v=d.inputs[id]; if(v===undefined) return; if(e.type==="checkbox") e.checked=!!v; else e.value=v});
+    if(d.name) $("savename").value=d.name;
+    if(d.settings&&SET_IDS[d.mode]){ Object.entries(d.settings).forEach(([id,v])=>{const e=$(id); if(e) e.value=v}); }
+    if(d.mode==="dev"||d.mode==="acc") setMode(d.mode);
+    if(Array.isArray(d.game)){ d.game.forEach((row,i)=>row.forEach((v,j)=>{const e=$(`cmp_${i}_${j}`); if(e) e.value=v==null?"":v})); saveCmp(); setMode("cmp"); }
+    calc(); if(typeof renderDev==="function") renderDev(); if(typeof renderAcc==="function") renderAcc(); msg(`画像「${d.name||f.name}」の入力を反映しました。`); window.scrollTo({top:0,behavior:"smooth"});
+  }catch(e){msg("画像を読み込めませんでした。")}
+});
+$("imgbtn").addEventListener("click",()=>{
+  const base={name:$("savename").value.trim()||(MODE==="cmp"?"感度比較":"現在の計算結果"),createdAt:Date.now(),inputs:readInputs()};
+  if(MODE==="cmp") saveImage({...base,mode:"cmp",calc:calcVals(),game:gameVals()});
+  else if(MODE==="dev"||MODE==="acc"){
+    const pre=MODE; const rows=readTable(pre+"out"); const wrows=readTable(pre+"wout");
+    const opt=id=>$(id).selectedOptions[0].textContent;
+    const lines=[$(pre+"res").textContent];
+    const kv=pre==="dev"?[["今の端末",opt("devfrom")+($("devfrom").value==="custom"?" "+$("ppifrom").value+"ppi":"")],["換算先",opt("devto")+($("devto").value==="custom"?" "+$("ppito").value+"ppi":"")]]
+      :[["向き",opt("accdir")],["端末",opt("accdev")+($("accdev").value==="custom"?" "+$("accppi").value+"ppi":"")],["指の速さ",$("accmode").value==="fixed"?$("accspd").value+" cm/秒":$("accmode").value==="my"&&myHist()?`自分で測った速さ（${myHist().n}回・${myHist().sec.toFixed(0)}秒）`:opt("accmode")]];
+    const one=$(pre+"one").value?`1つの値：${$(pre+"one").value} ${$(pre+"oneout").textContent}`:"";
+    saveImage({...base,name:$("savename").value.trim()||(pre==="dev"?"端末換算":"加速換算"),mode:pre,rows,wrows,lines,kv,one,settings:readSet(pre)});
+  }
+  else saveImage({...base,mode:"calc",main:readTable("out"),weapons:readTable("out2")});
+});
+
+/* ---- 表示モード（計算機／感度比較） ---- */
+let MODE="calc";
+function setMode(m){MODE=["calc","cmp","dev","acc","theory"].includes(m)?m:"calc"; document.body.dataset.mode=MODE;
+  document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.mode===MODE)));
+  $("imgnote").textContent={cmp:"感度比較の表とグラフを、計算に使った条件と一緒に画像にします。",dev:"端末換算の結果を、計算に使った条件と端末の情報と一緒に画像にします。",acc:"加速ON⇔OFFの換算結果を、計算に使った条件と一緒に画像にします。"}[MODE]||"計算結果の表を、計算に使った条件と一緒に画像にします。";
+  try{localStorage.setItem("pubg-sens-mode",MODE)}catch(e){}}
+document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
+/* ---- 感度比較モード ---- */
+const CR=["TPP No","FPP No","1x","2x","3x","4x","6x","8x"], CC=["カメラ","スコープ","ジャイロ カメラ","ジャイロ スコープ"];
+const REC=[[36,36,195,195],[28,28,195,195],[15,15,257,252],[12,12,202,204],[7,7,118,142],[5,5,89,124],[3,3,58,110],[3,3,49,48]];
+const CK="pubg-sens-compare";
+$("cmpbody").innerHTML=CR.map((r,i)=>`<tr><td>${r}</td>${CC.map((c,j)=>`<td><input type="number" inputmode="decimal" min="0" max="400" step="1" id="cmp_${i}_${j}" aria-label="${r} ${c}"></td>`).join("")}</tr>`).join("");
+try{const v=JSON.parse(localStorage.getItem(CK)||"null"); if(v) v.forEach((row,i)=>row.forEach((x,j)=>{if(x!==""&&x!=null)$(`cmp_${i}_${j}`).value=x}))}catch(e){}
+const gameVals=()=>CR.map((_,i)=>CC.map((_,j)=>{const t=$(`cmp_${i}_${j}`).value;return t===""?null:+t}));
+const calcVals=()=>readTable("out").map(r=>r.slice(1).map(Number));
+function saveCmp(){try{localStorage.setItem(CK,JSON.stringify(gameVals().map(r=>r.map(x=>x==null?"":x))))}catch(e){}}
+const tip=document.createElement("div"); tip.className="tip"; tip.hidden=true; document.body.appendChild(tip);
+function renderCompare(){
+  const G=gameVals(), C=calcVals();
+  $("charts").innerHTML=CC.map((name,j)=>{
+    const W=300,H=170,l=34,r=8,t=10,b=24, xs=k=>l+k*(W-l-r)/(CR.length-1);
+    const vals=[...C.map(x=>x[j]),...G.map(x=>x[j])].filter(v=>v!=null&&isFinite(v));
+    const max=Math.max(10,...vals)*1.1, ys=v=>t+(H-t-b)*(1-v/max);
+    const step=[5,10,20,25,50,100,200].find(s=>max/s<=5)||200;
+    let grid=""; for(let v=0;v<=max;v+=step) grid+=`<line x1="${l}" x2="${W-r}" y1="${ys(v)}" y2="${ys(v)}" stroke="var(--line)" stroke-width="1"/><text x="${l-5}" y="${ys(v)+3}" text-anchor="end">${v}</text>`;
+    const xl=["TPP","FPP","1x","2x","3x","4x","6x","8x"].map((s,k)=>`<text x="${xs(k)}" y="${H-8}" text-anchor="middle">${s}</text>`).join("");
+    const path=(arr,color,dash)=>{let d="",open=false;arr.forEach((v,k)=>{if(v==null||!isFinite(v)){open=false;return} d+=(open?"L":"M")+xs(k)+","+ys(v);open=true});return d?`<path d="${d}" fill="none" stroke="${color}" stroke-width="2" ${dash?'stroke-dasharray="5 4"':''} stroke-linejoin="round"/>`:""};
+    const dots=(arr,color,hollow,lab)=>arr.map((v,k)=>v==null||!isFinite(v)?"":`<circle cx="${xs(k)}" cy="${ys(v)}" r="4" fill="${hollow?'var(--panel)':color}" stroke="${hollow?color:'var(--panel)'}" stroke-width="2"/><circle cx="${xs(k)}" cy="${ys(v)}" r="11" fill="transparent" data-tip="${CR[k]}｜${lab}：${(+v).toFixed(2)}"/>`).join("");
+    const cA=C.map(x=>x[j]), gA=G.map(x=>x[j]);
+    return `<div class="chart"><h4>${name}</h4><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${name}の計算値とゲーム内の設定">${grid}${xl}${path(cA,"var(--s-calc)",true)}${path(gA,"var(--s-game)",false)}${dots(cA,"var(--s-calc)",true,"計算値")}${dots(gA,"var(--s-game)",false,"ゲーム")}</svg></div>`;
+  }).join("");
+  $("cmpdiff").innerHTML=CR.map((r,i)=>`<tr><td>${r}</td>${CC.map((_,j)=>{const g=G[i][j],c=C[i]&&C[i][j];if(g==null||!c)return "<td>—</td>";const d=g/c-1,a=Math.abs(d),cl=a<=.05?"ok":a<=.15?"warn":"bad";return `<td class="diff ${cl}">${d>=0?"+":""}${(d*100).toFixed(0)}%</td>`}).join("")}</tr>`).join("");
+}
+$("charts").addEventListener("pointermove",e=>{const t=e.target.closest("[data-tip]");if(!t){tip.hidden=true;return}tip.textContent=t.dataset.tip;tip.hidden=false;tip.style.left=(e.clientX+12)+"px";tip.style.top=(e.clientY-28)+"px"});
+$("charts").addEventListener("pointerleave",()=>tip.hidden=true);
+$("cmpbody").addEventListener("input",e=>{e.target.classList&&e.target.classList.remove("filled");saveCmp();renderCompare()});
+$("cmpfill").addEventListener("click",()=>{calcVals().forEach((r,i)=>r.forEach((v,j)=>$(`cmp_${i}_${j}`).value=Math.round(v)));saveCmp();renderCompare()});
+$("cmprec").addEventListener("click",()=>{REC.forEach((r,i)=>r.forEach((v,j)=>$(`cmp_${i}_${j}`).value=v));saveCmp();renderCompare()});
+$("cmpclear").addEventListener("click",()=>{CR.forEach((_,i)=>CC.forEach((_,j)=>$(`cmp_${i}_${j}`).value=""));saveCmp();renderCompare()});
+document.querySelectorAll(".grid input,.grid select").forEach(e=>e.addEventListener("input",renderCompare));
+{const base=calc; calc=function(){base();renderCompare()};}
+renderCompare();
+{let m="calc";try{m=localStorage.getItem("pubg-sens-mode")||"calc"}catch(e){} setMode(m);}
+
+/* ---- Claudeに評価してもらう ---- */
+let sampleFn=null;
+(async()=>{try{sampleFn=window.claude?.use?await claude.use("sample"):null}catch(e){sampleFn=null}
+  if(!sampleFn){$("evalbtn").disabled=true;$("evalmsg").textContent="この開き方ではClaudeの評価は使えません（claude.aiで開くと使えます）。"}})();
+$("evalbtn").addEventListener("click",async()=>{
+  if(!sampleFn) return;
+  const G=gameVals(), C=calcVals(), i=readInputs();
+  if(!G.some(r=>r.some(v=>v!=null))){$("evalmsg").textContent="先にゲーム内の設定を入力してください。";return}
+  const fmt=v=>v==null?"未入力":(+v).toFixed(1);
+  const rows=CR.map((r,k)=>`${r}: `+CC.map((c,j)=>`${c} 計算${fmt(C[k][j])}/ゲーム${fmt(G[k][j])}`).join("、")).join("\n");
+  const wep=readTable("out2").map(r=>`${r[0]}: カメラ${r[1]} スコープ${r[2]} ジャイロカメラ${r[3]} ジャイロスコープ${r[4]}`).join("\n");
+  const prompt=`あなたはPUBGモバイルの感度設定に詳しいアドバイザーです。以下は、モニターディスタンス方式の感度計算機で出した計算値と、プレイヤーがゲーム内で実際に設定している値です。日本語で、ゲーム内の設定を評価してください。
+
+# 前提
+- 計算値は「どのスコープでもクロスヘアから同じ割合（MD）離れた敵に、同じ指の量・同じ端末の傾きでエイムできる」ようにそろえた値。
+- カメラ＝指でのスコープ中操作、スコープ＝射撃中の指、ジャイロ カメラ／スコープ＝ジャイロの通常時／射撃時。単位はゲーム内の%。
+- 計算条件: 基礎スコープ ${BASE_NAMES[i.base]||i.base}、基礎感度 カメラ${i.sens}／ジャイロ${i.gsens}、MD ${i.md}%、TPPディスタンス ${i.dist}m、視野角 TPP${i.tpp}°／FPP${i.fpp}°、感度調整 カメラ${i.kc}／スコープ${i.ka}、ジャイロのスコープなし適正化 ${i.gfix?"ON":"OFF"}、水平スライド加速（指）${i.accel||"不明"}。
+- プレイヤーの補足: ${$("evalnote").value.trim()||"なし"}
+
+# 値（スコープ別）
+${rows}
+
+# 参考: 武器別レッドドットの計算値
+${wep}
+
+# 出力形式
+1. 総評（2〜3文）
+2. 計算値と大きくずれている項目と、そのずれで起きやすいこと（箇条書き、最大5つ）
+3. おすすめの調整（具体的な数値つき、最大5つ。計算値に完全に合わせる必要はなく、意図的な調整に見えるものはその理由も推測して残してよい）
+全体で500字程度。前置きや挨拶は不要。`;
+  $("evalbtn").disabled=true; $("evalmsg").textContent="評価しています…"; $("evalout").textContent="";
+  try{
+    const res=await sampleFn(prompt,{onText:({text})=>{$("evalout").textContent=text},cache:false});
+    $("evalout").textContent=res.text; $("evalmsg").textContent="評価はClaudeの意見です。最後は訓練場で感覚を確かめてください。";
+  }catch(e){
+    $("evalmsg").textContent=e&&e.code==="not_granted"?"Claudeの利用が許可されていません。":e&&e.code==="rate_limited"?"少し時間をおいてからもう一度お試しください。":"評価を取得できませんでした。";
+  }
+  $("evalbtn").disabled=false;
+});
+
+/* ---- ゲーム内のスクショから比較欄を読み取る ---- */
+(async()=>{
+  let sm=null; try{sm=window.claude?.use?await claude.use("sample"):null}catch(e){}
+  if(!sm) return;
+  let lim=null; try{lim=await sm.limits()}catch(e){}
+  if(!lim||!lim.images) return;
+  const btn=$("ocrbtn"), inp=$("ocrfile"); btn.hidden=false; $("ocrhint").hidden=false;
+  if(lim.images.mediaTypes) inp.accept=lim.images.mediaTypes.join(",");
+  const COL={camera:0,ads:1,gyro:2,gyro_ads:3}, ROW={"TPP":0,"FPP":1,"1x":2,"2x":3,"3x":4,"4x":5,"6x":6,"8x":7};
+  const PROMPT=`添付はスマホゲーム「PUBGモバイル」の感度設定画面のスクリーンショットです。画面に表示されている感度の数値（%）を読み取ってください。
+
+セクション見出しと対応:
+- 「カメラ感度」→ camera
+- 「射撃時のカメラ感度」（旧称 ADS感度）→ ads
+- 「ジャイロセンサ感度(通常時)」または「ジャイロ感度」→ gyro
+- 「ジャイロセンサ感度(射撃時)」（旧称 ADSジャイロ感度）→ gyro_ads
+見出しが画面外の行は、画面の並びや前後の見出しから判断し、判断できなければ section を "unknown" にしてください。
+
+行ラベルと対応:
+- 「TPP スコープ無し」→ TPP、「FPP スコープ無し」→ FPP
+- 「レッドドット、ホロサイト、エイムアシスト、キャンテッドサイト」→ 1x（ラベルが数値に重なって「…サイ 257%」のように見えても数値は257）
+- 「2xスコープ」→ 2x、「3xスコープ、Win94」→ 3x、「4xスコープ、VSS」→ 4x、「6xスコープ」→ 6x、「8xスコープ」→ 8x
+- 「カメラ感度(フリールック)」「降下カメラ」などそれ以外の行は無視
+
+画面に写っている行だけを返し、推測で埋めないこと。数値は%を除いた整数。
+次のJSONだけを返してください:
+{"sections":[{"section":"camera|ads|gyro|gyro_ads|unknown","rows":{"TPP":36,"FPP":28}}]}`;
+  btn.addEventListener("click",()=>inp.click());
+  inp.addEventListener("change",async()=>{
+    const files=[...inp.files]; inp.value=""; if(!files.length) return;
+    const per=Math.max(1,lim.images.maxCount||1), groups=[];
+    for(let k=0;k<files.length;k+=per) groups.push(files.slice(k,k+per));
+    btn.disabled=true; $("ocrmsg").textContent=`読み取り中…（${files.length}枚）`;
+    document.querySelectorAll(".cmpin input.filled").forEach(e=>e.classList.remove("filled"));
+    let filled=0, unknown=0, failed=0;
+    for(const grp of groups){
+      try{
+        const res=await sm.json(PROMPT,{images:grp,modelTier:"default",cache:false});
+        (res&&res.sections||[]).forEach(sec=>{
+          const c=COL[sec.section];
+          Object.entries(sec.rows||{}).forEach(([k,v])=>{
+            const r=ROW[k], n=Math.round(+v);
+            if(r===undefined||!isFinite(n)) return;
+            if(c===undefined){unknown++;return}
+            const e=$(`cmp_${r}_${c}`); e.value=n; e.classList.add("filled"); filled++;
+          });
+        });
+      }catch(e){
+        failed++;
+        if(e&&e.code==="not_granted"){$("ocrmsg").textContent="Claudeへの画像の送信が許可されていません。";btn.disabled=false;return}
+        if(e&&e.code==="rate_limited"){$("ocrmsg").textContent="少し時間をおいてからもう一度お試しください。";btn.disabled=false;return}
+      }
+    }
+    saveCmp(); renderCompare(); btn.disabled=false;
+    $("ocrmsg").textContent=`${filled}項目を読み取りました（読み取った欄は枠の色が変わっています）。`+
+      (unknown?`見出しが写っておらずどの欄か判断できなかった値が${unknown}個あります。見出しが入るように撮り直してください。`:"")+
+      (failed?`読み取れなかった画像があります。`:"")+"念のため、数値がゲーム画面と同じか確認してください。";
+  });
+})();
+
+/* ---- 端末間の感度換算 ---- */
+function convRows(rows,f){return rows.map(r=>`<tr><td>${r[0]}</td><td class="c">${(+r[1]).toFixed(2)}</td><td class="c"><b>${(r[1]*f).toFixed(2)}</b></td><td class="a">${(+r[2]).toFixed(2)}</td><td class="a"><b>${(r[2]*f).toFixed(2)}</b></td></tr>`).join("")}
+const DEVICES=[
+ ["Legion Y700",[["Legion Y700（初代・2022）",343],["Legion Y700（第2世代・2023）",343],["Legion Tab Y700 Gen3（2024）",343],["Legion Y700 Gen4（2025）",408]]],
+ ["iPhone",[["iPhone 11",326],["iPhone 11 Pro",458],["iPhone 11 Pro Max",458],["iPhone SE（第2世代）",326],
+   ["iPhone 12 mini",476],["iPhone 12",460],["iPhone 12 Pro",460],["iPhone 12 Pro Max",458],
+   ["iPhone 13 mini",476],["iPhone 13",460],["iPhone 13 Pro",460],["iPhone 13 Pro Max",458],["iPhone SE（第3世代）",326],
+   ["iPhone 14",460],["iPhone 14 Plus",458],["iPhone 14 Pro",460],["iPhone 14 Pro Max",460],
+   ["iPhone 15",460],["iPhone 15 Plus",460],["iPhone 15 Pro",460],["iPhone 15 Pro Max",460],
+   ["iPhone 16",460],["iPhone 16 Plus",460],["iPhone 16 Pro",460],["iPhone 16 Pro Max",460],["iPhone 16e",460],
+   ["iPhone 17",460],["iPhone Air",460],["iPhone 17 Pro",460],["iPhone 17 Pro Max",460]]],
+ ["iPad Pro",[["iPad Pro 12.9（第1世代・2015）",264],["iPad Pro 9.7（2016）",264],["iPad Pro 10.5（2017）",264],["iPad Pro 12.9（第2世代・2017）",264],
+   ["iPad Pro 11（第1世代・2018）",264],["iPad Pro 12.9（第3世代・2018）",264],["iPad Pro 11（第2世代・2020）",264],["iPad Pro 12.9（第4世代・2020）",264],
+   ["iPad Pro 11（第3世代・2021）",264],["iPad Pro 12.9（第5世代・2021）",264],["iPad Pro 11（第4世代・2022）",264],["iPad Pro 12.9（第6世代・2022）",264],
+   ["iPad Pro 11（M4・2024）",264],["iPad Pro 13（M4・2024）",264],["iPad Pro 11（M5・2025）",264],["iPad Pro 13（M5・2025）",264]]],
+ ["計測に使った端末",[["Galaxy S25",416]]]
+];
+function fillDev(sel,def){
+  DEVICES.forEach(([g,list])=>{const og=document.createElement("optgroup");og.label=g;
+    list.forEach(([n,p])=>{const o=document.createElement("option");o.value=p;o.textContent=`${n}（${p}ppi）`;if(n===def)o.selected=true;og.appendChild(o)});sel.appendChild(og)});
+  const o=document.createElement("option");o.value="custom";o.textContent="その他（ppiを入力）";sel.appendChild(o);
+}
+fillDev($("devfrom"),"Legion Tab Y700 Gen3（2024）"); fillDev($("devto"),"Galaxy S25");
+function ppiOf(sel,inp){inp.hidden=sel.value!=="custom";return sel.value==="custom"?(+inp.value||0):+sel.value}
+function renderDev(){
+  const a=ppiOf($("devfrom"),$("ppifrom")), b=ppiOf($("devto"),$("ppito"));
+  if(!a||!b){$("devres").textContent="ppiを入力してください。";$("devout").innerHTML="";$("devoneout").textContent="";return}
+  const f=a/b;
+  $("devres").innerHTML=`換算倍率 <b>×${f.toFixed(3)}</b>（${a}ppi → ${b}ppi）　${f<1?"換算先の方が画面が細かいので、感度を下げます。":f>1?"換算先の方が画面が粗いので、感度を上げます。":"同じppiなので換算は不要です。"}`;
+  const rows=readTable("out");
+  window.DEV_F=f; $("devwout").innerHTML=convRows(readTable("out2"),f);
+  $("devout").innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td class="c">${(+r[1]).toFixed(2)}</td><td class="c"><b>${(r[1]*f).toFixed(2)}</b></td><td class="a">${(+r[2]).toFixed(2)}</td><td class="a"><b>${(r[2]*f).toFixed(2)}</b></td></tr>`).join("");
+  const v=+$("devone").value; $("devoneout").textContent=v?`→ ${(v*f).toFixed(1)}（整数なら ${Math.round(v*f)}）`:"";
+}
+["devfrom","devto","ppifrom","ppito","devone"].forEach(id=>$(id).addEventListener("input",renderDev));
+{const base2=calc; calc=function(){base2();renderDev()};}
+document.querySelectorAll(".grid input,.grid select").forEach(e=>e.addEventListener("input",()=>setTimeout(renderDev)));
+renderDev();
+
+/* ---- 水平スライド加速 ON⇔OFF 換算 ---- */
+const SPD_HIST=[[0.5,0],[1.5,0.0077],[2.5,0.0475],[3.5,0.077],[4.5,0.0903],[5.5,0.1008],[6.5,0.0661],[7.5,0.0441],[9,0.1322],[11,0.0567],[13.5,0.0842],[17.5,0.068],[22.5,0.0727],[27.5,0.0383],[35,0.0813],[50,0.0332]];
+function accMul(vpx){ if(vpx<610) return 1; if(vpx<1330) return 1+(vpx-610)/720*1.2; return 2.2+0.3*Math.min(1,Math.log(vpx/1330)/Math.log(5.3)); }
+fillDev($("accdev"),"Legion Tab Y700 Gen3（2024）");
+// 速さの分布 [[cm/秒, 重み(動いた距離)]] から、加速ONの平均倍率（距離で重み付け）を出す
+function histMul(h,pxPerCm){ let a=0,w=0; h.forEach(([c,p])=>{a+=accMul(c*pxPerCm)*p;w+=p}); return w?a/w:1; }
+
+/* ---- 指の速さの測定（的当て）----
+   ・指の横方向の動きを、端末の物理px（CSS px × devicePixelRatio）で記録
+   ・約1/60秒ごとにまとめて速さを出し、動いた距離で重み付けして分布にする（録画解析と同じ考え方）
+   ・cm/秒への変換は「使う端末」のppiで行い、結果は #accmy（画像保存にも入る）とブラウザに保存 */
+const SPD_KEY="pubgsens-myspeed";
+function myHist(){ try{ const d=JSON.parse($("accmy").value||"null"); return d&&d.h&&d.h.length?d:null }catch(e){ return null } }
+function setMy(d){ $("accmy").value=d?JSON.stringify(d):""; try{ d?localStorage.setItem(SPD_KEY,$("accmy").value):localStorage.removeItem(SPD_KEY) }catch(e){} }
+try{ const s=localStorage.getItem(SPD_KEY); if(s) $("accmy").value=s }catch(e){}
+function renderSpdRes(){
+  const my=myHist(), el=$("spdres"); if(!my){ el.innerHTML=""; return }
+  const ppi=ppiOf($("accdev"),$("accppi"))||my.ppi, pc=ppi/2.54;
+  const tot=my.h.reduce((s,x)=>s+x[1],0); let acc=0, med=0;
+  for(const [c,p] of [...my.h].sort((a,b)=>a[0]-b[0])){ acc+=p; if(acc>=tot/2){ med=c; break } }
+  const slow=my.h.filter(x=>x[0]*pc<610).reduce((s,x)=>s+x[1],0)/tot;
+  const fast=my.h.filter(x=>x[0]*pc>=1330).reduce((s,x)=>s+x[1],0)/tot;
+  const c=my.cfg, vn={tpp:"TPP",rd:"レッドドット（AR・DMR）",rdsmg:"レッドドット（SMG・SG）",rdhg:"レッドドット（HG）",rdtg:"レッドドット（トミーガン）"};
+  el.innerHTML=`<b>測定結果</b>（合計 ${my.sec.toFixed(0)}秒・${my.n}回分、測定時の端末 ${my.ppi}ppi${c?`、${vn[c.view]||c.view}・感度${c.sens}・加速${c.acc}`:""}${my.shots?`、命中 ${my.hits}/${my.shots}`:""}）<br>`+
+    `平均の加速倍率 <b>${histMul(my.h,pc).toFixed(2)}倍</b>　参考：作者の実測データ ${histMul(SPD_HIST,pc).toFixed(2)}倍<br>`+
+    `速さの中央値 約${med.toFixed(1)} cm/秒　加速なしの範囲 ${(slow*100).toFixed(0)}%・最大近くまで加速 ${(fast*100).toFixed(0)}%（動いた距離の割合）　`+
+    `<button class="btn ghost" id="spdclear" type="button" style="padding:3px 10px;font-size:.78rem">結果を消す</button>`;
+  $("spdclear").onclick=()=>{ setMy(null); renderAcc(); };
+}
+(function(){
+  /* 的当て：視点（ヨー・ピッチ）を指のスライドで回し、画面内に出る的を撃つ。
+     回転量 = 指の移動(端末px) × 0.064°×(感度/36) × 加速倍率(ONのとき accMul(端末px/秒))
+     ※縦方向には水平スライド加速をかけない */
+  const fs=$("spdfs"), cv=$("spdcv"), g=cv.getContext("2d"), msg=$("spdmsg");
+  const DEG_PER_PX36=0.064, TR=1.3; // 的の半径（度）
+  let run=false, started=false, t0=0, DUR=30, raf=0, yaw=0, pitch=0, tg=[], hits=0, shots=0, bins={}, moved=0;
+  let pid=null, lx=0, ly=0, lt=0, accDx=0, accT=0, ppiNow=0, cfg=null, vbuf=[], W=0, H=0, F=1, hfov=80;
+  /* ジャイロ：devicemotion の rotationRate（°/秒）を積分して視点を回す。
+     画面の縦軸まわりの回転→左右、横軸まわり→上下。画面の向き（90/270°）で軸と符号を入れ替える。
+     ゲーム内の回転 = 端末の回転 × 0.645 × (感度/100) × (スコープ中はレッドドットの実測比 約0.43)。水平スライド加速はかからない。 */
+  const GYRO_PER100=0.645; let gLast=0, gOK=false;
+  /* センサーは3通りを順に試す：Gyroscope API → devicemotion(rotationRate) → deviceorientation(角度の差分) */
+  const gStat={src:"",n:0,why:""}; let gDiagT=0, gStartT=0; let gSensor=null, lastOri=null;
+  function applyRate(rx,ry,dt){ // rx,ry: 端末のX軸・Y軸まわりの角速度（°/秒）
+    if(!run||!cfg||cfg.gyro!=="ON"||!(dt>0)) return;
+    const ang=(screen.orientation&&typeof screen.orientation.angle==="number")?screen.orientation.angle:(+window.orientation||0);
+    const a=((ang%360)+360)%360; let yawR, pitR;   // 右を向く＝+、上を向く＝+
+    if(a===90){ yawR=-rx; pitR=-ry; } else if(a===270){ yawR=rx; pitR=ry; } else if(a===180){ yawR=ry; pitR=-rx; } else { yawR=-ry; pitR=rx; }
+    const k=GYRO_PER100*cfg.gsens/100*(cfg.view==="tpp"?1:1/GYRO_REL.TPP);
+    yaw+=(cfg.ginvx?-1:1)*yawR*dt*k; pitch=Math.max(-60,Math.min(60,pitch+(cfg.ginvy?-1:1)*pitR*dt*k));
+  }
+  function stamp(src){ gStat.n++; if(!gStat.src) gStat.src=src; gOK=true; }
+  function onMotion(e){
+    const r=e.rotationRate; if(!r||(r.beta==null&&r.gamma==null)) return;
+    if(gStat.src&&gStat.src!=="devicemotion") return;
+    const now=performance.now(), dt=gLast?Math.min(0.1,(now-gLast)/1000):0; gLast=now; stamp("devicemotion");
+    applyRate(r.beta||0,r.gamma||0,dt);
+  }
+  function onOrient(e){
+    if(e.beta==null||e.gamma==null) return; if(gStat.src&&gStat.src!=="deviceorientation"){ lastOri=null; return; }
+    const now=performance.now();
+    if(lastOri){ const dt=Math.min(0.1,(now-lastOri.t)/1000); let db=e.beta-lastOri.b, dg=e.gamma-lastOri.g;
+      if(Math.abs(db)<60&&Math.abs(dg)<60&&dt>0){ stamp("deviceorientation"); applyRate(db/dt,dg/dt,dt); } }
+    lastOri={b:e.beta,g:e.gamma,t:now};
+  }
+  window.addEventListener("devicemotion",onMotion); window.addEventListener("deviceorientation",onOrient);
+  function startSensors(){
+    gStat.src=""; gStat.n=0; gStat.why=""; lastOri=null; gLast=0; gStartT=performance.now();
+    try{ if(typeof DeviceMotionEvent!=="undefined"&&typeof DeviceMotionEvent.requestPermission==="function") DeviceMotionEvent.requestPermission().then(r=>{ if(r!=="granted") gStat.why="センサーの許可がありません"; }).catch(()=>{}); }catch(e){}
+    try{
+      if("Gyroscope" in window){
+        gSensor=new Gyroscope({frequency:60}); let t0=0;
+        gSensor.addEventListener("reading",()=>{ if(gStat.src&&gStat.src!=="Gyroscope") return; const now=performance.now(), dt=t0?Math.min(0.1,(now-t0)/1000):0; t0=now; stamp("Gyroscope"); applyRate(gSensor.x*57.2958,gSensor.y*57.2958,dt); });
+        gSensor.addEventListener("error",ev=>{ gStat.why=(ev.error&&ev.error.name)||"Gyroscope error"; });
+        gSensor.start();
+      }
+    }catch(e){ gStat.why=e.name||String(e); }
+  }
+  function stopSensors(){ try{ gSensor&&gSensor.stop(); }catch(e){} gSensor=null; }
+  function gyroDiag(){
+    if(gOK) return `ジャイロ：受信中（${gStat.src}）`;
+    const why=[];
+    if(!window.isSecureContext) why.push("安全な接続(https)ではない");
+    try{ const fp=document.permissionsPolicy||document.featurePolicy; if(fp&&fp.allowsFeature){ if(!fp.allowsFeature("gyroscope")) why.push("ページ埋め込み先でジャイロが許可されていない"); } }catch(e){}
+    if(gStat.why) why.push(gStat.why==="SecurityError"||gStat.why==="NotAllowedError"?"この画面ではセキュリティの制限でセンサーを読めません。HTMLファイルをChromeで直接開くか、httpsのサイトに置いて開いてください":gStat.why);
+    return "※ジャイロが取得できません"+(why.length?"（"+why.join("・")+"）":"（センサーの信号が届いていません）");
+  }
+  const rad=d=>d*Math.PI/180;
+  function fovOf(v){ const n=id=>+$(id).value||52; return v==="tpp"?(+$("tpp").value||80):v==="rd"?52:v==="rdsmg"?n("fovsmg"):v==="rdhg"?n("fovhg"):n("fovtg"); }
+  function resize(){ const d=window.devicePixelRatio||1; W=fs.clientWidth; H=fs.clientHeight; cv.width=W*d; cv.height=H*d; g.setTransform(d,0,0,d,0,0); F=(W/2)/Math.tan(rad(hfov/2)); }
+  function proj(a,b){ const dy=rad(a-yaw), dp=rad(b-pitch); if(Math.cos(dy)<=0.05) return null;
+    return [W/2+F*Math.tan(dy), H/2-F*Math.tan(dp)/Math.cos(dy)]; }
+  function spawn(){ // 現在の視界の中（端から少し内側）に出す。照準のすぐ近く〜画面の端まで
+    const vf=2*Math.atan(Math.tan(rad(hfov/2))*H/W)*180/Math.PI;
+    for(let k=0;k<30;k++){ const a=yaw+(Math.random()*2-1)*hfov/2*0.85, b=Math.max(-40,Math.min(40,pitch+(Math.random()*2-1)*vf/2*0.7));
+      if(Math.hypot(a-yaw,b-pitch)<TR*3) continue; if(tg.some(t=>Math.hypot(t[0]-a,t[1]-b)<TR*4)) continue; tg.push([a,b]); return; } }
+  function draw(){
+    g.fillStyle="#26354a"; g.fillRect(0,0,W,H);
+    const hz=H/2+F*Math.tan(rad(pitch)); g.fillStyle="#3a4a3a"; g.fillRect(0,Math.max(0,hz),W,H);
+    g.strokeStyle="rgba(255,255,255,.12)"; g.lineWidth=1; g.beginPath();
+    const st=hfov>60?10:5; for(let a=Math.floor((yaw-hfov)/st)*st;a<=yaw+hfov;a+=st){ const p=proj(a,pitch); if(p){ g.moveTo(p[0],0); g.lineTo(p[0],H);} }
+    for(let b=-40;b<=40;b+=st){ const p=proj(yaw,b); if(p){ g.moveTo(0,p[1]); g.lineTo(W,p[1]); } } g.stroke();
+    tg.forEach(t=>{ const p=proj(t[0],t[1]); if(!p) return; const r=F*Math.tan(rad(TR));
+      g.fillStyle="#e2474c"; g.beginPath(); g.arc(p[0],p[1],r,0,7); g.fill(); g.fillStyle="#fff"; g.beginPath(); g.arc(p[0],p[1],r*.35,0,7); g.fill(); });
+    if(cfg&&cfg.view!=="tpp"){ g.strokeStyle="rgba(255,255,255,.5)"; g.lineWidth=2; g.beginPath(); g.arc(W/2,H/2,Math.min(W,H)*.32,0,7); g.stroke();
+      g.fillStyle="#ff2b2b"; g.beginPath(); g.arc(W/2,H/2,3.5,0,7); g.fill(); }
+    else { g.strokeStyle="#fff"; g.lineWidth=2; g.beginPath(); [[-12,0,-4,0],[4,0,12,0],[0,-12,0,-4],[0,4,0,12]].forEach(([a,b,c,d])=>{g.moveTo(W/2+a,H/2+b);g.lineTo(W/2+c,H/2+d)}); g.stroke(); }
+  }
+  function flush(){ if(accT<=0) return; const dist=Math.abs(accDx);
+    if(dist>0){ const pc=ppiNow/2.54, cmps=(dist/accT*1000)/pc, cm=dist/pc;
+      const b=cmps<10?Math.round(cmps*2)/2:cmps<30?Math.round(cmps):Math.round(cmps/2.5)*2.5; bins[b]=(bins[b]||0)+cm; moved+=cm; }
+    accDx=0; accT=0; }
+  function loop(){ if(!run) return;
+    if(started){ const left=DUR-(performance.now()-t0)/1000; $("spdtime").textContent=Math.max(0,left).toFixed(1); if(left<=0){ finish(); return } }
+    if(cfg&&cfg.gyro==="ON"&&performance.now()-gDiagT>700&&performance.now()-gStartT>1200){ gDiagT=performance.now(); $("spdgst").textContent=gyroDiag(); }
+    draw(); raf=requestAnimationFrame(loop); }
+  function move(x,y,t){ const d=window.devicePixelRatio||1, dx=(x-lx)*d, dy=(y-ly)*d, dt=t-lt; lx=x; ly=y; lt=t;
+    if(!started){ started=true; t0=performance.now(); msg.textContent=""; }
+    if(dt>100){ flush(); vbuf=[]; return }
+    accDx+=dx; accT+=dt; if(accT>=16) flush();
+    vbuf.push([t,Math.abs(dx)]); while(vbuf.length&&t-vbuf[0][0]>33) vbuf.shift();   // 直近約33msの横の速さ
+    const span=Math.max(8,t-(vbuf[0]?vbuf[0][0]:t)+dt), v=vbuf.reduce((s,q)=>s+q[1],0)/span*1000;
+    const k=DEG_PER_PX36*cfg.sens/36, m=cfg.acc==="ON"?accMul(v):1;
+    yaw+=dx*k*m; pitch=Math.max(-60,Math.min(60,pitch-dy*k)); }
+  function fire(){ if(!run) return; shots++; $("spdshots").textContent=shots;
+    const i=tg.findIndex(t=>Math.hypot(t[0]-yaw,t[1]-pitch)<=TR);
+    if(i>=0){ tg.splice(i,1); hits++; $("spdhits").textContent=hits;
+      // 画面の外に出た的は消して、今の視界の中に出し直す（常に3つが画面内）
+      tg=tg.filter(t=>{const p=proj(t[0],t[1]); return p&&p[0]>0&&p[0]<W&&p[1]>0&&p[1]<H});
+      while(tg.length<3) spawn(); } }
+  fs.addEventListener("pointerdown",e=>{ if(!run||e.target.closest("button")||pid!==null) return; pid=e.pointerId; fs.setPointerCapture(pid); lx=e.clientX; ly=e.clientY; lt=e.timeStamp; accDx=0; accT=0; vbuf=[]; e.preventDefault(); });
+  fs.addEventListener("pointermove",e=>{ if(!run||e.pointerId!==pid) return;
+    const evs=e.getCoalescedEvents?e.getCoalescedEvents():[]; (evs.length?evs:[e]).forEach(c=>move(c.clientX,c.clientY,c.timeStamp)); e.preventDefault(); });
+  const up=e=>{ if(e.pointerId===pid){ flush(); pid=null; vbuf=[] } };
+  fs.addEventListener("pointerup",up); fs.addEventListener("pointercancel",up);
+  /* 撃つボタンの配置（このブラウザに保存）：中心位置を画面の割合で、大きさをpxで持つ */
+  const FKEY="pubgsens-fire", fireBtn=$("spdfire"); let FL={x:0.12,y:0.72,s:84}, editing=false;
+  try{ const v=JSON.parse(localStorage.getItem(FKEY)||"null"); if(v&&v.x>=0&&v.x<=1&&v.y>=0&&v.y<=1&&v.s>0) FL=v; }catch(e){}
+  function applyFL(){ fireBtn.style.left=(FL.x*100)+"%"; fireBtn.style.top=(FL.y*100)+"%"; fireBtn.style.width=fireBtn.style.height=FL.s+"px"; fireBtn.style.fontSize=Math.max(12,FL.s*0.2)+"px"; $("spdfsz").value=FL.s; }
+  function saveFL(){ try{ localStorage.setItem(FKEY,JSON.stringify(FL)); }catch(e){} }
+  applyFL();
+  let drag=null;
+  fireBtn.addEventListener("pointerdown",e=>{ e.preventDefault(); e.stopPropagation();
+    if(editing){ drag={id:e.pointerId}; fireBtn.setPointerCapture(e.pointerId); return; }
+    fire(); });
+  fireBtn.addEventListener("pointermove",e=>{ if(!editing||!drag||e.pointerId!==drag.id) return; e.preventDefault(); e.stopPropagation();
+    const r=fs.getBoundingClientRect(); FL.x=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)); FL.y=Math.min(1,Math.max(0,(e.clientY-r.top)/r.height)); applyFL(); });
+  const dragEnd=e=>{ if(drag&&e.pointerId===drag.id){ drag=null; saveFL(); } };
+  fireBtn.addEventListener("pointerup",dragEnd); fireBtn.addEventListener("pointercancel",dragEnd);
+  $("spdfsz").addEventListener("input",()=>{ FL.s=+$("spdfsz").value; applyFL(); saveFL(); });
+  function openEdit(){ if(run) return; editing=true; fs.classList.add("editing"); $("spdedit").hidden=false; msg.textContent=""; fs.hidden=false; document.body.style.overflow="hidden";
+    try{ const r=fs.requestFullscreen&&fs.requestFullscreen(); r&&r.then(()=>screen.orientation?.lock?.("landscape").catch(()=>{})).catch(()=>{}) }catch(e){}
+    hfov=+$("tpp").value||80; cfg={view:"tpp"}; resize(); tg=[]; draw(); }
+  function closeEdit(){ editing=false; fs.classList.remove("editing"); $("spdedit").hidden=true; fs.hidden=true; document.body.style.overflow=""; saveFL();
+    try{ if(document.fullscreenElement) document.exitFullscreen() }catch(e){} }
+  $("spdlayout").onclick=openEdit; $("spdeditok").onclick=closeEdit;
+  $("spdeditreset").onclick=()=>{ FL={x:0.12,y:0.72,s:84}; applyFL(); saveFL(); };
+  document.addEventListener("keydown",e=>{ if(run&&(e.code==="Space"||e.code==="KeyF")){ e.preventDefault(); fire(); } if(run&&e.code==="Escape") finish(); });
+  function start(){ ppiNow=ppiOf($("accdev"),$("accppi")); const sens=+$("spdsens").value;
+    if(!ppiNow){ $("spdres").textContent="先に「使う端末」を選ぶか、ppiを入力してください。"; return }
+    if(!(sens>0)){ $("spdres").textContent="ゲーム内のカメラ感度を入れてください。"; return }
+    cfg={view:$("spdview").value,sens,acc:$("spdacc").value,gyro:$("spdgyro").value,gsens:+$("spdgsens").value||0,ginvx:$("spdginvx").checked,ginvy:$("spdginvy").checked};
+    gLast=0; gOK=false; $("spdgst").textContent="";
+    if(cfg.gyro==="ON"){ startSensors(); setTimeout(()=>{ if(run) $("spdgst").textContent=gyroDiag(); },1500); } hfov=fovOf(cfg.view); DUR=+$("spddur").value;
+    run=true; started=false; yaw=0; pitch=0; tg=[]; hits=0; shots=0; bins={}; moved=0; pid=null;
+    $("spdhits").textContent=0; $("spdshots").textContent=0; $("spdtime").textContent=DUR.toFixed(1);
+    $("spdcfg").textContent=`${$("spdview").selectedOptions[0].textContent}・感度${sens}・加速${cfg.acc}`+(cfg.gyro==="ON"?`・ジャイロ${cfg.gsens}%`:"");
+    msg.textContent="画面をスライドすると開始します"; try{document.activeElement&&document.activeElement.blur()}catch(e){} fs.hidden=false; document.body.style.overflow="hidden";
+    try{ const r=fs.requestFullscreen&&fs.requestFullscreen(); r&&r.then(()=>screen.orientation?.lock?.("landscape").catch(()=>{})).catch(()=>{}) }catch(e){}
+    resize(); for(let i=0;i<3;i++) spawn(); raf=requestAnimationFrame(loop); }
+  function finish(){ if(!run) return; run=false; cancelAnimationFrame(raf); flush(); pid=null; stopSensors();
+    fs.hidden=true; document.body.style.overflow="";
+    try{ if(document.fullscreenElement) document.exitFullscreen() }catch(e){}
+    const sec=started?Math.min(DUR,(performance.now()-t0)/1000):0;
+    if(moved<10){ $("spdres").textContent="指の動きが少なすぎたので保存しませんでした。もう一度どうぞ。"; return }
+    const old=myHist(), keep=old&&old.ppi===ppiNow&&old.cfg&&old.cfg.acc===cfg.acc, m={};
+    if(keep) old.h.forEach(([c,p])=>m[c]=(m[c]||0)+p);
+    Object.entries(bins).forEach(([c,p])=>m[c]=(m[c]||0)+p);
+    setMy({ppi:ppiNow,cfg,sec:(keep?old.sec:0)+sec,n:(keep?old.n:0)+1,hits:(keep?old.hits||0:0)+hits,shots:(keep?old.shots||0:0)+shots,
+      h:Object.entries(m).map(([c,p])=>[+c,+p.toFixed(2)]).sort((a,b)=>a[0]-b[0])});
+    $("accmode").value="my";
+    if($("accdir").value!==(cfg.acc==="ON"?"on2off":"off2on")){ $("accdir").value=cfg.acc==="ON"?"on2off":"off2on"; }
+    renderAcc(); }
+  $("spdstart").onclick=start; $("spdend").onclick=finish;
+  window.__spd=()=>({yaw,pitch,tg,F,W,H,hfov,run});
+  window.addEventListener("resize",()=>{ if(run){ resize(); } });
+  // 計算機の出力から初期値を入れる（TPP行・1x行のカメラ感度）
+  function defSens(){ try{ const rows=readTable("out"), v=$("spdview").value;
+    const r=v==="tpp"?rows.find(r=>/^TPP/.test(r[0])):rows.find(r=>/^1x/.test(r[0]));
+    let s=r?+r[1]:0; if(v!=="tpp"&&v!=="rd"){ const w=readTable("out2").find(x=>x[0].includes(v==="rdsmg"?"SMG":v==="rdhg"?"ハンドガン":"トミー")); if(w) s=+w[1]; }
+    if(s>0) $("spdsens").value=Math.round(s);
+    let gs=r?+r[3]:0; if(v!=="tpp"&&v!=="rd"){ const w=readTable("out2").find(x=>x[0].includes(v==="rdsmg"?"SMG":v==="rdhg"?"ハンドガン":"トミー")); if(w&&+w[3]>0) gs=+w[3]; }
+    if(gs>0) $("spdgsens").value=Math.round(gs); }catch(e){} }
+  $("spdview").addEventListener("change",defSens);
+  $("spdgyro").addEventListener("change",()=>{ $("spdgbox").hidden=$("spdgyro").value!=="ON"; });
+  $("spdacc").value=$("accel").value==="OFF"?"OFF":"ON";
+  setTimeout(defSens,0);
+})();
+function renderAcc(){
+  const ppi=ppiOf($("accdev"),$("accppi")); const mode=$("accmode").value, dir=$("accdir").value;
+  $("accspdbox").hidden=mode!=="fixed"; $("accspdo").textContent=$("accspd").value+" cm/秒";
+  if(!ppi){$("accres").textContent="ppiを入力してください。";$("accout").innerHTML="";$("acconeout").textContent="";return}
+  const pxPerCm=ppi/2.54; let m;
+  const my=myHist();
+  if(mode==="my"&&!my){$("accres").textContent="まだ測っていません。「指の速さを測る」を開いて測定してください。";$("spdbox").open=true;$("accout").innerHTML="";$("accwout").innerHTML="";$("acconeout").textContent="";return}
+  if(mode==="fixed"){ m=accMul(+$("accspd").value*pxPerCm); }
+  else m=histMul(mode==="my"?my.h:SPD_HIST,pxPerCm);
+  const f=dir==="on2off"?m:1/m;
+  $("accres").innerHTML=`加速ONは${mode==="fixed"?"この速さで":mode==="my"?"測った速さの平均で":"普段の速さの平均で"} OFFの <b>${m.toFixed(2)}倍</b> 回ります → 換算倍率 <b>×${f.toFixed(2)}</b>`+(mode==="fixed"?`（端末上で約${Math.round(+$("accspd").value*pxPerCm)}px/秒）`:"");
+  renderSpdRes();
+  const rows=readTable("out");
+  window.ACC_F=f; $("accwout").innerHTML=convRows(readTable("out2"),f);
+  $("accout").innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td class="c">${(+r[1]).toFixed(2)}</td><td class="c"><b>${(r[1]*f).toFixed(2)}</b></td><td class="a">${(+r[2]).toFixed(2)}</td><td class="a"><b>${(r[2]*f).toFixed(2)}</b></td></tr>`).join("");
+  const v=+$("accone").value; $("acconeout").textContent=v?`→ ${(v*f).toFixed(1)}（整数なら ${Math.round(v*f)}）`:"";
+}
+["accdir","accdev","accppi","accmode","accspd","accone"].forEach(id=>$(id).addEventListener("input",renderAcc));
+document.querySelectorAll(".grid input,.grid select").forEach(e=>e.addEventListener("input",()=>setTimeout(renderAcc)));
+renderAcc();
+</script>
+</body></html>
