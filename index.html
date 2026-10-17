@@ -308,8 +308,6 @@ body[data-mode="theory"] .grid{display:none}
       <div class="f" id="spdgbox" hidden><label for="spdgsens">ゲーム内のジャイロ感度（この視点・%）</label>
         <input type="number" id="spdgsens" min="1" max="800" step="1" value="200">
         <small style="margin-top:6px">動かし方：端末を前に倒す→下、起こす→上、右手が上になるように傾ける（画面が左を向く）→右、左手が上になるように傾ける（画面が右を向く）→左。</small>
-        <small style="margin-top:4px">初回だけ、測定開始のあとに「向き合わせ」（右手を上げる→端末を起こす）をします。結果はこのブラウザに保存されます。</small>
-        <button type="button" class="btn ghost" id="spdgreset" style="margin-top:6px;align-self:flex-start;padding:5px 12px">向き合わせをやり直す</button>
         <label class="check" style="margin-top:6px;justify-content:flex-start;gap:8px"><input type="checkbox" id="spdginvx"><span>左右を反転</span></label>
         <label class="check" style="justify-content:flex-start;gap:8px"><input type="checkbox" id="spdginvy"><span>上下を反転</span></label>
         <small>回り方は実測値（TPPで100%あたり端末1°→0.645°、スコープ中はスコープごとの実測比、レッドドットで約0.43倍）。右手を上げて視点が左に動くときは「左右を反転」に✓。測定中は画面上部に、ジャイロで動いた左右・上下の速さ（°/秒）が出るので、両方が反応しているか確かめられます。画面は開始したときの横向きで固定されます（大きく傾けても回りません）。</small></div>
@@ -979,36 +977,22 @@ function renderSpdRes(){
     msg.textContent=(d===90||d===270)&&run?"横向きに戻してください（画面の自動回転をオフにすると確実です）":(started?"":msg.textContent);
     setTimeout(resize,50); }
   try{ screen.orientation&&screen.orientation.addEventListener("change",onRot) }catch(e){} window.addEventListener("orientationchange",onRot);
-  /* 向き合わせ：端末やブラウザでセンサーの軸の向きが違うので、最初に
-     ①右手が上になるように傾ける ②端末を起こす の2つの動きで、どの軸が左右・上下かを決めて保存する */
-  const GMKEY="pubgsens-gyromap"; let gMap={}; try{ gMap=JSON.parse(localStorage.getItem(GMKEY)||"{}")||{} }catch(e){ gMap={} }
-  let calib=null;   // {step:1|2, acc:[x,y,z], key}
-  function mapKey(){ return (gStat.src||"?")+"|"+holdA; }
-  function calibMsg(){ msg.textContent=calib.step===1?"ジャイロの向き合わせ①：右手が上になるように、端末をゆっくり傾けてください":"ジャイロの向き合わせ②：端末をゆっくり起こしてください（画面が自分の方を向くように）"; }
-  function calibFeed(r,dt){
-    for(let i=0;i<3;i++) calib.acc[i]+=r[i]*dt;
-    const ab=calib.acc.map(Math.abs), used=calib.step===2?calib.yaw[0]:-1;
-    let ax=-1, best=0; ab.forEach((v,i)=>{ if(i!==used&&v>best){ best=v; ax=i; } });
-    if(best<30) return;   // 30°ぶん動いたら決定
-    const pair=[ax,Math.sign(calib.acc[ax])];
-    if(calib.step===1){ calib.yaw=pair; calib.step=2; calib.acc=[0,0,0]; calibMsg(); return; }
-    gMap[calib.key]={yaw:calib.yaw,pit:pair}; try{ localStorage.setItem(GMKEY,JSON.stringify(gMap)) }catch(e){}
-    calib=null; msg.textContent="向き合わせ完了。画面をスライドすると開始します"; }
-  function applyRate(rx,ry,rz,dt){ // センサーの3軸の角速度（°/秒）
+  function applyRate(rx,ry,rz,dt){ // 端末のX・Y・Z軸まわりの角速度（°/秒、端末本来の向き基準）
     if(!run||!cfg||cfg.gyro!=="ON"||!(dt>0)) return;
-    const r=[rx,ry,rz], key=mapKey();
-    if(!gMap[key]){ if(started) return; if(!calib||calib.key!==key){ calib={step:1,acc:[0,0,0],key}; calibMsg(); } calibFeed(r,dt); return; }
-    const m=gMap[key], yawR=r[m.yaw[0]]*m.yaw[1], pitR=r[m.pit[0]]*m.pit[1];   // 右手が上＝右、起こす＝上
+    const a=holdAngle(); let sx, sy;   // 画面基準の軸に直す（sx:画面の右向き、sy:画面の上向き）
+    if(a===90){ sx=-ry; sy=rx; } else if(a===270){ sx=ry; sy=-rx; } else if(a===180){ sx=-rx; sy=-ry; } else { sx=rx; sy=ry; }
+    // 左右：画面の縦軸まわり（右手が上がって画面が左を向く＝右）、上下：画面の横軸まわり（起こす＝上、前に倒す＝下）
+    const yawR=-sy, pitR=sx;
     const k=GYRO_PER100*cfg.gsens/100*(cfg.view==="tpp"?1:1/GYRO_REL.TPP);
     yaw+=(cfg.ginvx?-1:1)*yawR*dt*k; pitch=Math.max(-60,Math.min(60,pitch+(cfg.ginvy?-1:1)*pitR*dt*k));
-    const f=Math.min(1,dt*4); gMon.yaw+=(Math.abs(yawR)-gMon.yaw)*f; gMon.pit+=(Math.abs(pitR)-gMon.pit)*f; gMon.a=holdA;
+    const f=Math.min(1,dt*4); gMon.yaw+=(Math.abs(yawR)-gMon.yaw)*f; gMon.pit+=(Math.abs(pitR)-gMon.pit)*f; gMon.a=a;
   }
   function stamp(src){ gStat.n++; if(!gStat.src) gStat.src=src; gOK=true; }
   function onMotion(e){
     const r=e.rotationRate; if(!r||(r.beta==null&&r.gamma==null)) return;
     if(gStat.src&&gStat.src!=="devicemotion") return;
     const now=performance.now(), dt=gLast?Math.min(0.1,(now-gLast)/1000):0; gLast=now; stamp("devicemotion");
-    applyRate(r.beta||0,r.gamma||0,r.alpha||0,dt);
+    applyRate(r.alpha||0,r.beta||0,r.gamma||0,dt);   // 実際のブラウザは alpha=X軸、beta=Y軸、gamma=Z軸まわり（Chrome・Safari・Firefox共通）
   }
   function oriMat(al,be,ga){ const c1=Math.cos(rad(al)),s1=Math.sin(rad(al)),c2=Math.cos(rad(be)),s2=Math.sin(rad(be)),c3=Math.cos(rad(ga)),s3=Math.sin(rad(ga));
     // R = Rz(alpha)·Rx(beta)·Ry(gamma)（端末→地面）
@@ -1075,7 +1059,6 @@ function renderSpdRes(){
     if(cfg&&cfg.gyro==="ON"&&performance.now()-gDiagT>(gOK?250:700)&&performance.now()-gStartT>1200){ gDiagT=performance.now(); $("spdgst").textContent=gyroDiag(); }
     draw(); raf=requestAnimationFrame(loop); }
   function move(x,y,t){ const d=(window.devicePixelRatio||1)*(flip?-1:1), dx=(x-lx)*d, dy=(y-ly)*d, dt=t-lt; lx=x; ly=y; lt=t;
-    if(calib) return;
     if(!started){ started=true; t0=performance.now(); msg.textContent=""; }
     if(dt>100){ flush(); vbuf=[]; return }
     accDx+=dx; accT+=dt; if(accT>=16) flush();
@@ -1121,7 +1104,7 @@ function renderSpdRes(){
     if(!ppiNow){ $("spdres").textContent="先に「使う端末」を選ぶか、ppiを入力してください。"; return }
     if(!(sens>0)){ $("spdres").textContent="ゲーム内のカメラ感度を入れてください。"; return }
     cfg={view:$("spdview").value,sens,acc:$("spdacc").value,gyro:$("spdgyro").value,gsens:+$("spdgsens").value||0,ginvx:$("spdginvx").checked,ginvy:$("spdginvy").checked};
-    gLast=0; gMon={yaw:0,pit:0,a:0}; calib=null; gOK=false; $("spdgst").textContent="";
+    gLast=0; gMon={yaw:0,pit:0,a:0}; gOK=false; $("spdgst").textContent="";
     if(cfg.gyro==="ON"){ startSensors(); setTimeout(()=>{ if(run) $("spdgst").textContent=gyroDiag(); },1500); } hfov=fovOf(cfg.view); DUR=+$("spddur").value;
     run=true; started=false; yaw=0; pitch=0; tg=[]; hits=0; shots=0; bins={}; moved=0; pid=null;
     $("spdhits").textContent=0; $("spdshots").textContent=0; $("spdtime").textContent=DUR.toFixed(1);
@@ -1155,7 +1138,6 @@ function renderSpdRes(){
     let gs=r?+r[3]:0; if(v!=="tpp"&&v!=="rd"){ const w=readTable("out2").find(x=>x[0].includes(v==="rdsmg"?"SMG":v==="rdhg"?"ハンドガン":"トミー")); if(w&&+w[3]>0) gs=+w[3]; }
     if(gs>0) $("spdgsens").value=Math.round(gs); }catch(e){} }
   $("spdview").addEventListener("change",defSens);
-  $("spdgreset").addEventListener("click",()=>{ gMap={}; try{ localStorage.removeItem(GMKEY) }catch(e){} $("spdres").textContent="ジャイロの向き合わせを消しました。次の測定開始のときにもう一度行います。"; });
   $("spdgyro").addEventListener("change",()=>{ $("spdgbox").hidden=$("spdgyro").value!=="ON"; });
   $("spdacc").value=$("accel").value==="OFF"?"OFF":"ON";
   setTimeout(defSens,0);
