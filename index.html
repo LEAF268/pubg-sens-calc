@@ -307,12 +307,10 @@ body[data-mode="theory"] .grid{display:none}
         <small>ONにすると端末を傾けて視点を動かせます（指の速さの測定には影響しません）。</small></div>
       <div class="f" id="spdgbox" hidden><label for="spdgsens">ゲーム内のジャイロ感度（この視点・%）</label>
         <input type="number" id="spdgsens" min="1" max="800" step="1" value="200">
-        <label for="spdgyaw" style="margin-top:8px">左右の視点の動かし方</label>
-        <select id="spdgyaw"><option value="roll">左右に傾ける（右手が上→右、左手が上→左）</option><option value="both">左右に傾ける＋体ごと回す</option><option value="turn">体ごと回すのみ</option></select>
-        <small style="margin-top:4px">上下は、端末を前に倒すと下、起こすと上を向きます。</small>
+        <small style="margin-top:6px">動かし方：端末を前に倒す→下、起こす→上、右手が上になるように傾ける（画面が左を向く）→右、左手が上になるように傾ける（画面が右を向く）→左。</small>
         <label class="check" style="margin-top:6px;justify-content:flex-start;gap:8px"><input type="checkbox" id="spdginvx"><span>左右を反転</span></label>
         <label class="check" style="justify-content:flex-start;gap:8px"><input type="checkbox" id="spdginvy"><span>上下を反転</span></label>
-        <small>回り方は実測値（TPPで100%あたり端末1°→0.645°、スコープ中はスコープごとの実測比、レッドドットで約0.43倍）。端末を右に回して視点が左に動くときは「左右を反転」に✓。測定中は画面上部に、ジャイロで動いた左右・上下の速さ（°/秒）が出るので、両方が反応しているか確かめられます。画面は開始したときの横向きで固定されます（大きく傾けても回りません）。</small></div>
+        <small>回り方は実測値（TPPで100%あたり端末1°→0.645°、スコープ中はスコープごとの実測比、レッドドットで約0.43倍）。右手を上げて視点が左に動くときは「左右を反転」に✓。測定中は画面上部に、ジャイロで動いた左右・上下の速さ（°/秒）が出るので、両方が反応しているか確かめられます。画面は開始したときの横向きで固定されます（大きく傾けても回りません）。</small></div>
       <div class="f"><label for="spddur">時間</label>
         <select id="spddur"><option value="30">30秒</option><option value="60">60秒</option></select></div>
     </div>
@@ -983,8 +981,8 @@ function renderSpdRes(){
     if(!run||!cfg||cfg.gyro!=="ON"||!(dt>0)) return;
     const a=holdAngle(); let sx, sy;   // 画面基準の軸に直す（sx:画面の右向き、sy:画面の上向き）
     if(a===90){ sx=-ry; sy=rx; } else if(a===270){ sx=ry; sy=-rx; } else if(a===180){ sx=-rx; sy=-ry; } else { sx=rx; sy=ry; }
-    const turn=-sy, roll=rz, mode=cfg.gyaw||"roll";   // 右を向く・右手が上になるように傾ける（画面の反時計回り）＝+
-    const yawR=mode==="turn"?turn:mode==="roll"?roll:turn+roll, pitR=sx;   // 上を向く＝+
+    // 左右：画面の縦軸まわり（右手が上がって画面が左を向く＝右）、上下：画面の横軸まわり（起こす＝上）
+    const yawR=-sy, pitR=sx;
     const k=GYRO_PER100*cfg.gsens/100*(cfg.view==="tpp"?1:1/GYRO_REL.TPP);
     yaw+=(cfg.ginvx?-1:1)*yawR*dt*k; pitch=Math.max(-60,Math.min(60,pitch+(cfg.ginvy?-1:1)*pitR*dt*k));
     const f=Math.min(1,dt*4); gMon.yaw+=(Math.abs(yawR)-gMon.yaw)*f; gMon.pit+=(Math.abs(pitR)-gMon.pit)*f; gMon.a=a;
@@ -1105,7 +1103,7 @@ function renderSpdRes(){
   function start(){ ppiNow=ppiOf($("accdev"),$("accppi")); const sens=+$("spdsens").value;
     if(!ppiNow){ $("spdres").textContent="先に「使う端末」を選ぶか、ppiを入力してください。"; return }
     if(!(sens>0)){ $("spdres").textContent="ゲーム内のカメラ感度を入れてください。"; return }
-    cfg={view:$("spdview").value,sens,acc:$("spdacc").value,gyro:$("spdgyro").value,gsens:+$("spdgsens").value||0,ginvx:$("spdginvx").checked,ginvy:$("spdginvy").checked,gyaw:$("spdgyaw").value};
+    cfg={view:$("spdview").value,sens,acc:$("spdacc").value,gyro:$("spdgyro").value,gsens:+$("spdgsens").value||0,ginvx:$("spdginvx").checked,ginvy:$("spdginvy").checked};
     gLast=0; gMon={yaw:0,pit:0,a:0}; gOK=false; $("spdgst").textContent="";
     if(cfg.gyro==="ON"){ startSensors(); setTimeout(()=>{ if(run) $("spdgst").textContent=gyroDiag(); },1500); } hfov=fovOf(cfg.view); DUR=+$("spddur").value;
     run=true; started=false; yaw=0; pitch=0; tg=[]; hits=0; shots=0; bins={}; moved=0; pid=null;
