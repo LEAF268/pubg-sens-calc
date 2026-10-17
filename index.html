@@ -975,28 +975,37 @@ function renderSpdRes(){
   /* 画面の自動回転：開始時の横向きにロック。ロックできずに上下逆に回ったときは、表示を180°回して元の見え方に戻す */
   function lockOri(){ const t=holdA===90?"landscape-primary":holdA===270?"landscape-secondary":"landscape";
     try{ screen.orientation?.lock?.(t).catch(()=>screen.orientation?.lock?.("landscape").catch(()=>{})) }catch(e){} }
-  let locking=false;
+  let locking=false, wantType=null;
+  function curType(){ return (screen.orientation&&screen.orientation.type)||""; }
   function landTarget(){ const v=$("spdland").value; return v==="right"?"landscape-secondary":v==="left"?"landscape-primary":null; }
-  /* 選んだ横向きにして固定 → 固定できたらその向きをジャイロの基準にする */
+  /* 選んだ横向きにして固定する。画面が実際にその向きに回り切ってから、その向きをジャイロの基準にする
+     （回転の途中で向きを読むと、縦持ちや反対の横向きのまま基準が決まってしまうため） */
+  function settle(){ locking=false; holdA=curAngle(); wantType=curType()||wantType; flip=false; fs.style.transform=""; setTimeout(resize,50); }
+  function waitLand(t0){ const ty=curType(), ok=wantType?ty===wantType:ty.startsWith("landscape");
+    if(ok||!ty){ setTimeout(settle,120); return; }
+    if(performance.now()-t0>2500){ settle(); return; }
+    setTimeout(()=>waitLand(t0),50); }
   function enterLand(){ const t=landTarget(); locking=true;
-    const done=()=>{ locking=false; holdA=curAngle(); flip=false; fs.style.transform=""; setTimeout(resize,50); };
+    wantType=t||(curType().startsWith("landscape")?curType():null);
     try{ const r=fs.requestFullscreen&&fs.requestFullscreen();
-      if(!r){ done(); return; }
-      r.then(()=>{ const lk=screen.orientation?.lock?.(t||(holdA===90?"landscape-primary":holdA===270?"landscape-secondary":"landscape"));
-        if(lk&&lk.then) lk.then(()=>setTimeout(done,150)).catch(()=>{ screen.orientation?.lock?.("landscape").catch(()=>{}); done(); }); else done(); }).catch(done);
-    }catch(e){ done(); } }
-  function onRot(){ if(!run||locking) return; const d=(curAngle()-holdA+360)%360;
+      const go=()=>{ let lk=null; try{ lk=screen.orientation?.lock?.(wantType||"landscape") }catch(e){}
+        if(lk&&lk.catch) lk.catch(()=>{ wantType=null; try{ screen.orientation?.lock?.("landscape").catch(()=>{}) }catch(e){} });
+        waitLand(performance.now()); };
+      if(r&&r.then) r.then(go).catch(()=>waitLand(performance.now())); else go();
+    }catch(e){ waitLand(performance.now()); } }
+  function onRot(){ if(!run||locking) return;
+    if(wantType&&curType()===wantType){ holdA=curAngle(); flip=false; fs.style.transform=""; setTimeout(resize,50); return; }
+    const d=(curAngle()-holdA+360)%360;
     flip=d===180; fs.style.transform=flip?"rotate(180deg)":"";
     msg.textContent=(d===90||d===270)&&run?"横向きに戻してください（画面の自動回転をオフにすると確実です）":(started?"":msg.textContent);
     setTimeout(resize,50); }
   try{ screen.orientation&&screen.orientation.addEventListener("change",onRot) }catch(e){} window.addEventListener("orientationchange",onRot);
   function applyRate(rx,ry,rz,dt){ // 端末のX・Y・Z軸まわりの角速度（°/秒、端末本来の向き基準）
-    if(!run||!cfg||cfg.gyro!=="ON"||!(dt>0)) return;
+    if(!run||!cfg||cfg.gyro!=="ON"||!(dt>0)||locking) return;   // 横向きに回り切るまでは使わない
     const a=holdAngle(); let sx, sy;   // 画面基準の軸に直す（sx:画面の右向き、sy:画面の上向き）
     if(a===90){ sx=-ry; sy=rx; } else if(a===270){ sx=ry; sy=-rx; } else if(a===180){ sx=-rx; sy=-ry; } else { sx=rx; sy=ry; }
     // 左右：画面の縦軸まわり（右手が上がって画面が左を向く＝右）、上下：画面の横軸まわり（起こす＝上、前に倒す＝下）
-    const lf=$("spdland").value==="left"?-1:1;   // 左に回した横画面（充電端子が右）は上下左右とも逆にする（実機で確認）
-    const yawR=-sy*lf, pitR=sx*lf;
+    const yawR=-sy, pitR=sx;
     const k=GYRO_PER100*cfg.gsens/100*(cfg.view==="tpp"?1:1/GYRO_REL.TPP);
     yaw+=(cfg.ginvx?-1:1)*yawR*dt*k; pitch=Math.max(-60,Math.min(60,pitch+(cfg.ginvy?-1:1)*pitR*dt*k));
     const f=Math.min(1,dt*4); gMon.yaw+=(Math.abs(yawR)-gMon.yaw)*f; gMon.pit+=(Math.abs(pitR)-gMon.pit)*f; gMon.a=a;
