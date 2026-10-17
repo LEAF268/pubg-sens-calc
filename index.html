@@ -995,7 +995,8 @@ function renderSpdRes(){
     const a=holdAngle(); let sx, sy;   // 画面基準の軸に直す（sx:画面の右向き、sy:画面の上向き）
     if(a===90){ sx=-ry; sy=rx; } else if(a===270){ sx=ry; sy=-rx; } else if(a===180){ sx=-rx; sy=-ry; } else { sx=rx; sy=ry; }
     // 左右：画面の縦軸まわり（右手が上がって画面が左を向く＝右）、上下：画面の横軸まわり（起こす＝上、前に倒す＝下）
-    const yawR=-sy, pitR=sx;
+    const lf=$("spdland").value==="left"?-1:1;   // 左に回した横画面（充電端子が右）は上下左右とも逆にする（実機で確認）
+    const yawR=-sy*lf, pitR=sx*lf;
     const k=GYRO_PER100*cfg.gsens/100*(cfg.view==="tpp"?1:1/GYRO_REL.TPP);
     yaw+=(cfg.ginvx?-1:1)*yawR*dt*k; pitch=Math.max(-60,Math.min(60,pitch+(cfg.ginvy?-1:1)*pitR*dt*k));
     const f=Math.min(1,dt*4); gMon.yaw+=(Math.abs(yawR)-gMon.yaw)*f; gMon.pit+=(Math.abs(pitR)-gMon.pit)*f; gMon.a=a;
