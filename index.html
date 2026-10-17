@@ -308,7 +308,8 @@ body[data-mode="theory"] .grid{display:none}
       <div class="f" id="spdgbox" hidden><label for="spdgsens">ゲーム内のジャイロ感度（この視点・%）</label>
         <input type="number" id="spdgsens" min="1" max="800" step="1" value="200">
         <label for="spdgyaw" style="margin-top:8px">左右の視点の動かし方</label>
-        <select id="spdgyaw"><option value="both">回す＋ハンドルのように傾ける（両方）</option><option value="turn">回す（体ごと向きを変える動き）のみ</option><option value="roll">ハンドルのように傾けるのみ</option></select>
+        <select id="spdgyaw"><option value="roll">左右に傾ける（右手が上→右、左手が上→左）</option><option value="both">左右に傾ける＋体ごと回す</option><option value="turn">体ごと回すのみ</option></select>
+        <small style="margin-top:4px">上下は、端末を前に倒すと下、起こすと上を向きます。</small>
         <label class="check" style="margin-top:6px;justify-content:flex-start;gap:8px"><input type="checkbox" id="spdginvx"><span>左右を反転</span></label>
         <label class="check" style="justify-content:flex-start;gap:8px"><input type="checkbox" id="spdginvy"><span>上下を反転</span></label>
         <small>回り方は実測値（TPPで100%あたり端末1°→0.645°、スコープ中はスコープごとの実測比、レッドドットで約0.43倍）。端末を右に回して視点が左に動くときは「左右を反転」に✓。測定中は画面上部に、ジャイロで動いた左右・上下の速さ（°/秒）が出るので、両方が反応しているか確かめられます。画面は開始したときの横向きで固定されます（大きく傾けても回りません）。</small></div>
@@ -982,7 +983,7 @@ function renderSpdRes(){
     if(!run||!cfg||cfg.gyro!=="ON"||!(dt>0)) return;
     const a=holdAngle(); let sx, sy;   // 画面基準の軸に直す（sx:画面の右向き、sy:画面の上向き）
     if(a===90){ sx=-ry; sy=rx; } else if(a===270){ sx=ry; sy=-rx; } else if(a===180){ sx=-rx; sy=-ry; } else { sx=rx; sy=ry; }
-    const turn=-sy, roll=-rz, mode=cfg.gyaw||"both";   // 右を向く・右に傾ける＝+
+    const turn=-sy, roll=rz, mode=cfg.gyaw||"roll";   // 右を向く・右手が上になるように傾ける（画面の反時計回り）＝+
     const yawR=mode==="turn"?turn:mode==="roll"?roll:turn+roll, pitR=sx;   // 上を向く＝+
     const k=GYRO_PER100*cfg.gsens/100*(cfg.view==="tpp"?1:1/GYRO_REL.TPP);
     yaw+=(cfg.ginvx?-1:1)*yawR*dt*k; pitch=Math.max(-60,Math.min(60,pitch+(cfg.ginvy?-1:1)*pitR*dt*k));
