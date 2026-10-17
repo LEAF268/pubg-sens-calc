@@ -307,9 +307,11 @@ body[data-mode="theory"] .grid{display:none}
         <small>ONにすると端末を傾けて視点を動かせます（指の速さの測定には影響しません）。</small></div>
       <div class="f" id="spdgbox" hidden><label for="spdgsens">ゲーム内のジャイロ感度（この視点・%）</label>
         <input type="number" id="spdgsens" min="1" max="800" step="1" value="200">
+        <label for="spdgyaw" style="margin-top:8px">左右の視点の動かし方</label>
+        <select id="spdgyaw"><option value="both">回す＋ハンドルのように傾ける（両方）</option><option value="turn">回す（体ごと向きを変える動き）のみ</option><option value="roll">ハンドルのように傾けるのみ</option></select>
         <label class="check" style="margin-top:6px;justify-content:flex-start;gap:8px"><input type="checkbox" id="spdginvx"><span>左右を反転</span></label>
         <label class="check" style="justify-content:flex-start;gap:8px"><input type="checkbox" id="spdginvy"><span>上下を反転</span></label>
-        <small>回り方は実測値（TPPで100%あたり端末1°→0.645°、スコープ中はスコープごとの実測比、レッドドットで約0.43倍）。端末を右に回して視点が左に動くときは「左右を反転」に✓。</small></div>
+        <small>回り方は実測値（TPPで100%あたり端末1°→0.645°、スコープ中はスコープごとの実測比、レッドドットで約0.43倍）。端末を右に回して視点が左に動くときは「左右を反転」に✓。測定中は画面上部に、ジャイロで動いた左右・上下の速さ（°/秒）が出るので、両方が反応しているか確かめられます。画面は開始したときの横向きで固定されます（大きく傾けても回りません）。</small></div>
       <div class="f"><label for="spddur">時間</label>
         <select id="spddur"><option value="30">30秒</option><option value="60">60秒</option></select></div>
     </div>
@@ -964,27 +966,47 @@ function renderSpdRes(){
   const GYRO_PER100=0.645; let gLast=0, gOK=false;
   /* センサーは3通りを順に試す：Gyroscope API → devicemotion(rotationRate) → deviceorientation(角度の差分) */
   const gStat={src:"",n:0,why:""}; let gDiagT=0, gStartT=0; let gSensor=null, lastOri=null;
-  function applyRate(rx,ry,dt){ // rx,ry: 端末のX軸・Y軸まわりの角速度（°/秒）
+  let gMon={yaw:0,pit:0,a:0};
+  function curAngle(){ const ang=(screen.orientation&&typeof screen.orientation.angle==="number")?screen.orientation.angle:(+window.orientation||0); return ((ang%360)+360)%360; }
+  let holdA=0, flip=false;   // 開始時の画面の向きで固定（途中で画面が回っても持ち方は変わらない）
+  function holdAngle(){ return holdA; }
+  /* 画面の自動回転：開始時の横向きにロック。ロックできずに上下逆に回ったときは、表示を180°回して元の見え方に戻す */
+  function lockOri(){ const t=holdA===90?"landscape-primary":holdA===270?"landscape-secondary":"landscape";
+    try{ screen.orientation?.lock?.(t).catch(()=>screen.orientation?.lock?.("landscape").catch(()=>{})) }catch(e){} }
+  function onRot(){ if(!run) return; const d=(curAngle()-holdA+360)%360;
+    flip=d===180; fs.style.transform=flip?"rotate(180deg)":"";
+    msg.textContent=(d===90||d===270)&&run?"横向きに戻してください（画面の自動回転をオフにすると確実です）":(started?"":msg.textContent);
+    setTimeout(resize,50); }
+  try{ screen.orientation&&screen.orientation.addEventListener("change",onRot) }catch(e){} window.addEventListener("orientationchange",onRot);
+  function applyRate(rx,ry,rz,dt){ // 端末のX・Y・Z軸まわりの角速度（°/秒、端末本来の向き基準）
     if(!run||!cfg||cfg.gyro!=="ON"||!(dt>0)) return;
-    const ang=(screen.orientation&&typeof screen.orientation.angle==="number")?screen.orientation.angle:(+window.orientation||0);
-    const a=((ang%360)+360)%360; let yawR, pitR;   // 右を向く＝+、上を向く＝+
-    if(a===90){ yawR=-rx; pitR=-ry; } else if(a===270){ yawR=rx; pitR=ry; } else if(a===180){ yawR=ry; pitR=-rx; } else { yawR=-ry; pitR=rx; }
+    const a=holdAngle(); let sx, sy;   // 画面基準の軸に直す（sx:画面の右向き、sy:画面の上向き）
+    if(a===90){ sx=-ry; sy=rx; } else if(a===270){ sx=ry; sy=-rx; } else if(a===180){ sx=-rx; sy=-ry; } else { sx=rx; sy=ry; }
+    const turn=-sy, roll=-rz, mode=cfg.gyaw||"both";   // 右を向く・右に傾ける＝+
+    const yawR=mode==="turn"?turn:mode==="roll"?roll:turn+roll, pitR=sx;   // 上を向く＝+
     const k=GYRO_PER100*cfg.gsens/100*(cfg.view==="tpp"?1:1/GYRO_REL.TPP);
     yaw+=(cfg.ginvx?-1:1)*yawR*dt*k; pitch=Math.max(-60,Math.min(60,pitch+(cfg.ginvy?-1:1)*pitR*dt*k));
+    const f=Math.min(1,dt*4); gMon.yaw+=(Math.abs(yawR)-gMon.yaw)*f; gMon.pit+=(Math.abs(pitR)-gMon.pit)*f; gMon.a=a;
   }
   function stamp(src){ gStat.n++; if(!gStat.src) gStat.src=src; gOK=true; }
   function onMotion(e){
     const r=e.rotationRate; if(!r||(r.beta==null&&r.gamma==null)) return;
     if(gStat.src&&gStat.src!=="devicemotion") return;
     const now=performance.now(), dt=gLast?Math.min(0.1,(now-gLast)/1000):0; gLast=now; stamp("devicemotion");
-    applyRate(r.beta||0,r.gamma||0,dt);
+    applyRate(r.beta||0,r.gamma||0,r.alpha||0,dt);
   }
+  function oriMat(al,be,ga){ const c1=Math.cos(rad(al)),s1=Math.sin(rad(al)),c2=Math.cos(rad(be)),s2=Math.sin(rad(be)),c3=Math.cos(rad(ga)),s3=Math.sin(rad(ga));
+    // R = Rz(alpha)·Rx(beta)·Ry(gamma)（端末→地面）
+    return [[c1*c3-s1*s2*s3,-s1*c2,c1*s3+s1*s2*c3],[s1*c3+c1*s2*s3,c1*c2,s1*s3-c1*s2*c3],[-c2*s3,s2,c2*c3]]; }
   function onOrient(e){
     if(e.beta==null||e.gamma==null) return; if(gStat.src&&gStat.src!=="deviceorientation"){ lastOri=null; return; }
-    const now=performance.now();
-    if(lastOri){ const dt=Math.min(0.1,(now-lastOri.t)/1000); let db=e.beta-lastOri.b, dg=e.gamma-lastOri.g;
-      if(Math.abs(db)<60&&Math.abs(dg)<60&&dt>0){ stamp("deviceorientation"); applyRate(db/dt,dg/dt,dt); } }
-    lastOri={b:e.beta,g:e.gamma,t:now};
+    const now=performance.now(), M=oriMat(e.alpha||0,e.beta,e.gamma);
+    if(lastOri){ const dt=Math.min(0.1,(now-lastOri.t)/1000), P=lastOri.M;
+      // 端末基準の相対回転 D = Pᵀ·M から角速度を出す
+      const D=(i,j)=>P[0][i]*M[0][j]+P[1][i]*M[1][j]+P[2][i]*M[2][j];
+      const wx=(D(2,1)-D(1,2))/2, wy=(D(0,2)-D(2,0))/2, wz=(D(1,0)-D(0,1))/2;
+      if(dt>0&&Math.abs(wx)<0.8&&Math.abs(wy)<0.8&&Math.abs(wz)<0.8){ stamp("deviceorientation"); applyRate(wx*57.2958/dt,wy*57.2958/dt,wz*57.2958/dt,dt); } }
+    lastOri={M,t:now};
   }
   window.addEventListener("devicemotion",onMotion); window.addEventListener("deviceorientation",onOrient);
   function startSensors(){
@@ -993,7 +1015,7 @@ function renderSpdRes(){
     try{
       if("Gyroscope" in window){
         gSensor=new Gyroscope({frequency:60}); let t0=0;
-        gSensor.addEventListener("reading",()=>{ if(gStat.src&&gStat.src!=="Gyroscope") return; const now=performance.now(), dt=t0?Math.min(0.1,(now-t0)/1000):0; t0=now; stamp("Gyroscope"); applyRate(gSensor.x*57.2958,gSensor.y*57.2958,dt); });
+        gSensor.addEventListener("reading",()=>{ if(gStat.src&&gStat.src!=="Gyroscope") return; const now=performance.now(), dt=t0?Math.min(0.1,(now-t0)/1000):0; t0=now; stamp("Gyroscope"); applyRate(gSensor.x*57.2958,gSensor.y*57.2958,gSensor.z*57.2958,dt); });
         gSensor.addEventListener("error",ev=>{ gStat.why=(ev.error&&ev.error.name)||"Gyroscope error"; });
         gSensor.start();
       }
@@ -1001,7 +1023,7 @@ function renderSpdRes(){
   }
   function stopSensors(){ try{ gSensor&&gSensor.stop(); }catch(e){} gSensor=null; }
   function gyroDiag(){
-    if(gOK) return `ジャイロ：受信中（${gStat.src}）`;
+    if(gOK) return `ジャイロ 左右${gMon.yaw.toFixed(0)}°/秒・上下${gMon.pit.toFixed(0)}°/秒（${"画面の向き"+gMon.a+"°"}）`;
     const why=[];
     if(!window.isSecureContext) why.push("安全な接続(https)ではない");
     try{ const fp=document.permissionsPolicy||document.featurePolicy; if(fp&&fp.allowsFeature){ if(!fp.allowsFeature("gyroscope")) why.push("ページ埋め込み先でジャイロが許可されていない"); } }catch(e){}
@@ -1035,9 +1057,9 @@ function renderSpdRes(){
     accDx=0; accT=0; }
   function loop(){ if(!run) return;
     if(started){ const left=DUR-(performance.now()-t0)/1000; $("spdtime").textContent=Math.max(0,left).toFixed(1); if(left<=0){ finish(); return } }
-    if(cfg&&cfg.gyro==="ON"&&performance.now()-gDiagT>700&&performance.now()-gStartT>1200){ gDiagT=performance.now(); $("spdgst").textContent=gyroDiag(); }
+    if(cfg&&cfg.gyro==="ON"&&performance.now()-gDiagT>(gOK?250:700)&&performance.now()-gStartT>1200){ gDiagT=performance.now(); $("spdgst").textContent=gyroDiag(); }
     draw(); raf=requestAnimationFrame(loop); }
-  function move(x,y,t){ const d=window.devicePixelRatio||1, dx=(x-lx)*d, dy=(y-ly)*d, dt=t-lt; lx=x; ly=y; lt=t;
+  function move(x,y,t){ const d=(window.devicePixelRatio||1)*(flip?-1:1), dx=(x-lx)*d, dy=(y-ly)*d, dt=t-lt; lx=x; ly=y; lt=t;
     if(!started){ started=true; t0=performance.now(); msg.textContent=""; }
     if(dt>100){ flush(); vbuf=[]; return }
     accDx+=dx; accT+=dt; if(accT>=16) flush();
@@ -1082,16 +1104,18 @@ function renderSpdRes(){
   function start(){ ppiNow=ppiOf($("accdev"),$("accppi")); const sens=+$("spdsens").value;
     if(!ppiNow){ $("spdres").textContent="先に「使う端末」を選ぶか、ppiを入力してください。"; return }
     if(!(sens>0)){ $("spdres").textContent="ゲーム内のカメラ感度を入れてください。"; return }
-    cfg={view:$("spdview").value,sens,acc:$("spdacc").value,gyro:$("spdgyro").value,gsens:+$("spdgsens").value||0,ginvx:$("spdginvx").checked,ginvy:$("spdginvy").checked};
-    gLast=0; gOK=false; $("spdgst").textContent="";
+    cfg={view:$("spdview").value,sens,acc:$("spdacc").value,gyro:$("spdgyro").value,gsens:+$("spdgsens").value||0,ginvx:$("spdginvx").checked,ginvy:$("spdginvy").checked,gyaw:$("spdgyaw").value};
+    gLast=0; gMon={yaw:0,pit:0,a:0}; gOK=false; $("spdgst").textContent="";
     if(cfg.gyro==="ON"){ startSensors(); setTimeout(()=>{ if(run) $("spdgst").textContent=gyroDiag(); },1500); } hfov=fovOf(cfg.view); DUR=+$("spddur").value;
     run=true; started=false; yaw=0; pitch=0; tg=[]; hits=0; shots=0; bins={}; moved=0; pid=null;
     $("spdhits").textContent=0; $("spdshots").textContent=0; $("spdtime").textContent=DUR.toFixed(1);
     $("spdcfg").textContent=`${$("spdview").selectedOptions[0].textContent}・感度${sens}・加速${cfg.acc}`+(cfg.gyro==="ON"?`・ジャイロ${cfg.gsens}%`:"");
     msg.textContent="画面をスライドすると開始します"; try{document.activeElement&&document.activeElement.blur()}catch(e){} fs.hidden=false; document.body.style.overflow="hidden";
-    try{ const r=fs.requestFullscreen&&fs.requestFullscreen(); r&&r.then(()=>screen.orientation?.lock?.("landscape").catch(()=>{})).catch(()=>{}) }catch(e){}
+    holdA=curAngle(); flip=false; fs.style.transform="";
+    try{ const r=fs.requestFullscreen&&fs.requestFullscreen(); r&&r.then(()=>{ holdA=curAngle(); lockOri(); }).catch(()=>{}) }catch(e){}
     resize(); for(let i=0;i<3;i++) spawn(); raf=requestAnimationFrame(loop); }
-  function finish(){ if(!run) return; run=false; cancelAnimationFrame(raf); flush(); pid=null; stopSensors();
+  function finish(){ if(!run) return; run=false; cancelAnimationFrame(raf); flush(); pid=null; stopSensors(); flip=false; fs.style.transform="";
+    try{ screen.orientation?.unlock?.() }catch(e){}
     fs.hidden=true; document.body.style.overflow="";
     try{ if(document.fullscreenElement) document.exitFullscreen() }catch(e){}
     const sec=started?Math.min(DUR,(performance.now()-t0)/1000):0;
