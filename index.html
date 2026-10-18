@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow,noarchive">
-<title>PUBGモバイル計算機</title>
+<title>PUBGモバイル感度計算機</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
@@ -23,8 +23,7 @@ body{background:var(--bg);color:var(--fg);font-family:var(--f-body);line-height:
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 48px}
 .wrap{max-width:1040px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
 .wrap>*{min-width:0}
-header h1{font-family:var(--f-display);font-size:1.75rem;margin:0;letter-spacing:.02em;white-space:nowrap}
-@media (max-width:420px){header h1{font-size:1.45rem}}
+header h1{font-family:var(--f-display);font-size:1.75rem;margin:0;letter-spacing:.02em;text-wrap:balance}
 header p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
 .grid{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:20px;align-items:start}
 @media (max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}}
@@ -95,14 +94,12 @@ tr.base td{background:var(--accent-soft);font-weight:600}
 .diff.ok{color:var(--ok)} .diff.warn{color:var(--warn)} .diff.bad{color:var(--bad);font-weight:700}
 .tip{position:fixed;pointer-events:none;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-size:.78rem;font-family:var(--f-mono);color:var(--fg);box-shadow:0 2px 8px rgba(0,0,0,.15);z-index:10}
 .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
-.tabs button{appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--muted);font-family:var(--f-body);font-size:.92rem;font-weight:700;padding:8px 4px;border-radius:8px;cursor:pointer;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
-.tabs button small{display:block;font-size:.68em;font-weight:500;line-height:1.1;margin-top:1px}
-.tabs button[aria-selected="true"]{background:var(--accent);color:var(--panel);border-color:var(--accent)}
+.tabs button{appearance:none;border:1px solid transparent;border-bottom:none;background:transparent;color:var(--muted);font-family:var(--f-body);font-size:.95rem;font-weight:700;padding:9px 18px;border-radius:8px 8px 0 0;cursor:pointer;margin-bottom:-1px}
+.tabs button[aria-selected="true"]{background:var(--panel);color:var(--accent);border-color:var(--line)}
 .ms{display:none}
 body[data-mode="calc"] .m-calc,body[data-mode="cmp"] .m-cmp,body[data-mode="dev"] .m-dev,body[data-mode="acc"] .m-acc{display:block}
 body[data-mode="calc"] .formula.m-calc{display:grid}
-.tabs{display:grid!important;gap:6px;border-bottom:none!important}
-.tabrow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.tabs{flex-wrap:wrap;overflow-x:auto}
 .formula details>summary{cursor:pointer;font-family:var(--f-display);font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);list-style:none}
 .formula details>summary::-webkit-details-marker{display:none}
 .formula details>summary::before{content:"▸ ";} .formula details[open]>summary::before{content:"▾ ";}
@@ -119,43 +116,9 @@ body[data-mode="calc"] .formula.m-calc{display:grid}
 .adv>summary{cursor:pointer;font-size:.85rem;font-weight:700;color:var(--accent);list-style:none;padding:6px 0;border-top:1px dashed var(--line)}
 .adv>summary::-webkit-details-marker{display:none}
 .adv>summary::before{content:"▸ "} .adv[open]>summary::before{content:"▾ "}
-@media (max-width:520px){.tabs button{padding:8px 2px;font-size:.8rem}}
+@media (max-width:520px){.tabs button{padding:8px 9px;font-size:.82rem}}
 body[data-mode="theory"] .m-theory{display:block}
-body[data-mode="theory"] .grid,body[data-mode="dmg"] .grid,body[data-mode="bag"] .grid,body[data-mode="pulse"] .grid{display:none}
-body[data-mode="dmg"] .m-dmg,body[data-mode="bag"] .m-bag,body[data-mode="pulse"] .m-pulse{display:block}
-#plstbl td,#plstbl th,#plsitm td,#plsitm th{padding:5px 7px;font-size:.85rem}
-#plstbl tr.sel td{outline:2px solid var(--accent);outline-offset:-2px}
-td.pos{color:var(--ok)} td.neg{color:var(--bad)}
-.plschart{width:100%;height:auto;display:block;margin:6px 0}
-.plschart text{fill:var(--muted);font-size:12px;font-family:var(--f-mono)}
-.plschart .ax{stroke:var(--line)} .plschart .l0{fill:none;stroke:var(--bad);stroke-width:2} .plschart .l1{fill:none;stroke:var(--accent);stroke-width:2.5}
-.dmgres{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
-.dmgres div{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--bg)}
-.dmgres span{display:block;font-size:.75rem;color:var(--muted)}
-.dmgres b{font-family:var(--f-mono);font-size:1.25rem;color:var(--accent)}
-.dmgres i{font-style:normal;font-size:.75rem;color:var(--muted);margin-left:4px}
-.segs{display:flex;flex-wrap:wrap;gap:4px}
-.segs label{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:6px;padding:4px 9px;font-size:.85rem;cursor:pointer;background:var(--bg)}
-.segs input{accent-color:var(--accent);margin:0}
-#dmgtbl td,#dmgtbl th{padding:5px 7px;font-size:.85rem}
-#dmgtbl tr.cat td{background:var(--accent-soft);font-family:var(--f-body);font-weight:700;color:var(--fg);text-align:left}
-#dmgtbl tr.sel td{outline:2px solid var(--accent);outline-offset:-2px}
-.bagbar{height:16px;border-radius:8px;background:var(--bg);border:1px solid var(--line);overflow:hidden;margin:8px 0}
-.bagbar i{display:block;height:100%;background:var(--accent);transition:width .2s}
-.bagbar.over i{background:var(--bad)}
-.baggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px 12px}
-.baggrid .it{display:grid;grid-template-columns:minmax(0,1fr) 64px;align-items:center;gap:6px;font-size:.85rem}
-.baggrid .it small{display:block;color:var(--muted);font-size:.72rem;font-weight:400}
-.baggrid .itn{all:unset;cursor:pointer;font-size:.85rem;line-height:1.35;color:var(--fg);min-width:0}
-.baggrid .itn:disabled{cursor:default}
-.baggrid .itn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
-.baggrid .ii{display:inline-grid;place-items:center;width:15px;height:15px;margin-left:5px;border-radius:50%;border:1px solid var(--accent);color:var(--accent);font-size:.66rem;font-style:normal;font-weight:700;vertical-align:1px}
-.baggrid .itd{grid-column:1/-1;font-size:.78rem;line-height:1.5;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px;display:flex;flex-wrap:wrap;gap:2px 10px}
-.baggrid .itd[hidden]{display:none}
-.baggrid .itd .up{color:var(--ok)} .baggrid .itd .dn{color:var(--bad)}
-.baggrid input{width:64px;box-sizing:border-box;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);font-family:var(--f-mono);text-align:right}
-.bagh{font-size:.88rem;margin:14px 0 6px;font-weight:700}
-.bagd summary{cursor:pointer;color:var(--accent)}
+body[data-mode="theory"] .grid{display:none}
 .theory{max-width:80ch;font-size:.92rem}
 .theory>*{margin:0 0 10px}
 .theory h3{font-size:1rem;margin:22px 0 8px;padding-top:10px;border-top:1px solid var(--line);scroll-margin-top:12px}
@@ -169,7 +132,6 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
 .diag .d-dim{stroke:var(--muted);stroke-width:1}
 .theory .steps{padding-left:1.3em;margin:0 0 10px}
 .theory .steps li{margin:3px 0}
-.theory h4 .dt{display:inline-block;margin-left:8px;font-size:.72rem;font-weight:500;color:var(--muted);border:1px solid var(--line);border-radius:10px;padding:0 7px;vertical-align:1px}
 .toc{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:.82rem;margin:4px 0 6px}
 .toc a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent)}
 .diag{width:100%;max-width:520px;height:auto;display:block;margin:4px 0 10px}
@@ -183,23 +145,16 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
 
 <div class="wrap">
 <header>
-  <h1>PUBGモバイル計算機</h1>
-  <p>感度（モニターディスタンス方式）・ダメージ・バッグ容量の計算機です。</p>
+  <h1>PUBGモバイル感度計算機</h1>
+  <p>モニターディスタンス（MD）方式。どのスコープでも「クロスヘアから同じ割合だけ離れた敵」に同じ指の量でエイムできるよう換算します。</p>
 </header>
 
 <div class="tabs" role="tablist" aria-label="表示の切り替え">
-  <div class="tabrow">
-    <button type="button" role="tab" id="tab-calc" data-mode="calc">感度計算</button>
-    <button type="button" role="tab" id="tab-cmp" data-mode="cmp">感度比較</button>
-    <button type="button" role="tab" id="tab-dev" data-mode="dev">端末換算</button>
-    <button type="button" role="tab" id="tab-acc" data-mode="acc">加速換算</button>
-  </div>
-  <div class="tabrow">
-    <button type="button" role="tab" id="tab-dmg" data-mode="dmg">ダメージ<small>作成中</small></button>
-    <button type="button" role="tab" id="tab-pulse" data-mode="pulse">パルス<small>作成中</small></button>
-    <button type="button" role="tab" id="tab-bag" data-mode="bag">バッグ容量</button>
-    <button type="button" role="tab" id="tab-theory" data-mode="theory">理論・検証</button>
-  </div>
+  <button type="button" role="tab" id="tab-calc" data-mode="calc">計算機</button>
+  <button type="button" role="tab" id="tab-cmp" data-mode="cmp">感度比較</button>
+  <button type="button" role="tab" id="tab-dev" data-mode="dev">端末換算</button>
+  <button type="button" role="tab" id="tab-acc" data-mode="acc">加速ON⇔OFF</button>
+  <button type="button" role="tab" id="tab-theory" data-mode="theory">理論・検証</button>
 </div>
 
 <div class="grid">
@@ -352,13 +307,11 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
         <small>ONにすると端末を傾けて視点を動かせます（指の速さの測定には影響しません）。</small></div>
       <div class="f" id="spdgbox" hidden><label for="spdgsens">ゲーム内のジャイロ感度（この視点・%）</label>
         <input type="number" id="spdgsens" min="1" max="800" step="1" value="200">
-        <small style="margin-top:6px">動かし方：端末を前に倒す→下、起こす→上、右手が上になるように傾ける（画面が左を向く）→右、左手が上になるように傾ける（画面が右を向く）→左。</small>
+        <label for="spdgyaw" style="margin-top:8px">左右の視点の動かし方</label>
+        <select id="spdgyaw"><option value="both">回す＋ハンドルのように傾ける（両方）</option><option value="turn">回す（体ごと向きを変える動き）のみ</option><option value="roll">ハンドルのように傾けるのみ</option></select>
         <label class="check" style="margin-top:6px;justify-content:flex-start;gap:8px"><input type="checkbox" id="spdginvx"><span>左右を反転</span></label>
         <label class="check" style="justify-content:flex-start;gap:8px"><input type="checkbox" id="spdginvy"><span>上下を反転</span></label>
-        <small>回り方は実測値（TPPで100%あたり端末1°→0.645°、スコープ中はスコープごとの実測比、レッドドットで約0.43倍）。右手を上げて視点が左に動くときは「左右を反転」に✓。測定中は画面上部に、ジャイロで動いた左右・上下の速さ（°/秒）が出るので、両方が反応しているか確かめられます。画面は開始したときの横向きで固定されます（大きく傾けても回りません）。</small></div>
-      <div class="f"><label for="spdland">横画面の向き</label>
-        <select id="spdland"><option value="right">右に回す（充電端子が左）</option><option value="left">左に回す（充電端子が右）</option><option value="auto">自動（開始したときの向き）</option></select>
-        <small>ゲームと同じ向きを選んでください。測定中はこの向きで固定され、端末を大きく傾けても画面は回りません。</small></div>
+        <small>回り方は実測値（TPPで100%あたり端末1°→0.645°、スコープ中はスコープごとの実測比、レッドドットで約0.43倍）。端末を右に回して視点が左に動くときは「左右を反転」に✓。測定中は画面上部に、ジャイロで動いた左右・上下の速さ（°/秒）が出るので、両方が反応しているか確かめられます。画面は開始したときの横向きで固定されます（大きく傾けても回りません）。</small></div>
       <div class="f"><label for="spddur">時間</label>
         <select id="spddur"><option value="30">30秒</option><option value="60">60秒</option></select></div>
     </div>
@@ -400,7 +353,7 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
   <p class="note" style="margin:8px 0 0">・加速は速さで倍率が変わるため、どの速さでもONと同じになるOFFの値はありません。「普段の速さで平均すると同じ量回る」値です。OFFにするとゆっくりした操作は今より速く、速いフリックは今より遅くなります。<br>・倍率の式：端末のpx/秒で 約610まで1倍 → 約1,330で2.2倍 → それ以上はゆるやかに約2.5倍まで（Legion Tab Y700 Gen3・Galaxy S25の実測、TPP〜8倍で共通）。<br>・換算するのは指の感度（カメラ・スコープ）だけです。ジャイロには水平スライド加速はかかりません。</p>
 </section>
 
-<section class="panel ms m-calc m-cmp m-dev m-acc m-bag" aria-label="画像で保存">
+<section class="panel ms m-calc m-cmp m-dev m-acc" aria-label="画像で保存">
   <h2>画像で保存</h2>
   <div class="saverow">
     <input type="text" id="savename" maxlength="40" placeholder="名前（画像のタイトル・ファイル名になります）">
@@ -416,69 +369,12 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
   <p class="note" style="margin:0">計算式・実測データ・検証の方法は「理論・検証」タブにまとめています。</p>
 </section>
 
-<section class="panel ms m-dmg" aria-label="ダメージ計算">
-  <h2>ダメージ計算（作成中）</h2>
-  <p class="note" style="margin:0 0 10px">武器・当たった場所・相手の防具から、1発のダメージと倒すまでの発数を出します。数値はネットの公開データ（下の注意を参照）で、まだ実測していません。</p>
-  <div class="devgrid">
-    <div class="f"><label for="dmgw">武器</label><select id="dmgw"></select></div>
-    <div class="f"><label>相手のヘルメット</label><div class="segs" id="dmgh"></div></div>
-    <div class="f"><label>相手のベスト</label><div class="segs" id="dmgv"></div></div>
-    <div class="f"><label for="dmghp">相手の体力</label><input type="number" id="dmghp" min="1" max="100" step="1" value="100"><small>100＝無傷。回復しきれていない相手を想定するときに下げます。</small></div>
-  </div>
-  <div class="dmgres" id="dmgres"></div>
-  <div id="dmgsub" class="note" style="margin:-4px 0 12px"></div>
-  <h3 style="font-size:.9rem;margin:14px 0 6px">全武器の比較（上で選んだ防具）</h3>
-  <div class="tbl"><table id="dmgtbl">
-    <thead><tr><th>武器</th><th>基礎</th><th>頭</th><th>胴</th><th>手足</th><th>胴で倒す発数</th><th>胴で倒す時間</th></tr></thead>
-    <tbody></tbody>
-  </table></div>
-  <p class="note" style="margin:8px 0 0">ダメージ＝基礎ダメージ×部位の倍率×（1−防具の軽減率）。数値はネットの公開データで、まだ実測していません。 計算のしかた・数値の出どころ・確認した日付は「理論・検証」タブ（13章）にまとめています。</p>
-</section>
-
-<section class="panel ms m-pulse" aria-label="パルス">
-  <h2>パルス（安全地帯の外）のダメージと回復（作成中）</h2>
-  <p class="note" style="margin:0 0 10px">パルスの中に何秒いられるか、回復アイテムを使うと差し引きいくら回復するかを出します。数値はネットの公開データ（PC版エランゲル）なので、モバイル版で確認しながら直していく予定です。</p>
-  <div class="devgrid">
-    <div class="f"><label>モード</label><div class="segs" id="plsmode"><label><input type="radio" name="plsmode" value="classic">クラシック</label><label><input type="radio" name="plsmode" value="top">トップレ</label></div><small id="plsmoden"></small></div>
-    <div class="f"><label for="plsph">パルスのフェーズ</label><select id="plsph"></select></div>
-    <div class="f"><label for="plshp">今の体力</label><input type="number" id="plshp" min="1" max="100" step="1" value="75"></div>
-    <div class="f"><label for="plsbo">今のブースト（0〜100）</label><input type="number" id="plsbo" min="0" max="100" step="1" value="0"><small>エナジードリンク＋40、鎮痛剤＋60、アドレナリン＋100</small></div>
-<div class="f"><label for="plsver">回復アイテムの値</label><select id="plsver" class="verSel"><option value="auto">自動（11月12日から新しい値）</option><option value="old">今の値</option><option value="new">11月12日アップデート後の値</option></select><small id="plsvern"></small></div>
-    <div class="f"><label for="plsdps">このフェーズの毎秒ダメージ</label><input type="number" id="plsdps" min="0" max="50" step="0.1"><small>実測した値に書き換えられます（フェーズごとに保存）。</small></div>
-  </div>
-  <div id="plsres" class="devres"></div>
-  <svg class="plschart" id="plschart" viewBox="0 0 400 200" role="img" aria-label="パルスの中での体力の変化"></svg>
-  <div class="legend" style="margin:-2px 0 10px"><span><i style="border-color:var(--bad)"></i>ブーストなし</span><span><i style="border-color:var(--accent)"></i>今のブーストあり</span></div>
-  <h3 style="font-size:.9rem;margin:14px 0 6px">このフェーズで回復アイテムを使ったとき（パルスの中で使用）</h3>
-  <div class="tbl"><table id="plsitm"><thead><tr><th>アイテム</th><th>使用時間</th><th>使用中に受けるダメージ</th><th>回復</th><th>差し引き</th><th>使用後の体力</th></tr></thead><tbody></tbody></table></div>
-  <h3 style="font-size:.9rem;margin:14px 0 6px">フェーズごとの比較（今の体力・ブーストで）</h3>
-  <div class="tbl"><table id="plstbl"><thead><tr><th>フェーズ</th><th>毎秒ダメージ</th><th>ブーストなしで倒れるまで</th><th>今のブーストありで</th><th>ブースト最大で相殺</th></tr></thead><tbody></tbody></table></div>
-  <p class="note" style="margin:8px 0 0">ダメージは毎秒・体力100を基準。ブーストの回復と回復アイテムの使用時間も含めて計算します。数値はネットの値（トップレは仮）です。 計算のしかた・数値の出どころ・確認した日付は「理論・検証」タブ（14章）にまとめています。</p>
-</section>
-
-<section class="panel ms m-bag" aria-label="バッグ容量">
-  <h2>バッグ容量</h2>
-  <p class="note" style="margin:0 0 10px">バッグとベストから合計の容量を出し、持ち物の個数を入れると残りの容量が分かります。<b>ⓘ</b>の付いたアイテム名をタップすると、ゲーム内の説明（アタッチメントは性能の上がり下がり）が出ます。入力はこのブラウザに保存されます。</p>
-  <div class="devgrid">
-    <div class="f"><label>バッグ</label><div class="segs" id="bagb"></div></div>
-    <div class="f"><label>ベスト</label><div class="segs" id="bagv"></div></div>
-<div class="f"><label for="bagver">回復アイテムの値</label><select id="bagver" class="verSel"><option value="auto">自動（11月12日から新しい値）</option><option value="old">今の値</option><option value="new">11月12日アップデート後の値</option></select><small id="bagvern"></small></div>
-    <div class="f"><label for="bagbase">素の容量（バッグなし）</label><input type="number" id="bagbase" min="0" max="300" step="1" value="150"><small>ゲーム内で確認済み（バッグ・ベストなしで150）。</small></div>
-  </div>
-  <div id="bagres" class="devres"></div>
-  <div class="bagbar" id="bagbar"><i></i></div>
-  <div id="bagleft" class="note"></div>
-  <div id="bagitems"></div>
-  <div class="saverow" style="margin-top:10px"><button class="btn ghost" id="bagclear" type="button">個数をすべて0にする</button></div>
-  <p class="note" style="margin:8px 0 0">アイテムの容量・バッグとベストの容量は、すべてゲーム内で確認した値です。 計算のしかた・数値の出どころ・確認した日付は「理論・検証」タブ（15章）にまとめています。</p>
-</section>
-
 <section class="panel ms m-theory theory" aria-label="理論と検証">
   <h2>理論と検証</h2>
   <p>この計算機で使っている考え方、計算式、定数、それを確かめた実測データをすべてまとめたページです。実測はすべて Legion Tab Y700 Gen3（343ppi）での画面録画で行いました。端末換算と加速の確認だけ Galaxy S25（416ppi）も使っています。</p>
 
   <nav class="toc" aria-label="目次">
-    <a href="#th-1">1. 全体の流れ</a><a href="#th-2">2. MD方式</a><a href="#th-3">3. 視野角</a><a href="#th-4">4. 感度調整 k</a><a href="#th-5">5. TPPスコープなし</a><a href="#th-6">6. ジャイロ</a><a href="#th-7">7. 端末換算</a><a href="#th-8">8. 加速ON⇔OFF</a><a href="#th-9">9. 指の速さの測定</a><a href="#th-10">10. 実測データ一覧</a><a href="#th-11">11. 解析の方法</a><a href="#th-12">12. 未検証・今後</a><a href="#th-13">13. ダメージ</a><a href="#th-14">14. パルス</a><a href="#th-15">15. バッグ容量</a><a href="#th-16">16. 作成・実測の記録</a>
+    <a href="#th-1">1. 全体の流れ</a><a href="#th-2">2. MD方式</a><a href="#th-3">3. 視野角</a><a href="#th-4">4. 感度調整 k</a><a href="#th-5">5. TPPスコープなし</a><a href="#th-6">6. ジャイロ</a><a href="#th-7">7. 端末換算</a><a href="#th-8">8. 加速ON⇔OFF</a><a href="#th-9">9. 指の速さの測定</a><a href="#th-10">10. 実測データ一覧</a><a href="#th-11">11. 解析の方法</a><a href="#th-12">12. 未検証・今後</a>
   </nav>
 
   <h3 id="th-1">1. 全体の流れ</h3>
@@ -566,7 +462,7 @@ OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
   <h3 id="th-10">10. 実測データ一覧</h3>
   <p class="note">n はスワイプ（または解析区間）の数です。1pxは端末の画面の物理pxです。録画は2560×1440で、ゲーム画面の部分は 端末px × 0.9 で記録されています。</p>
 
-  <h4>10-1. 感度の数値と回転量（加速OFF・ジャイロOFF・TPP）<span class="dt">検証8・10/16</span></h4>
+  <h4>10-1. 感度の数値と回転量（加速OFF・ジャイロOFF・TPP）</h4>
   <div class="tbl"><table class="sm">
     <thead><tr><th>感度</th><th>n</th><th>1pxあたりの回転</th><th>感度36に直した値</th></tr></thead>
     <tbody>
@@ -578,7 +474,7 @@ OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
     </tbody></table></div>
   <p class="note">中央値です。回転量は画面上部の方位の数字（1°単位）から読んでいます。感度36はnが少なく方位の読み取り誤差が大きいので、他の4つ（0.064）を採用しました。結論：<b>感度の数値と回転量は比例し、感度36で 1pxあたり約0.064°</b>。</p>
 
-  <h4>10-2. スコープによる違い（全スコープ感度36）<span class="dt">検証9・11・10/16</span></h4>
+  <h4>10-2. スコープによる違い（全スコープ感度36）</h4>
   <div class="tbl"><table class="sm">
     <thead><tr><th>スコープ（感度36）</th><th>n</th><th>1pxあたりの回転（中央値）</th><th>範囲</th></tr></thead>
     <tbody>
@@ -594,7 +490,7 @@ OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
     </tbody></table></div>
   <p class="note">6倍は検証9ではn=2で高めに出たため、検証11で録り直しました（n=5で他のスコープと同じ値）。回転量は方位の数字（1°単位）から読むので、1本ごとに±10%ほどのばらつきがあります。結論：<b>同じ数値ならどのスコープでも1pxあたりの回転量はほぼ同じ</b>で、ズーム分の補正はかかっていません。</p>
 
-  <h4>10-3. 水平スライド加速のカーブ<span class="dt">検証1〜4・6・7・10/15〜16</span></h4>
+  <h4>10-3. 水平スライド加速のカーブ</h4>
   <p>加速ONとOFFで同じような操作を録画して、指の速さ（端末px/秒）ごとの回転量の比を出しました。2端末で同じカーブになり、TPPと各スコープでも差はありませんでした。8章の式はこの結果です。</p>
   <div class="tbl"><table class="sm">
     <thead><tr><th>録画</th><th>端末</th><th>加速</th><th>解析したスワイプ</th><th>回転量を読めたもの</th></tr></thead>
@@ -608,7 +504,7 @@ OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
       <tr><td>合計</td><td></td><td></td><td>1,148</td><td>853</td></tr>
     </tbody></table></div>
 
-  <h4>10-4. TPPのカメラ位置（加速OFF・ジャイロOFF・感度50・TPP/FPP視野角90°）<span class="dt">検証2・3・10/17</span></h4>
+  <h4>10-4. TPPのカメラ位置（加速OFF・ジャイロOFF・感度50・TPP/FPP視野角90°）</h4>
   <p>画面の端に置いた的を照準まで動かすのに必要な指の移動量（中央値、端末px）。的までの距離は、的の上の距離表示とエネミーマーカーの距離が一致する位置で合わせています。</p>
   <div class="tbl"><table class="sm">
     <thead><tr><th>距離</th><th>右 (n)</th><th>左 (n)</th><th>100mとの比</th><th>2.25mでの計算値</th></tr></thead>
@@ -621,7 +517,7 @@ OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
     </tbody></table></div>
   <p class="note">4つの距離をまとめて当てはめると d = 2.26m（10mだけから求めた値は2.25m、90%の範囲で約2.0〜2.7m）。25mと50mは同じ録画の中の比（右1.038・左1.040）でも、計算値 1.039 と一致しました。左右で約10%差があるのは端に置くときの癖によるもので、同じ向き同士の比では打ち消されます。カメラ位置の検証1は的の判別ができず不採用、検証2の25m・50mは開始位置がそろっていなかったため不採用にしました。</p>
 
-  <h4>10-5. ジャイロ（phyphoxで端末の傾きを同時に記録）<span class="dt">ジャイロ検証1〜3・10/17</span></h4>
+  <h4>10-5. ジャイロ（phyphoxで端末の傾きを同時に記録）</h4>
   <div class="tbl"><table class="sm">
     <thead><tr><th>ジャイロ感度（TPP）</th><th>n（解析点）</th><th>端末1°あたり</th><th>100%あたり</th></tr></thead>
     <tbody>
@@ -655,7 +551,7 @@ OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
     </tbody></table></div>
   <p class="note">ジャイロ200%での端末1°あたりの回転量です。n は10秒区間の数です。採用値は、スコープごとの区間をまとめて当てはめた値です。5秒ずつずらした10秒区間ごとの値（右の2列）とも1.5%以内で一致しています。R はレッドドットを1とした比です。</p>
 
-  <h4>10-6. 普段の指の速さ（加速ONでの録画）<span class="dt">検証5・10・10/16</span></h4>
+  <h4>10-6. 普段の指の速さ（加速ONでの録画）</h4>
   <div class="tbl"><table class="sm">
     <thead><tr><th>録画</th><th>視点</th><th>n</th><th>指の総移動</th><th>速さの中央値</th><th>平均倍率 M</th></tr></thead>
     <tbody>
@@ -683,46 +579,6 @@ OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
     <li>スコープの視野角（52／40／26.67／19／13.33／10°）は元の計算式の値です。</li>
   </ul>
   <p class="note">この計算機は、動画で公開されていた計算方法を元にしています（MD 25%・50%、感度調整 1.0／1.15／0.87 の各表と小数第2位まで一致することを確認）。その後、TPPのカメラ位置とジャイロの補正などの定数は、自分の録画による実測値に置き換えています。</p>
-
-  <h3 id="th-13">13. ダメージ（作成中）</h3>
-  <div class="eq">ダメージ = 基礎ダメージ × 部位の倍率 × (1 − 防具の軽減率)
-倒すのに必要な発数 = 切り上げ(相手の体力 ÷ 1発のダメージ)
-倒すまでの時間 = (発数 − 1) × 連射間隔</div>
-  <p>部位の倍率（頭／胴／手足）：AR 2.35／1.0／0.9、DMR 2.35／1.0／0.95、SR 2.5／1.3／0.95、SMG 1.8／1.05／1.3、LMG 2.3／1.05／0.9、SG 1.5／1.0／1.05、HG 2.1／1.0／1.0。</p>
-  <ul class="steps"><li>ダメージ＝基礎ダメージ × 部位の倍率 ×（1 − 防具の軽減率）。ヘルメットは頭、ベストは胴だけを守り、手足はどちらも効きません。</li><li>防具の軽減率：Lv1 30%、Lv2 40%、Lv3 55%（ヘルメット・ベスト共通）。防具の耐久値（ベスト Lv1 200・Lv2 220・Lv3 250、ゲーム内で確認済み）はまだ計算に入れていません。</li><li>倒す時間＝（発数−1）× 連射間隔。全弾命中・距離による減衰なし・ダウン（気絶）までの計算です。</li><li>ショットガンは近距離で全ペレットが胴に当たった合計の値です。</li><li>出典：基礎ダメージは PUBG Mobile の公開データ（Sportskeeda、2020年）、連射間隔は PC 版のデータ（PUBG Resource）、部位の倍率は PC 版の値（アサルトライフルの頭 2.35 などはモバイルのヘッドショットの実例と一致）、防具の軽減率は国内の攻略サイト（AltemaほかPUBGモバイル装備一覧）。アップデートで変わっている可能性があります。今後、訓練場での実測で置き換える予定です。</li></ul>
-  <p class="note">確認状況（2026年10月18日）：ベストの耐久値（Lv1 200・Lv2 220・Lv3 250）だけゲーム内で確認済み。基礎ダメージ・倍率・軽減率・連射間隔はネットの値で、未実測です。</p>
-
-  <h3 id="th-14">14. パルス（作成中）</h3>
-  <div class="eq">体力の変化（0.1秒ごと）= ブーストの回復 − パルスの毎秒ダメージ
-ブーストの回復（毎秒）= 1〜20：0.125 ／ 21〜60：0.25 ／ 61〜90：0.375 ／ 91〜100：0.5
-ブーストの減り方 = 8秒ごとに約2.5
-回復アイテムの差し引き = 回復量 − 使用時間 × 毎秒ダメージ</div>
-  <ul class="steps"><li>パルスのダメージ（毎秒）：クラシックはフェーズ1から 0.4／0.6／0.8／1／3／5／7／9／11（PC版エランゲルの値、PUBG Wiki）。トップレはクラシックとダメージが違いますが、値がまだ分からないため同じ値を仮に入れています。モバイル版は「フェーズ5で1〜3、6で5、7で7、8で11」とする資料もあります（Gurugamer）。</li><li>ブーストの回復：ブーストの段階ごとに8秒で 1／2／3／4 回復（0〜20／20〜60／60〜90／90〜100）。ブーストは8秒ごとに約2.5ずつ減ります（鎮痛剤1個で約3分・約40回復になる値）。</li><li>回復アイテム：包帯＋10（75まで）・4秒、応急処置キット 75まで・6秒、医療用キット 100まで・8秒。11月12日のアップデートで包帯は＋12・3秒、医療用キットは6秒になる予定です（「回復アイテムの値」で切り替え。自動なら11月12日から新しい値）。ブーストはエナジードリンク4秒・鎮痛剤6秒・アドレナリン6秒（PC版の値）。</li><li>「ブースト最大で相殺」は、ブースト90以上の回復（毎秒0.5）がパルスのダメージを上回るかどうかです。</li><li>使用時間中もパルスのダメージを受け続けるとして計算しています。体力が尽きると使い終わる前に倒れます。</li></ul>
-  <p class="note">確認状況（2026年10月18日）：ブーストで移動速度が上がる境目（60以上）はゲーム内の説明で確認済み。パルスの毎秒ダメージ（クラシック・トップレ）、ブーストの回復・減り方、使用時間は未実測です。11月12日のアップデート予定（包帯・医療用キット）は2026年10月18日に追加しました。</p>
-
-  <h3 id="th-15">15. バッグ容量</h3>
-  <div class="eq">合計容量 = 素の容量 150 + バッグ（Lv1 150／Lv2 200／Lv3 250）+ ベスト 50
-使った容量 = Σ アイテムの個数 × 1個あたりの容量（弾は1発あたり）</div>
-  <ul class="steps"><li>アイテムの容量は、ゲーム内のアイテム説明の「容量」をスクショで確認した値です（2026年10月18日）。弾は1発あたり 5.56mm 0.5、7.62mm 0.6、9mm 0.375、.45ACP 0.4、12ゲージ 1.25。</li><li>すべてゲーム内のアイテム説明で確認済みです（2026年10月18日）。</li><li>説明の ⇈ は性能が大きく上がる、↑ は上がる、↓ は下がる（ゲーム内の矢印と同じ）。</li><li>11月12日のアップデートで、医療用キット 20→15、アドレナリン 20→10、鎮痛剤 10→6 になる予定です（「回復アイテムの値」で切り替え。自動なら11月12日から新しい値）。</li><li>容量の合計もゲーム内で確認済みです：何も着けない 150、ベストのみ 200（Lv1〜3どれでも＋50）、ベスト＋バッグ Lv1 350・Lv2 400・Lv3 450（バッグは＋150／＋200／＋250）。</li></ul>
-  <p class="note">確認状況：アイテムの容量と説明・バッグとベストの容量・ベストの耐久値は、2026年10月18日にゲーム内のスクショで確認しました（アイテム約80種、医療用キットとスコープは同日に追加で確認）。</p>
-
-  <h3 id="th-16">16. 作成・実測の記録</h3>
-  <p class="note">録画の日付は、録画ファイルの保存日時です。</p>
-  <div class="tbl"><table class="sm">
-    <thead><tr><th>日付（2026年）</th><th>内容</th></tr></thead>
-    <tbody>
-      <tr><td>10月14日</td><td>感度計算機の計算式を作成（元の計算方法の表から逆算して一致を確認）</td></tr>
-      <tr><td>10月15日</td><td>水平スライド加速 検証1・2（Legion、加速ON／OFF）を録画・解析</td></tr>
-      <tr><td>10月16日</td><td>加速 検証3・4（加速ON／OFF）、検証5（普段のエイムの指の速さ）</td></tr>
-      <tr><td>10月16日</td><td>加速 検証6・7（Galaxy S25、加速ON／OFF）→ 加速カーブと端末換算を確定</td></tr>
-      <tr><td>10月16日</td><td>検証8（感度と回転量の比例）、検証9（全スコープ感度36）、検証10（練習の指の速さ）、検証11（6倍の録り直し）</td></tr>
-      <tr><td>10月17日</td><td>ジャイロ検証1〜3（感度50〜400%、速さ、スコープ別）→ ジャイロ補正を実測値に置き換え</td></tr>
-      <tr><td>10月17日</td><td>TPPのカメラ位置 検証1（不採用）・検証2（10m・100m）・検証3（25m・50m）→ 2.25mに置き換え</td></tr>
-      <tr><td>10月17日</td><td>指の速さの測定（的当て）を作成、ジャイロに対応。「理論・検証」タブを作成</td></tr>
-      <tr><td>10月18日</td><td>GitHub Pagesで公開。ジャイロの向き・横画面の固定を修正</td></tr>
-      <tr><td>10月18日</td><td>ダメージ・パルス・バッグ容量のタブを作成（ネットの値）</td></tr>
-      <tr><td>10月18日</td><td>アイテムの容量と説明、バッグ・ベストの容量、ベストの耐久値をゲーム内で確認して反映。11月12日アップデート予定の値を追加。パルスにクラシック／トップレの切り替えを追加</td></tr>
-    </tbody></table></div>
 </section>
 </div>
 
@@ -875,29 +731,6 @@ function drawCompare(r){
 }
 
 // 端末換算・加速換算の画像
-function drawBag(r){
-  const W=860,P=28,RH=28, b=r.bag||{}, rows=b.rows||[], st=b.st||{};
-  const H=P+40+(r.name?20:0)+14+19*3+16+30+20+RH*(rows.length+1)+P+20;
-  const [cv,g]=newCanvas(W,H); let y=P+26;
-  g.fillStyle=IC.fg; g.font=`700 22px ${IMGF}`; g.fillText("PUBGモバイル バッグ容量",P,y);
-  g.font=`400 13px ${IMGF}`; g.fillStyle=IC.mu; g.textAlign="right"; g.fillText(new Date(r.createdAt||Date.now()).toLocaleString("ja-JP"),W-P,y); g.textAlign="left";
-  if(r.name){ y+=20; g.fillStyle=IC.ac; g.font=`700 12.5px ${IMGF}`; g.fillText(r.name,P,y); }
-  y+=14;
-  [["バッグ",["なし","Lv1","Lv2","Lv3"][st.b]||"—"],["ベスト",st.v?"あり":"なし"],["回復アイテムの値",b.ver||"—"]].forEach(([k,v])=>{ y+=19;
-    g.font=`400 11.5px ${IMGF}`; g.fillStyle=IC.mu; g.fillText(k,P,y); g.font=`600 12px ${IMGF}`; g.fillStyle=IC.fg; g.fillText(v,P+140,y); });
-  y+=16+22; const left=(b.cap||0)-(b.used||0);
-  g.font=`700 16px ${IMGF}`; g.fillStyle=left<0?IC.bad:IC.ac; g.fillText(`使用 ${(+b.used||0).toFixed(1)} ／ 容量 ${b.cap||0}　残り ${left.toFixed(1)}`,P,y);
-  y+=12; g.fillStyle=IC.soft; g.fillRect(P,y,W-2*P,10); g.fillStyle=left<0?IC.bad:IC.ac; g.fillRect(P,y,(W-2*P)*Math.min(1,b.cap?b.used/b.cap:0),10); y+=22;
-  const cx=[P+8,P+170,0,0,0], cr=[0,0,P+560,P+680,W-P];
-  g.fillStyle=IC.soft; g.fillRect(P,y,W-2*P,RH); g.font=`700 12.5px ${IMGF}`; g.fillStyle=IC.mu;
-  g.fillText("分類",cx[0],y+19); g.fillText("アイテム",cx[1],y+19); g.textAlign="right"; ["個数","1個","合計"].forEach((t,j)=>g.fillText(t,cr[j+2],y+19)); g.textAlign="left"; y+=RH;
-  if(!rows.length){ g.font=`400 13px ${IMGF}`; g.fillStyle=IC.mu; g.fillText("持ち物は入力されていません。",P+8,y+19); }
-  rows.forEach(([h,nm,n,c,t])=>{ g.strokeStyle=IC.ln; g.beginPath(); g.moveTo(P,y+RH); g.lineTo(W-P,y+RH); g.stroke();
-    g.font=`400 12px ${IMGF}`; g.fillStyle=IC.mu; g.fillText(h.replace("（個数は発数）",""),cx[0],y+19);
-    g.font=`500 13px ${IMGF}`; g.fillStyle=IC.fg; g.fillText(nm.length>26?nm.slice(0,25)+"…":nm,cx[1],y+19);
-    g.font=`600 13px ${IMGM}`; g.textAlign="right"; g.fillText(String(n),cr[2],y+19); g.fillStyle=IC.mu; g.fillText(String(c),cr[3],y+19); g.fillStyle=IC.ac; g.fillText((+t).toFixed(1).replace(/\.0$/,""),cr[4],y+19); g.textAlign="left"; y+=RH; });
-  return cv;
-}
 const SET_IDS={dev:["devfrom","ppifrom","devto","ppito","devone"],acc:["accdir","accdev","accppi","accmy","accmode","accspd","accone"]};
 function readSet(m){const o={};SET_IDS[m].forEach(id=>o[id]=$(id).value);return o}
 function drawConv(r){
@@ -930,12 +763,12 @@ function drawConv(r){
 }
 async function saveImage(r){
   try{ if(document.fonts?.ready) await document.fonts.ready }catch(e){}
-  const cv=r.mode==="cmp"?drawCompare(r):r.mode==="bag"?drawBag(r):(r.mode==="dev"||r.mode==="acc")?drawConv(r):drawImage(r);
+  const cv=r.mode==="cmp"?drawCompare(r):(r.mode==="dev"||r.mode==="acc")?drawConv(r):drawImage(r);
   const raw=await new Promise(res=>cv.toBlob(res,"image/png"));
   if(!raw){msg("画像を作れませんでした。");return}
-  const blob=await embedInputs(raw,{v:3,mode:r.mode||"calc",name:r.name||"",inputs:r.inputs||{},game:r.mode==="cmp"?r.game:undefined,settings:r.settings,bag:r.mode==="bag"&&r.bag?r.bag.st:undefined});
+  const blob=await embedInputs(raw,{v:3,mode:r.mode||"calc",name:r.name||"",inputs:r.inputs||{},game:r.mode==="cmp"?r.game:undefined,settings:r.settings});
   const safe=(r.name||"結果").replace(/[\\/:*?"<>|]/g,"_").slice(0,40);
-  const filename=r.mode==="bag"?`PUBGバッグ容量_${safe}.png`:`PUBG感度${({cmp:"比較",dev:"端末換算",acc:"加速換算"})[r.mode]||""}_${safe}.png`;
+  const filename=`PUBG感度${({cmp:"比較",dev:"端末換算",acc:"加速換算"})[r.mode]||""}_${safe}.png`;
   let dl=null; try{ dl=window.claude?.use? await claude.use("downloads"):null }catch(e){}
   if(dl){
     try{ await dl.save({filename,data:blob}); msg("画像を保存しました。") }
@@ -983,7 +816,6 @@ $("imgfile").addEventListener("change",async ev=>{
   const f=ev.target.files&&ev.target.files[0]; ev.target.value=""; if(!f) return;
   try{
     const d=readEmbedded(await f.arrayBuffer());
-    if(d&&d.mode==="bag"&&d.bag){ if(window.BAG_API) BAG_API.load(d.bag); if(d.name) $("savename").value=d.name; setMode("bag"); msg(`画像「${d.name||f.name}」のバッグの中身を反映しました。`); window.scrollTo({top:0,behavior:"smooth"}); return; }
     if(!d||!d.inputs){msg("この画像には入力データが入っていません。計算機の「画像で保存」で作った画像を選んでください（SNSやLINEで送り直した画像はデータが消えることがあります）。");return}
     IN_IDS.forEach(id=>{const e=$(id),v=d.inputs[id]; if(v===undefined) return; if(e.type==="checkbox") e.checked=!!v; else e.value=v});
     if(d.name) $("savename").value=d.name;
@@ -995,7 +827,6 @@ $("imgfile").addEventListener("change",async ev=>{
 });
 $("imgbtn").addEventListener("click",()=>{
   const base={name:$("savename").value.trim()||(MODE==="cmp"?"感度比較":"現在の計算結果"),createdAt:Date.now(),inputs:readInputs()};
-  if(MODE==="bag"){ saveImage({...base,name:$("savename").value.trim()||"バッグの中身",mode:"bag",bag:window.BAG_API?BAG_API.snapshot():{}}); return; }
   if(MODE==="cmp") saveImage({...base,mode:"cmp",calc:calcVals(),game:gameVals()});
   else if(MODE==="dev"||MODE==="acc"){
     const pre=MODE; const rows=readTable(pre+"out"); const wrows=readTable(pre+"wout");
@@ -1011,9 +842,9 @@ $("imgbtn").addEventListener("click",()=>{
 
 /* ---- 表示モード（計算機／感度比較） ---- */
 let MODE="calc";
-function setMode(m){MODE=["calc","cmp","dev","acc","dmg","pulse","bag","theory"].includes(m)?m:"calc"; document.body.dataset.mode=MODE;
+function setMode(m){MODE=["calc","cmp","dev","acc","theory"].includes(m)?m:"calc"; document.body.dataset.mode=MODE;
   document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.mode===MODE)));
-  $("imgnote").textContent={cmp:"感度比較の表とグラフを、計算に使った条件と一緒に画像にします。",dev:"端末換算の結果を、計算に使った条件と端末の情報と一緒に画像にします。",acc:"加速ON⇔OFFの換算結果を、計算に使った条件と一緒に画像にします。",bag:"バッグ・ベストの設定と持ち物の一覧を画像にします。"}[MODE]||"計算結果の表を、計算に使った条件と一緒に画像にします。";
+  $("imgnote").textContent={cmp:"感度比較の表とグラフを、計算に使った条件と一緒に画像にします。",dev:"端末換算の結果を、計算に使った条件と端末の情報と一緒に画像にします。",acc:"加速ON⇔OFFの換算結果を、計算に使った条件と一緒に画像にします。"}[MODE]||"計算結果の表を、計算に使った条件と一緒に画像にします。";
   try{localStorage.setItem("pubg-sens-mode",MODE)}catch(e){}}
 document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
 /* ---- 感度比較モード ---- */
@@ -1142,37 +973,17 @@ function renderSpdRes(){
   /* 画面の自動回転：開始時の横向きにロック。ロックできずに上下逆に回ったときは、表示を180°回して元の見え方に戻す */
   function lockOri(){ const t=holdA===90?"landscape-primary":holdA===270?"landscape-secondary":"landscape";
     try{ screen.orientation?.lock?.(t).catch(()=>screen.orientation?.lock?.("landscape").catch(()=>{})) }catch(e){} }
-  let locking=false, wantType=null;
-  function curType(){ return (screen.orientation&&screen.orientation.type)||""; }
-  function landTarget(){ const v=$("spdland").value; return v==="right"?"landscape-secondary":v==="left"?"landscape-primary":null; }
-  /* 選んだ横向きにして固定する。画面が実際にその向きに回り切ってから、その向きをジャイロの基準にする
-     （回転の途中で向きを読むと、縦持ちや反対の横向きのまま基準が決まってしまうため） */
-  function settle(){ locking=false; holdA=curAngle(); wantType=curType()||wantType; flip=false; fs.style.transform=""; setTimeout(resize,50); }
-  function waitLand(t0){ const ty=curType(), ok=wantType?ty===wantType:ty.startsWith("landscape");
-    if(ok||!ty){ setTimeout(settle,120); return; }
-    if(performance.now()-t0>2500){ settle(); return; }
-    setTimeout(()=>waitLand(t0),50); }
-  function enterLand(){ const t=landTarget(); locking=true;
-    wantType=t||(curType().startsWith("landscape")?curType():null);
-    try{ const r=fs.requestFullscreen&&fs.requestFullscreen();
-      const go=()=>{ let lk=null; try{ lk=screen.orientation?.lock?.(wantType||"landscape") }catch(e){}
-        if(lk&&lk.catch) lk.catch(()=>{ wantType=null; try{ screen.orientation?.lock?.("landscape").catch(()=>{}) }catch(e){} });
-        waitLand(performance.now()); };
-      if(r&&r.then) r.then(go).catch(()=>waitLand(performance.now())); else go();
-    }catch(e){ waitLand(performance.now()); } }
-  function onRot(){ if(!run||locking) return;
-    if(wantType&&curType()===wantType){ holdA=curAngle(); flip=false; fs.style.transform=""; setTimeout(resize,50); return; }
-    const d=(curAngle()-holdA+360)%360;
+  function onRot(){ if(!run) return; const d=(curAngle()-holdA+360)%360;
     flip=d===180; fs.style.transform=flip?"rotate(180deg)":"";
     msg.textContent=(d===90||d===270)&&run?"横向きに戻してください（画面の自動回転をオフにすると確実です）":(started?"":msg.textContent);
     setTimeout(resize,50); }
   try{ screen.orientation&&screen.orientation.addEventListener("change",onRot) }catch(e){} window.addEventListener("orientationchange",onRot);
   function applyRate(rx,ry,rz,dt){ // 端末のX・Y・Z軸まわりの角速度（°/秒、端末本来の向き基準）
-    if(!run||!cfg||cfg.gyro!=="ON"||!(dt>0)||locking) return;   // 横向きに回り切るまでは使わない
+    if(!run||!cfg||cfg.gyro!=="ON"||!(dt>0)) return;
     const a=holdAngle(); let sx, sy;   // 画面基準の軸に直す（sx:画面の右向き、sy:画面の上向き）
     if(a===90){ sx=-ry; sy=rx; } else if(a===270){ sx=ry; sy=-rx; } else if(a===180){ sx=-rx; sy=-ry; } else { sx=rx; sy=ry; }
-    // 左右：画面の縦軸まわり（右手が上がって画面が左を向く＝右）、上下：画面の横軸まわり（起こす＝上、前に倒す＝下）
-    const yawR=-sy, pitR=sx;
+    const turn=-sy, roll=-rz, mode=cfg.gyaw||"both";   // 右を向く・右に傾ける＝+
+    const yawR=mode==="turn"?turn:mode==="roll"?roll:turn+roll, pitR=sx;   // 上を向く＝+
     const k=GYRO_PER100*cfg.gsens/100*(cfg.view==="tpp"?1:1/GYRO_REL.TPP);
     yaw+=(cfg.ginvx?-1:1)*yawR*dt*k; pitch=Math.max(-60,Math.min(60,pitch+(cfg.ginvy?-1:1)*pitR*dt*k));
     const f=Math.min(1,dt*4); gMon.yaw+=(Math.abs(yawR)-gMon.yaw)*f; gMon.pit+=(Math.abs(pitR)-gMon.pit)*f; gMon.a=a;
@@ -1182,7 +993,7 @@ function renderSpdRes(){
     const r=e.rotationRate; if(!r||(r.beta==null&&r.gamma==null)) return;
     if(gStat.src&&gStat.src!=="devicemotion") return;
     const now=performance.now(), dt=gLast?Math.min(0.1,(now-gLast)/1000):0; gLast=now; stamp("devicemotion");
-    applyRate(r.alpha||0,r.beta||0,r.gamma||0,dt);   // 実際のブラウザは alpha=X軸、beta=Y軸、gamma=Z軸まわり（Chrome・Safari・Firefox共通）
+    applyRate(r.beta||0,r.gamma||0,r.alpha||0,dt);
   }
   function oriMat(al,be,ga){ const c1=Math.cos(rad(al)),s1=Math.sin(rad(al)),c2=Math.cos(rad(be)),s2=Math.sin(rad(be)),c3=Math.cos(rad(ga)),s3=Math.sin(rad(ga));
     // R = Rz(alpha)·Rx(beta)·Ry(gamma)（端末→地面）
@@ -1283,7 +1094,7 @@ function renderSpdRes(){
   fireBtn.addEventListener("pointerup",dragEnd); fireBtn.addEventListener("pointercancel",dragEnd);
   $("spdfsz").addEventListener("input",()=>{ FL.s=+$("spdfsz").value; applyFL(); saveFL(); });
   function openEdit(){ if(run) return; editing=true; fs.classList.add("editing"); $("spdedit").hidden=false; msg.textContent=""; fs.hidden=false; document.body.style.overflow="hidden";
-    try{ const r=fs.requestFullscreen&&fs.requestFullscreen(); r&&r.then(()=>screen.orientation?.lock?.(landTarget()||"landscape").catch(()=>{})).then(()=>setTimeout(resize,200)).catch(()=>{}) }catch(e){}
+    try{ const r=fs.requestFullscreen&&fs.requestFullscreen(); r&&r.then(()=>screen.orientation?.lock?.("landscape").catch(()=>{})).catch(()=>{}) }catch(e){}
     hfov=+$("tpp").value||80; cfg={view:"tpp"}; resize(); tg=[]; draw(); }
   function closeEdit(){ editing=false; fs.classList.remove("editing"); $("spdedit").hidden=true; fs.hidden=true; document.body.style.overflow=""; saveFL();
     try{ if(document.fullscreenElement) document.exitFullscreen() }catch(e){} }
@@ -1293,14 +1104,15 @@ function renderSpdRes(){
   function start(){ ppiNow=ppiOf($("accdev"),$("accppi")); const sens=+$("spdsens").value;
     if(!ppiNow){ $("spdres").textContent="先に「使う端末」を選ぶか、ppiを入力してください。"; return }
     if(!(sens>0)){ $("spdres").textContent="ゲーム内のカメラ感度を入れてください。"; return }
-    cfg={view:$("spdview").value,sens,acc:$("spdacc").value,gyro:$("spdgyro").value,gsens:+$("spdgsens").value||0,ginvx:$("spdginvx").checked,ginvy:$("spdginvy").checked};
+    cfg={view:$("spdview").value,sens,acc:$("spdacc").value,gyro:$("spdgyro").value,gsens:+$("spdgsens").value||0,ginvx:$("spdginvx").checked,ginvy:$("spdginvy").checked,gyaw:$("spdgyaw").value};
     gLast=0; gMon={yaw:0,pit:0,a:0}; gOK=false; $("spdgst").textContent="";
     if(cfg.gyro==="ON"){ startSensors(); setTimeout(()=>{ if(run) $("spdgst").textContent=gyroDiag(); },1500); } hfov=fovOf(cfg.view); DUR=+$("spddur").value;
     run=true; started=false; yaw=0; pitch=0; tg=[]; hits=0; shots=0; bins={}; moved=0; pid=null;
     $("spdhits").textContent=0; $("spdshots").textContent=0; $("spdtime").textContent=DUR.toFixed(1);
     $("spdcfg").textContent=`${$("spdview").selectedOptions[0].textContent}・感度${sens}・加速${cfg.acc}`+(cfg.gyro==="ON"?`・ジャイロ${cfg.gsens}%`:"");
     msg.textContent="画面をスライドすると開始します"; try{document.activeElement&&document.activeElement.blur()}catch(e){} fs.hidden=false; document.body.style.overflow="hidden";
-    holdA=curAngle(); flip=false; fs.style.transform=""; enterLand();
+    holdA=curAngle(); flip=false; fs.style.transform="";
+    try{ const r=fs.requestFullscreen&&fs.requestFullscreen(); r&&r.then(()=>{ holdA=curAngle(); lockOri(); }).catch(()=>{}) }catch(e){}
     resize(); for(let i=0;i<3;i++) spawn(); raf=requestAnimationFrame(loop); }
   function finish(){ if(!run) return; run=false; cancelAnimationFrame(raf); flush(); pid=null; stopSensors(); flip=false; fs.style.transform="";
     try{ screen.orientation?.unlock?.() }catch(e){}
@@ -1327,8 +1139,6 @@ function renderSpdRes(){
     let gs=r?+r[3]:0; if(v!=="tpp"&&v!=="rd"){ const w=readTable("out2").find(x=>x[0].includes(v==="rdsmg"?"SMG":v==="rdhg"?"ハンドガン":"トミー")); if(w&&+w[3]>0) gs=+w[3]; }
     if(gs>0) $("spdgsens").value=Math.round(gs); }catch(e){} }
   $("spdview").addEventListener("change",defSens);
-  try{ const v=localStorage.getItem("pubgsens-land"); if(v) $("spdland").value=v; }catch(e){}
-  $("spdland").addEventListener("change",()=>{ try{ localStorage.setItem("pubgsens-land",$("spdland").value) }catch(e){} });
   $("spdgyro").addEventListener("change",()=>{ $("spdgbox").hidden=$("spdgyro").value!=="ON"; });
   $("spdacc").value=$("accel").value==="OFF"?"OFF":"ON";
   setTimeout(defSens,0);
@@ -1353,233 +1163,5 @@ function renderAcc(){
 ["accdir","accdev","accppi","accmode","accspd","accone"].forEach(id=>$(id).addEventListener("input",renderAcc));
 document.querySelectorAll(".grid input,.grid select").forEach(e=>e.addEventListener("input",()=>setTimeout(renderAcc)));
 renderAcc();
-
-/* ---- ダメージ計算（ネットの公開データ。実測で置き換える予定） ---- */
-(function(){
-  // [名前, 分類, 弾, 基礎ダメージ, 連射間隔(秒)]
-  const W=[
-    ["AKM","AR","7.62",49,0.1],["Beryl M762","AR","7.62",47,0.0857],["Groza","AR","7.62",49,0.08],["Mk47 Mutant","AR","7.62",49,0.075],
-    ["M416","AR","5.56",43,0.0857],["SCAR-L","AR","5.56",43,0.096],["M16A4","AR","5.56",43,0.075],["QBZ","AR","5.56",43,0.0923],["AUG A3","AR","5.56",43,0.08],["G36C","AR","5.56",43,0.0857],
-    ["Mk14","DMR","7.62",61,0.09],["SLR","DMR","7.62",58,0.1],["SKS","DMR","7.62",53,0.1],["QBU","DMR","5.56",48,0.1],["Mini14","DMR","5.56",46,0.1],["VSS","DMR","9mm",41,0.0856],
-    ["AWM","SR",".300",105,1.85],["M24","SR","7.62",79,1.42],["Kar98k","SR","7.62",75,1.55],["Win94","SR",".45",66,0.6],
-    ["トミーガン","SMG",".45",40,0.08],["UMP45","SMG",".45",39,0.09],["PP-19 Bizon","SMG","9mm",35,0.086],["MP5K","SMG","9mm",33,0.0667],["Vector","SMG","9mm",31,0.0545],["P90","SMG","5.7",30,0.06],["UZI","SMG","9mm",26,0.048],
-    ["DP-28","LMG","7.62",51,0.109],["M249","LMG","5.56",45,0.075],
-    ["S686","SG","12G",216,0.2],["S1897","SG","12G",216,0.58],["S12K","SG","12G",198,0.25],
-    ["R1895","HG","7.62",55,0.3],["R45","HG",".45",55,0.25],["P1911","HG",".45",41,0.11],["P92","HG","9mm",35,0.1],["P18C","HG","9mm",23,0.06],["スコーピオン","HG","9mm",22,0.0706]];
-  const CAT={AR:"アサルトライフル",DMR:"マークスマンライフル",SR:"スナイパーライフル",SMG:"サブマシンガン",LMG:"ライトマシンガン",SG:"ショットガン",HG:"ハンドガン"};
-  // 部位の倍率 [頭, 胴, 手足]
-  const MUL={AR:[2.35,1,0.9],DMR:[2.35,1,0.95],SR:[2.5,1.3,0.95],SMG:[1.8,1.05,1.3],LMG:[2.3,1.05,0.9],SG:[1.5,1,1.05],HG:[2.1,1,1]};
-  const RED=[0,0.3,0.4,0.55], LV=["なし","Lv1","Lv2","Lv3"], K="pubgsens-dmg";
-  let st={w:"M416",h:2,v:2,hp:100}; try{ st=Object.assign(st,JSON.parse(localStorage.getItem(K)||"{}")) }catch(e){}
-  const sel=document.getElementById("dmgw");
-  sel.innerHTML=Object.keys(CAT).map(c=>`<optgroup label="${CAT[c]}">`+W.filter(w=>w[1]===c).map(w=>`<option>${w[0]}</option>`).join("")+"</optgroup>").join("");
-  sel.value=st.w;
-  const seg=(id,key)=>{ const el=document.getElementById(id); el.innerHTML=LV.map((l,i)=>`<label><input type="radio" name="${id}" value="${i}"${st[key]===i?" checked":""}>${l}</label>`).join("");
-    el.addEventListener("change",e=>{ st[key]=+e.target.value; draw(); }); };
-  seg("dmgh","h"); seg("dmgv","v");
-  const dmg=(w,part)=>{ const m=MUL[w[1]][part], r=part===0?RED[st.h]:part===1?RED[st.v]:0; return w[3]*m*(1-r); };
-  const shots=d=>Math.ceil(st.hp/d-1e-9), ttk=(n,w)=>Math.round((n-1)*w[4]*1000);
-  function draw(){ st.w=sel.value; st.hp=Math.max(1,Math.min(100,+document.getElementById("dmghp").value||100));
-    try{ localStorage.setItem(K,JSON.stringify(st)) }catch(e){}
-    const w=W.find(x=>x[0]===st.w)||W[4], P=["頭","胴","手足"];
-    document.getElementById("dmgres").innerHTML=P.map((p,i)=>{ const d=dmg(w,i), n=shots(d); return `<div><span>${p}（${i===0?"ヘルメット"+LV[st.h]:i===1?"ベスト"+LV[st.v]:"防具なし"}）</span><b>${d.toFixed(1)}</b><i>×${MUL[w[1]][i]}</i><br><span>${n}発で倒せる・${ttk(n,w)}ms</span></div>`; }).join("");
-    document.getElementById("dmgsub").textContent=`${CAT[w[1]]}・${w[2]}弾・基礎ダメージ${w[3]}・連射間隔${(w[4]*1000).toFixed(0)}ms（毎分約${Math.round(60/w[4])}発）`;
-    let html="", last="";
-    W.forEach(x=>{ if(x[1]!==last){ last=x[1]; html+=`<tr class="cat"><td colspan="7">${CAT[x[1]]}</td></tr>`; }
-      const d=[0,1,2].map(i=>dmg(x,i)), n=shots(d[1]);
-      html+=`<tr${x[0]===st.w?' class="sel"':""}><td>${x[0]}</td><td>${x[3]}</td><td>${d[0].toFixed(0)}</td><td>${d[1].toFixed(0)}</td><td>${d[2].toFixed(0)}</td><td>${n}</td><td>${ttk(n,x)}ms</td></tr>`; });
-    document.querySelector("#dmgtbl tbody").innerHTML=html; }
-  document.getElementById("dmghp").value=st.hp;
-  sel.addEventListener("change",draw); document.getElementById("dmghp").addEventListener("input",draw);
-  document.querySelector("#dmgtbl tbody").addEventListener("click",e=>{ const tr=e.target.closest("tr"); if(!tr||tr.classList.contains("cat")) return; sel.value=tr.cells[0].textContent; draw(); });
-  draw();
-})();
-
-/* ---- 回復アイテムの値の切り替え（2026年11月12日のアップデート） ----
-   医療用キット 容量20→15・使用8秒→6秒、包帯 回復10→12・使用4秒→3秒、アドレナリン 容量20→10、鎮痛剤 容量10→6 */
-const UPD_DATE=new Date("2026-11-12T00:00:00+09:00"), VER_KEY="pubgsens-itemver";
-function itemVerSetting(){ try{ return localStorage.getItem(VER_KEY)||"auto" }catch(e){ return "auto" } }
-function itemNew(){ const v=itemVerSetting(); return v==="new"||(v==="auto"&&Date.now()>=UPD_DATE.getTime()); }
-const ITEM_CAP_NEW={medkit:15,adr:10,pain:6};
-const verHooks=[];
-function setupVerSel(id){ const el=document.getElementById(id); el.value=itemVerSetting();
-  const note=()=>{ document.getElementById(id+"n").textContent=itemNew()?"11月12日以降の値で計算しています（医療用キット15・6秒、包帯＋12・3秒、アドレナリン10、鎮痛剤6）。":"今の値で計算しています（医療用キット20・8秒、包帯＋10・4秒、アドレナリン20、鎮痛剤10）。"; };
-  note(); el.addEventListener("change",()=>{ try{ localStorage.setItem(VER_KEY,el.value) }catch(e){} document.querySelectorAll(".verSel").forEach(x=>x.value=el.value); verHooks.forEach(f=>f()); });
-  verHooks.push(note); }
-
-/* ---- バッグ容量（ネットの公開データ。実測で置き換える予定） ---- */
-(function(){
-  // [キー, 名前, 1個あたりの容量, 補足, 説明]　補足なし＝ゲーム内のアイテム説明で確認（2026/10/18）、「ネット」＝公開データ
-  // 説明の「+」は性能アップ、「++」は大きくアップ、「-」は性能ダウン（ゲーム内の矢印と同じ）。「|」で区切る
-  const G=[
-    ["弾（個数は発数）",[
-      ["a556","5.56mm",0.5,"","M16A4、M416、SCAR-L、AUG、M249、Mini14、QBZ、QBU、G36C、MK12、FAMAS、ASM Abakanの弾薬"],
-      ["a762","7.62mm",0.6,"","AKM、Groza、Kar98k、M24、SKS、MK14、R1895、DP28、M762、SLR、MK47、Mosin Nagant、MG3、Honey Badger、ACE32、DSR、M1 Garandの弾薬"],
-      ["a9","9mm",0.375,"","Micro UZI、Vector、PP-19、VSS、MP5K、デュアルMP7、P92、P18C、JS9、Skorpionの弾薬"],
-      ["a45",".45ACP",0.4,"","P1911、Tommy Gun、UMP45、Win94、R45、Deagleの弾薬"],
-      ["a12","12ゲージ",1.25,"","S1897、S686、S12K、DBS、M1014、Sawed-offの弾薬"],
-      ["a300",".300マグナム",1,"","AWM"],
-      ["a50",".50口径",1,"","AMRの弾薬"],
-      ["abolt","ボルト",2,"","クロスボウ、タクティカルクロスボウ、エクスプローシブボウの弾薬"]]],
-    ["回復",[
-      ["bandage","包帯",2,"","時間経過で体力10回復"],
-      ["fak","応急処置キット",10,"","75まで体力回復"],
-      ["medkit","医療用キット",20,"","満タンまで体力回復"],
-      ["drink","エナジードリンク",4,"","ブースト+40、ブーストが60以上になると移動速度が増加します。"],
-      ["pain","鎮痛剤",10,"","ブースト+60、ブーストが60以上になると移動速度が増加します。"],
-      ["adr","アドレナリン",20,"","ブースト+100、ブーストが60以上になると移動速度が増加します。"]]],
-    ["投げ物",[
-      ["frag","グレネード",18,"",""],["molo","火炎瓶",16,"",""],["smoke","スモークグレネード",14,"",""],["stun","スタングレネード",12,"",""],
-      ["sticky","粘着爆弾",18,"","投擲するとあらゆる物体の表面にくっつき、広範囲にダメージを与えられます"],
-      ["sdef","非常防衛信号弾",15,"","非常防衛信号弾を投げて遮蔽物を召喚し、敵の弾丸を防ぎます。屋内に投げたり、落下地点に他のオブジェクトがある場合は遮蔽物を召喚できません。"]]],
-    ["スコープ",[
-      ["sc_rd","レッドドットサイト",10,"",""],["sc_holo","ホロサイト",10,"",""],["sc_cant","キャンテッドサイト",10,"",""],
-      ["sc_2","2xスコープ",15,"",""],["sc_3","3xスコープ",15,"",""],["sc_4","4xスコープ",15,"",""],
-      ["sc_6","6xスコープ",20,"",""],["sc_8","8xスコープ",20,"",""]]],
-    ["マガジン",[
-      ["mg_s","マガジン（SMG・HG）",13,"","+マガジン容量"],
-      ["mg_sq","大容量QDマガジン（SMG・HG）",17,"","+マガジン容量|+リロード速度"],
-      ["mg_a","大容量マガジン（AR）",15,"","+マガジン容量"],
-      ["mg_aq","クイックドローマガジン（AR）",14,"","++リロード速度"],
-      ["mg_aqq","大容量QDマガジン（AR）",20,"","+マガジン容量|+リロード速度"],
-      ["mg_drum","小型ドラムマガジン（AR）",25,"","++マガジン容量"],
-      ["mg_rq","クイックドローマガジン（SR）",16,"","++リロード速度"],
-      ["mg_rqq","大容量QDマガジン（SR）",23,"","+マガジン容量|+リロード速度"]]],
-    ["マズル・バレル",[
-      ["mz_sf","フラッシュハイダー（SMG）",8,"","+垂直反動抑制|+水平反動抑制|+マズルフラッシュをなくす"],
-      ["mz_sc","コンペンセイター（SMG）",8,"","++垂直反動抑制|++水平反動抑制|+銃器発砲時の安定性"],
-      ["mz_sm","マズルブレーキ（SMG）",8,"","+垂直反動抑制|++水平反動抑制|+発砲時の視点安定性|+発砲時の揺れ抑制"],
-      ["mz_ss","サプレッサー（SMG・HG）",15,"","+発砲拡散抑制|+マズルフラッシュをなくす|+発砲音の低減"],
-      ["mz_sb","アウターバレル（SMG）",8,"","+銃器弾丸ダメージ|+ダメージの減少抑制|+有効ダメージ射程距離"],
-      ["mz_af","フラッシュハイダー（AR）",10,"","+垂直反動抑制|+水平反動抑制|+マズルフラッシュをなくす"],
-      ["mz_ac","コンペンセイター（AR）",10,"","+垂直反動抑制|++水平反動抑制|+銃器発砲時の安定性"],
-      ["mz_am","マズルブレーキ（AR）",10,"","+垂直反動抑制|+水平反動抑制|++発砲時の視点安定性|+発砲時の揺れ抑制"],
-      ["mz_as","サプレッサー（AR・DMR）",20,"","+発砲拡散抑制|+マズルフラッシュをなくす|+発砲音の低減"],
-      ["mz_ab","アウターバレル（AR）",12,"","+銃器弾丸ダメージ|++ダメージの減少抑制|+有効ダメージ射程距離"],
-      ["mz_rf","フラッシュハイダー（SR）",12,"","+垂直反動抑制|+水平反動抑制|+マズルフラッシュをなくす"],
-      ["mz_rc","コンペンセイター（SR）",12,"","+垂直反動抑制|++水平反動抑制|+発砲拡散抑制|+銃器発砲時の安定性"],
-      ["mz_rs","サプレッサー（SR）",23,"","+発砲拡散抑制|+マズルフラッシュをなくす|+発砲音の低減"],
-      ["mz_rb","アウターバレル（SR）",12,"","++銃器弾丸ダメージ|-発砲時の揺れ抑制"],
-      ["mz_ch","チョーク",5,"","+SG噴射の水平拡散抑制|+SG噴射の垂直拡散抑制"],
-      ["mz_db","ダックビル（ショットガン）",5,"","++SG噴射の水平拡散抑制|-SG噴射の垂直拡散抑制"]]],
-    ["グリップ・ストック",[
-      ["gr_ang","アングルフォアグリップ",10,"","++水平反動抑制|+照準速度"],
-      ["gr_ver","バーティカルフォアグリップ",10,"","++垂直反動抑制"],
-      ["gr_lig","軽量グリップ",10,"","++発砲時の視点安定性|++銃器発砲時の安定性"],
-      ["gr_thu","サムグリップ",10,"","+垂直反動抑制|++照準速度"],
-      ["gr_hal","ハーフグリップ",10,"","+垂直反動抑制|+水平反動抑制|+反動回復速度|-発砲時の視点安定性"],
-      ["gr_erg","エルゴノミックグリップ",10,"","+垂直反動抑制|+水平反動抑制|+発砲時の揺れ抑制|+銃器発砲時の安定性"],
-      ["laser","レーザーサイト",10,"","++発砲拡散抑制"],
-      ["st_uzi","ストック（Micro UZI）",10,"","++垂直反動抑制|+反動回復速度"],
-      ["st_tac","タクティカルストック（AR・SMG）",12,"","+発砲時の視点安定性|+発砲時の揺れ抑制"],
-      ["st_hvy","ヘビーストック（AR・SMG）",14,"","+垂直反動抑制|+水平反動抑制|-照準速度"],
-      ["cheek","チークパッド（SR）",17,"","+垂直反動抑制|++発砲時の視点安定性|+銃器発砲時の安定性"],
-      ["shell","シェルホルダー（SG・Win94・Kar98k・Mosin Nagant）",15,"","+リロード速度"],
-      ["quiver","矢筒（クロスボウ用）",14,"","+リロード速度"]]],
-    ["その他",[
-      ["full","フルオート",20,"","M16A4、Mk47およびDMR銃器でオート射撃モードを追加可能。"],
-      ["plate","防弾プレート",20,"","防弾プレートはカバーとして利用でき、伏せると自動的に展開します。DP28とM249に装着できます。"],
-      ["gunpow","タクティカルガンパウダー",20,"","クロスボウをリロードする際にボルトに火薬を入れられます。火薬入りボルトは物に命中すると遅れて爆発し、敵に命中するとすぐに爆発します。クロスボウのみ使用可能。"],
-      ["smkl","ランチャースモークグレネード",5,"","スモークグレネードランチャーの弾薬"],
-      ["mortar","60mm迫撃砲の弾薬",4,"","迫撃砲の弾薬"],
-      ["flare","フレア",2,"","フレアガンの弾薬"],
-      ["dart","電撃ダーツ",2,"","スタンガンの弾薬"],
-      ["fuel","ハイブリッド燃料",20,"",""],
-      ["boat","ゴムボート",30,"","携帯型のボートです。いつでも展開してゴムボートとして使用でき、水上を隠密に移動できます。"],
-      ["knife","コンバットナイフ",20,"","軍用で開発された隠しやすく致命的な近接武器。ケーキを切る時にも使えます！"],
-      ["pan","フライパン",20,"","これを食べて！"],
-      ["mach","マチェット",20,"","様々な用途で使用できる、軽量で持ち運びのしやすいナイフです。サバイバルツールとして、とても信頼のおけるツールです。"],
-      ["free","自由入力（容量の合計）",1,"容量をそのまま入力",""]]]];
-  // 以前の版のキーの引き継ぎ（グリップ一括・近接武器一括）
-  try{ const o=JSON.parse(localStorage.getItem("pubgsens-bag")||"{}"); if(o.n){ if(o.n.gr&&!o.n.gr_ver){ o.n.gr_ver=o.n.gr; } if(o.n.melee&&!o.n.knife){ o.n.knife=o.n.melee; } if(o.n.scope&&!o.n.sc_rd){ o.n.sc_rd=o.n.scope; } delete o.n.gr; delete o.n.melee; delete o.n.scope; localStorage.setItem("pubgsens-bag",JSON.stringify(o)); } }catch(e){}
-  const esc=t=>t.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
-  const descHtml=d=>!d?"":d.includes("|")||/^[+-]/.test(d)?d.split("|").map(x=>{ const m=x.match(/^(\+\+|\+|-)(.*)$/); if(!m) return `<span>${esc(x)}</span>`;
-      return `<span class="${m[1]==="-"?"dn":"up"}">${m[1]==="++"?"⇈":m[1]==="+"?"↑":"↓"} ${esc(m[2])}</span>`; }).join(""):`<span>${esc(d)}</span>`;
-  const BAG=[0,150,200,250], K="pubgsens-bag";
-  let st={b:3,v:1,base:150,n:{}}; try{ st=Object.assign(st,JSON.parse(localStorage.getItem(K)||"{}")); st.n=st.n||{}; if(st.base===20) st.base=150; }catch(e){}
-  const segB=document.getElementById("bagb"), segV=document.getElementById("bagv");
-  segB.innerHTML=["なし","Lv1","Lv2","Lv3"].map((l,i)=>`<label><input type="radio" name="bagb" value="${i}"${st.b===i?" checked":""}>${l}</label>`).join("");
-  segV.innerHTML=["なし","あり"].map((l,i)=>`<label><input type="radio" name="bagv" value="${i}"${st.v===i?" checked":""}>${l}</label>`).join("");
-  document.getElementById("bagbase").value=st.base;
-  const capOf=(k,c)=>itemNew()&&ITEM_CAP_NEW[k]!=null?ITEM_CAP_NEW[k]:c;
-  function render(){ document.getElementById("bagitems").innerHTML=G.map(([h,items],gi)=>{ const body=`<div class="baggrid">`+items.map(([k,nm,c,note,desc])=>
-    `<div class="it"><button type="button" class="itn"${desc?"":" disabled"}>${nm}${desc?'<i class="ii">i</i>':""}<small>${k==="free"?"":"1個 "+capOf(k,c)}${ITEM_CAP_NEW[k]!=null&&itemNew()?"・11/12更新":note?"・"+note:""}</small></button><input type="number" min="0" step="1" inputmode="numeric" data-k="${k}" value="${st.n[k]||""}" placeholder="0" aria-label="${nm}の個数">${desc?`<div class="itd" hidden>${descHtml(desc)}</div>`:""}</div>`).join("")+"</div>";
-    return gi<3?`<h3 class="bagh">${h}</h3>`+body:`<details class="bagd"${items.some(it=>st.n[it[0]])?" open":""}><summary class="bagh">${h}</summary>${body}</details>`; }).join(""); }
-  render();
-  const all=G.flatMap(g=>g[1]);
-  function draw(){ st.b=+(segB.querySelector("input:checked")||{value:0}).value; st.v=+(segV.querySelector("input:checked")||{value:0}).value;
-    st.base=Math.max(0,+document.getElementById("bagbase").value||0);
-    document.querySelectorAll("#bagitems input").forEach(i=>{ const v=Math.max(0,+i.value||0); if(v) st.n[i.dataset.k]=v; else delete st.n[i.dataset.k]; });
-    try{ localStorage.setItem(K,JSON.stringify(st)) }catch(e){}
-    const cap=st.base+BAG[st.b]+(st.v?50:0), used=all.reduce((s,[k,,c])=>s+(st.n[k]||0)*capOf(k,c),0), left=cap-used;
-    document.getElementById("bagres").innerHTML=`使用 <b>${used.toFixed(1)}</b> ／ 容量 <b>${cap}</b>　残り <b style="color:${left<0?"var(--bad)":"var(--accent)"}">${left.toFixed(1)}</b>`;
-    const bar=document.getElementById("bagbar"); bar.classList.toggle("over",left<0); bar.firstElementChild.style.width=Math.min(100,cap?used/cap*100:0)+"%";
-    document.getElementById("bagleft").textContent=left<0?"容量オーバーです。":"残りであと：5.56mm "+Math.floor(left/0.5)+"発・7.62mm "+Math.floor(left/0.6)+"発・9mm "+Math.floor(left/0.375)+"発・.45 "+Math.floor(left/0.4)+"発・エナジードリンク "+Math.floor(left/4)+"本"; }
-  ["bagb","bagv"].forEach(id=>document.getElementById(id).addEventListener("change",draw));
-  document.getElementById("bagbase").addEventListener("input",draw);
-  document.getElementById("bagitems").addEventListener("input",draw);
-  document.getElementById("bagitems").addEventListener("click",e=>{ const b=e.target.closest(".itn"); if(!b||b.disabled) return; const d=b.parentElement.querySelector(".itd"); if(d) d.hidden=!d.hidden; });
-  // 画像保存・読み込み用
-  window.BAG_API={
-    snapshot:()=>{ draw(); const cap=st.base+BAG[st.b]+(st.v?50:0); const rows=[]; let used=0;
-      G.forEach(([h,items])=>items.forEach(([k,nm,c])=>{ const n=st.n[k]; if(!n) return; const cc=capOf(k,c); used+=n*cc; rows.push([h,nm,n,cc,n*cc]); }));
-      return {st:JSON.parse(JSON.stringify(st)),cap,used,rows,ver:itemNew()?"11月12日以降の値":"今の値"}; },
-    load:o=>{ if(!o) return; st=Object.assign({b:3,v:1,base:150,n:{}},o); st.n=st.n||{};
-      segB.querySelectorAll("input").forEach(i=>i.checked=+i.value===st.b); segV.querySelectorAll("input").forEach(i=>i.checked=+i.value===st.v);
-      document.getElementById("bagbase").value=st.base; render(); draw(); } };
-  document.getElementById("bagclear").addEventListener("click",()=>{ document.querySelectorAll("#bagitems input").forEach(i=>i.value=""); draw(); });
-  setupVerSel("bagver"); verHooks.push(()=>{ render(); draw(); });
-  draw();
-})();
-
-/* ---- パルス（安全地帯の外）のダメージと回復 ---- */
-(function(){
-  // モードごとの初期値（毎秒ダメージ）。トップレはまだ値が分からないため、クラシックと同じ値を仮に入れている
-  const DPSM={classic:[0.4,0.6,0.8,1,3,5,7,9,11],top:[0.4,0.6,0.8,1,3,5,7,9,11]}, K="pubgsens-pulse";
-  let st={mode:"classic",ph:5,hp:75,bo:0,dps:{}}; try{ st=Object.assign(st,JSON.parse(localStorage.getItem(K)||"{}")); st.dps=st.dps||{} }catch(e){}
-  // 以前の版はフェーズ番号だけで保存していた → クラシックの値として引き継ぐ
-  Object.keys(st.dps).forEach(k=>{ if(!k.includes(":")){ st.dps["classic:"+k]=st.dps[k]; delete st.dps[k]; } });
-  const DPS0=DPSM.classic, def=i=>DPSM[st.mode][i-1];
-  const $$=id=>document.getElementById(id), dpsOf=i=>st.dps[st.mode+":"+i]!=null?st.dps[st.mode+":"+i]:def(i);
-  const modeNote=()=>{ const n=Object.keys(st.dps).filter(k=>k.startsWith(st.mode+":")).length;
-    $$("plsmoden").textContent=(st.mode==="top"?"トップレの値はまだ分からないため、クラシックと同じ値を仮に入れています。":"クラシックはPC版エランゲルの値です。")+(n?`（${n}フェーズは入力した値）`:"毎秒ダメージを実測値に書き換えると、モードごとに保存されます。"); };
-  document.querySelector(`#plsmode input[value="${st.mode}"]`).checked=true;
-  $$("plsph").innerHTML=DPS0.map((d,i)=>`<option value="${i+1}">フェーズ${i+1}</option>`).join("");
-  $$("plsph").value=st.ph; $$("plshp").value=st.hp; $$("plsbo").value=st.bo; $$("plsdps").value=dpsOf(st.ph);
-  const lvRate=b=>b<=0?0:b<=20?1/8:b<=60?2/8:b<=90?3/8:4/8;   // ブーストの段階ごとの回復（毎秒）
-  // 体力の変化をシミュレーション（0.1秒刻み）。戻り値 {t:倒れるまでの秒(Infinity可), pts:[[t,hp]]}
-  function sim(hp,bo,dps,maxT=600){ let t=0, pts=[[0,hp]], dt=0.1;
-    while(t<maxT){ hp+=(lvRate(bo)-dps)*dt; hp=Math.min(100,hp); bo=Math.max(0,bo-2.5/8*dt); t+=dt;
-      if(Math.abs(t*10-Math.round(t*10))<1e-6&&Math.round(t*10)%10===0) pts.push([t,Math.max(0,hp)]);
-      if(hp<=0) return {t,pts:pts.concat([[t,0]])}; }
-    return {t:Infinity,pts}; }
-  const fmt=t=>!isFinite(t)?"10分以上":t>=60?`${Math.floor(t/60)}分${Math.round(t%60)}秒`:`${t.toFixed(1)}秒`;
-  const items=()=>{ const nw=itemNew(); return [["包帯",nw?3:4,h=>Math.min(75,h+(nw?12:10))],["応急処置キット",6,h=>Math.max(h,75)],["医療用キット",nw?6:8,h=>100],["エナジードリンク",4,null,40],["鎮痛剤",6,null,60],["アドレナリン",6,null,100]]; };
-  const ITEMS_OLD=[["包帯",4,h=>Math.min(75,h+10)],["応急処置キット",6,h=>Math.max(h,75)],["医療用キット",8,h=>100],["エナジードリンク",4,null,40],["鎮痛剤",6,null,60],["アドレナリン",6,null,100]];
-  function chart(a,b,hp0){ const W=400,H=200,L=34,R=8,T=8,B=24; const tmax=Math.min(600,Math.max(20,...[a.t,b.t].map(x=>isFinite(x)?x*1.1:0),isFinite(a.t)&&isFinite(b.t)?0:120));
-    const X=t=>L+(W-L-R)*t/tmax, Y=h=>T+(H-T-B)*(1-h/100), path=pts=>pts.filter(p=>p[0]<=tmax).map((p,i)=>(i?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1)).join(" ");
-    let g=""; for(let h=0;h<=100;h+=25) g+=`<line class="ax" x1="${L}" x2="${W-R}" y1="${Y(h)}" y2="${Y(h)}"/><text x="${L-6}" y="${Y(h)+4}" text-anchor="end">${h}</text>`;
-    const step=tmax>240?60:tmax>60?30:10; for(let t=0;t<=tmax;t+=step) g+=`<text x="${X(t)}" y="${H-8}" text-anchor="middle">${t>=60?(t/60)+"分":t+"秒"}</text>`;
-    $$("plschart").innerHTML=g+`<path class="l0" d="${path(a.pts)}"/><path class="l1" d="${path(b.pts)}"/>`; }
-  function draw(){ modeNote(); st.ph=+$$("plsph").value; st.hp=Math.max(1,Math.min(100,+$$("plshp").value||1)); st.bo=Math.max(0,Math.min(100,+$$("plsbo").value||0));
-    try{ localStorage.setItem(K,JSON.stringify(st)) }catch(e){}
-    const dps=dpsOf(st.ph), a=sim(st.hp,0,dps), b=sim(st.hp,st.bo,dps);
-    $$("plsres").innerHTML=`${st.mode==="top"?"トップレ":"クラシック"}・フェーズ${st.ph}（毎秒${dps}）で体力${st.hp}から倒れるまで：ブーストなし <b>${fmt(a.t)}</b>　ブースト${st.bo}あり <b>${fmt(b.t)}</b>`;
-    chart(a,b,st.hp);
-    $$("plsitm").querySelector("tbody").innerHTML=items().map(([nm,ct,f,boost])=>{ const dmg=dps*ct, mid=st.hp-dmg;
-      if(mid<=0) return `<tr><td>${nm}</td><td>${ct}秒</td><td>${dmg.toFixed(1)}</td><td>—</td><td class="neg">使い終わる前に倒れる</td><td>0</td></tr>`;
-      if(f){ const after=Math.max(mid,f(mid)), heal=after-mid; return `<tr><td>${nm}</td><td>${ct}秒</td><td>${dmg.toFixed(1)}</td><td>+${heal.toFixed(0)}</td><td class="${after-st.hp>=0?"pos":"neg"}">${(after-st.hp>=0?"+":"")+(after-st.hp).toFixed(1)}</td><td>${after.toFixed(0)}</td></tr>`; }
-      const nb=Math.min(100,st.bo+boost), r=sim(mid,nb,dps); return `<tr><td>${nm}</td><td>${ct}秒</td><td>${dmg.toFixed(1)}</td><td>ブースト${nb}</td><td class="neg">${(-dmg).toFixed(1)}</td><td>${mid.toFixed(0)}（そこから${fmt(r.t)}）</td></tr>`; }).join("");
-    $$("plstbl").querySelector("tbody").innerHTML=DPS0.map((d,i)=>{ const ph=i+1, dp=dpsOf(ph), x=sim(st.hp,0,dp), y=sim(st.hp,st.bo,dp);
-      return `<tr${ph===st.ph?' class="sel"':""}><td>${ph}</td><td>${dp}</td><td>${fmt(x.t)}</td><td>${fmt(y.t)}</td><td class="${dp<=0.5?"pos":"neg"}">${dp<0.5?"できる":dp===0.5?"釣り合う":"できない"}</td></tr>`; }).join("");
-  }
-  $$("plsmode").addEventListener("change",e=>{ st.mode=e.target.value; $$("plsdps").value=dpsOf(+$$("plsph").value); draw(); });
-  $$("plsph").addEventListener("change",()=>{ $$("plsdps").value=dpsOf(+$$("plsph").value); draw(); });
-  $$("plsdps").addEventListener("input",()=>{ const v=+$$("plsdps").value; const ph=+$$("plsph").value; const key=st.mode+":"+ph; if($$("plsdps").value===""||!(v>=0)) delete st.dps[key]; else if(v===def(ph)) delete st.dps[key]; else st.dps[key]=v; draw(); });
-  ["plshp","plsbo"].forEach(id=>$$(id).addEventListener("input",draw));
-  setupVerSel("plsver"); verHooks.push(draw);
-  $$("plstbl").addEventListener("click",e=>{ const tr=e.target.closest("tr"); if(!tr||!tr.cells[0]) return; const ph=+tr.cells[0].textContent; if(ph){ $$("plsph").value=ph; $$("plsdps").value=dpsOf(ph); draw(); } });
-  draw();
-})();
 </script>
 </body></html>
