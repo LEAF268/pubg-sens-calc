@@ -182,8 +182,8 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
 .diag .d-l1{stroke:var(--ads);stroke-width:1.5;stroke-dasharray:5 4} .diag .d-l2{stroke:var(--accent);stroke-width:2}
 .diag .d-arc1{fill:none;stroke:var(--ads);stroke-width:1.5} .diag .d-arc2{fill:none;stroke:var(--accent);stroke-width:1.5}
 .diag .d-t{fill:var(--muted);font-size:12px} .diag .d-s{font-size:12px;fill:var(--fg)}
-#out2 .wt{display:block;font-size:.7rem;color:var(--muted);font-weight:700;line-height:1.2}
-#out2 .wsp{display:none}#out2 small{display:block;color:var(--muted);font-size:.75rem}
+#out2 .wh{display:block;font-weight:700;line-height:1.3}
+#out2 .wsp{display:none}#out2 small{display:block;color:var(--muted);font-size:.75rem;line-height:1.45;margin-top:2px}
 #out2 tr.wtop td,#out3 tr.wtop td{border-top:2px solid var(--line)}
 </style>
 
@@ -252,12 +252,12 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
       <thead><tr><th>スコープ</th><th>カメラ</th><th>スコープ</th><th>ジャイロ<br>カメラ</th><th>ジャイロ<br>スコープ</th></tr></thead>
       <tbody id="out"></tbody>
     </table></div>
-    <h2 style="margin-top:20px">武器別レッドドット・アイアンサイト</h2>
+    <h2 style="margin-top:20px">武器別レッドドット・アイアンサイト（視野角ごと）</h2>
     <div class="tbl"><table>
-      <thead><tr><th>武器</th><th>カメラ</th><th>スコープ</th><th>ジャイロ<br>カメラ</th><th>ジャイロ<br>スコープ</th></tr></thead>
+      <thead><tr><th>視野角・武器</th><th>カメラ</th><th>スコープ</th><th>ジャイロ<br>カメラ</th><th>ジャイロ<br>スコープ</th></tr></thead>
       <tbody id="out2"></tbody>
     </table></div>
-    <p class="note" style="margin:6px 0 0">TPP・FPPスコープなしと2倍以上のスコープは、上の表（AR・DMR）と同じ値を使います。</p>
+    <p class="note" style="margin:6px 0 0">同じ視野角なら感度の値も同じなので、視野角ごとに1行にまとめています（レッドドット55.3°の行は上の表の1xと同じ値）。TPP・FPPスコープなしと2倍以上のスコープは、どの武器も上の表と同じ値を使います。</p>
     <h2 style="margin-top:20px">可変倍率スコープ（途中の倍率）</h2>
     <div class="tbl"><table>
       <thead><tr><th>倍率の位置</th><th>カメラ<br>ゲーム</th><th>カメラ<br>計算値</th><th>スコープ<br>ゲーム</th><th>スコープ<br>計算値</th></tr></thead>
@@ -310,9 +310,9 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
     <thead><tr><th>スコープ</th><th>カメラ<br>今の端末</th><th>カメラ<br>換算先</th><th>スコープ<br>今の端末</th><th>スコープ<br>換算先</th></tr></thead>
     <tbody id="devout"></tbody>
   </table></div>
-  <h3 style="font-size:.9rem;margin:14px 0 6px">武器別レッドドット・アイアンサイト</h3>
+  <h3 style="font-size:.9rem;margin:14px 0 6px">武器別レッドドット・アイアンサイト（視野角ごと）</h3>
   <div class="tbl"><table>
-    <thead><tr><th>武器</th><th>カメラ<br>換算前</th><th>カメラ<br>換算後</th><th>スコープ<br>換算前</th><th>スコープ<br>換算後</th></tr></thead>
+    <thead><tr><th>視野角・武器</th><th>カメラ<br>換算前</th><th>カメラ<br>換算後</th><th>スコープ<br>換算前</th><th>スコープ<br>換算後</th></tr></thead>
     <tbody id="devwout"></tbody>
   </table></div>
   <div class="saverow" style="margin-top:10px;align-items:center">
@@ -369,7 +369,7 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
     <ol class="note spdhow">
       <li>ゲームで使う端末で開き、上の「使う端末」をその端末に合わせます。</li>
       <li>「測定開始」で画面いっぱいの的当て画面になります。端末を横向きにして、ゲームと同じ持ち方をしてください。</li>
-      <li>右手の親指のスライドで視点を動かし、照準を的に合わせて左下の「撃つ」をタップ（左手の親指）。スライドを始めると時間が進みます。</li>
+      <li>右手の親指のスライドで視点を動かし、照準を的に合わせて左下の「撃つ」をタップ（左手の親指）。的は1つずつ出て、当てると次の的が出ます。スライドを始めると時間が進みます。</li>
     </ol>
     <div class="saverow" style="margin-top:8px">
       <button class="btn" id="spdstart" type="button">測定開始</button>
@@ -391,9 +391,9 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
     <thead><tr><th>スコープ</th><th>カメラ<br>換算前</th><th>カメラ<br>換算後</th><th>スコープ<br>換算前</th><th>スコープ<br>換算後</th></tr></thead>
     <tbody id="accout"></tbody>
   </table></div>
-  <h3 style="font-size:.9rem;margin:14px 0 6px">武器別レッドドット・アイアンサイト</h3>
+  <h3 style="font-size:.9rem;margin:14px 0 6px">武器別レッドドット・アイアンサイト（視野角ごと）</h3>
   <div class="tbl"><table>
-    <thead><tr><th>武器</th><th>カメラ<br>換算前</th><th>カメラ<br>換算後</th><th>スコープ<br>換算前</th><th>スコープ<br>換算後</th></tr></thead>
+    <thead><tr><th>視野角・武器</th><th>カメラ<br>換算前</th><th>カメラ<br>換算後</th><th>スコープ<br>換算前</th><th>スコープ<br>換算後</th></tr></thead>
     <tbody id="accwout"></tbody>
   </table></div>
   <div class="saverow" style="margin-top:10px;align-items:center">
@@ -537,7 +537,7 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
       <tr><td>可変倍率スコープ</td><td>6倍スコープ 26.8〜13.5° ／ 8倍スコープ 21.3〜11.2°</td><td>実測（10章-11）。6倍スコープの3倍側は3倍スコープと同じ視野角、8倍スコープの4倍側は4倍スコープの1.055倍</td></tr>
       <tr><td>武器専用の照準</td><td>P90 2倍 35.2° ／ Win94 29.8° ／ VSS 20.2°</td><td>実測（10章-10）。P90 2倍は2倍スコープ、Win94は3倍スコープの感度の枠を使うが、視野角は違う</td></tr>
     </tbody></table></div>
-  <p class="note">武器別の値は、同じ場所・同じ向きで撮った静止画を比べて、M416のレッドドット（55.3°）に対する景色の大きさの比から出しています（11/5〜6、約110枚）。以前の値（設定から逆算した 59.8／64.9／79.6°）は実測と0.4〜0.8°の差でした。同じ種類の武器でも視野角が違うものがあるので、出力の表は武器ごとに分けています。2倍以上のスコープには武器による差がないので共通の値を使います。</p>
+  <p class="note">武器別の値は、同じ場所・同じ向きで撮った静止画を比べて、M416のレッドドット（55.3°）に対する景色の大きさの比から出しています（11/5〜6、約110枚）。以前の値（設定から逆算した 59.8／64.9／79.6°）は実測と0.4〜0.8°の差でした。同じ視野角なら感度の値も同じなので、出力の表は視野角ごとに1行にまとめ、その視野角を使う武器を並べています（11/8に武器の種類ごとの表から変更）。2倍以上のスコープには武器による差がないので共通の値を使います。</p>
 
   <h3 id="th-4">4. 感度調整 k</h3>
   <p>2章の式の指数 k です。k=1 なら全スコープで同じ感覚になります。k を上げると倍率の差が強調されて、高倍率は遅く、腰撃ちは速くなります。カメラ（射撃していないとき）とスコープ（射撃中）で別々に設定でき、初期値はどちらも 1.00 です。スコープを1より下げると高倍率が少し速くなり、倍率スコープでフルオートを撃つときの縦の反動を抑えやすくなります。</p>
@@ -973,6 +973,8 @@ OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
       <tr><td>11月7日</td><td>TPPのカメラ位置 検証5（5・10・15・25m、FPP→TPPの切り替え、置き直し 端29回・中央39回）→ d を2.38m→2.35mに変更（約2.31〜2.40m）。カメラの右へのずれは約0.22m。TPPスコープなしの値は D=10mで約0.3%下がる</td></tr>
       <tr><td>11月8日</td><td>2章に「MDの考え方」を追加（MD 50%の意味、MDとkは実測で決まらない好みの設定であること、MD 0%・50%・100%の比の表、MDの影響をなくすときは1%）。計算は変更なし</td></tr>
       <tr><td>11月8日</td><td>MDの初期値を50%→1%に変更（MDの影響がない設定。感度の比が拡大率の比になる）</td></tr>
+      <tr><td>11月8日</td><td>指の速さの測定（的当て）で、的を3つ同時に出すのをやめ、1つずつ出して当てたら次が出るように変更。速さの計算は変更なし</td></tr>
+      <tr><td>11月8日</td><td>出力の「武器別レッドドット・アイアンサイト」の表を、武器の種類ごとから視野角ごと（レッドドット 55.3／60.4／65.3／80.4°、アイアン 62.4／70.4／75.4／80.3°、武器専用 P90 2倍・Win94・VSS・エクスプローシブボウ）にまとめ直し。計算は変更なし</td></tr>
     </tbody></table></div>
 </section>
 </div>
@@ -982,28 +984,21 @@ OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
 // スコープ・アイアン・武器固有のADSはレッドドットと同じ（ジャイロ検証6〜8・11/6、差1%以内）
 const GYRO_REL={TPP:1.30/0.555,FPP:1.30/0.555,"1x":1,SMG:1,HG:1,TG:1,IR:1,"2x":1,"3x":1,"4x":1,"6x":1,"8x":1};
 // 武器別の視野角（11/5〜6、静止画でM416レッドドットとの倍率を測り、55.3°から換算。10章-10）
-// [種類, 武器, サイト, 視野角, ゲーム内で使う感度の枠（省略はレッドドット）, ジャイロの回り方（レッドドット比、省略は1）]
+// 視野角ごとにまとめた表（11/8）。同じ視野角なら感度の値も同じなので、1行にその視野角の武器をまとめる
+// [区分, 武器, サイト, 視野角, ゲーム内で使う感度の枠（省略はレッドドット）, ジャイロの回り方（レッドドット比、省略は1）]
 const WEP=[
- ["AR","ARすべて","レッドドット",55.3],["AR","ARすべて","アイアン",70.4],
- ["DMR","Mini14・Mk-12・QBU・SLR・SKS・Mk14","レッドドット",55.3],["DMR","Mini14・Mk-12・QBU・SLR・SKS・Mk14","アイアン",70.4],
- ["DMR","M1 Garand","レッドドット",55.3],["DMR","M1 Garand","アイアン",80.3],
- ["DMR","VSS","内蔵スコープ",20.2,"4x"],
- ["SR","AWM・AMR・DSR・Kar98k・M24・Mosin Nagant","レッドドット",55.3],["SR","AWM・AMR・DSR・Kar98k・M24・Mosin Nagant","アイアン",70.4],
- ["SR","Win94","ADS（3倍の感度）",29.8,"3x"],
- ["LMG","M249・MG3・DP-28","レッドドット",55.3],["LMG","M249・MG3・DP-28","アイアン",70.4],
- ["SMG","UZI・UMP45・Vector・JS9","レッドドット",60.4],["SMG","UZI・UMP45・Vector・JS9","アイアン",75.4],
- ["SMG","MP5K・PP-19","レッドドット",55.3],["SMG","MP5K・PP-19","アイアン",70.4],
- ["SMG","P90","ADS（レッドドットの感度）",55.3],["SMG","P90","ADS 2倍（2倍の感度）",35.2,"2x"],
- ["SMG","トミーガン","レッドドット",80.4],["SMG","トミーガン","アイアン",70.4],
- ["SG","S12K","レッドドット",60.4],["SG","S12K","アイアン",75.4],
- ["SG","NS2000","レッドドット",60.4],["SG","NS2000","アイアン",70.4],
- ["SG","DBS","レッドドット",55.3],["SG","DBS","アイアン",70.4],
- ["SG","S1897・S686","アイアン",75.4],["SG","M1014","アイアン",70.4],["SG","Sawed-off","アイアン",80.3],
- ["HG","P92・P1911・P18C・R45・Deagle・Skorpion","レッドドット",65.3],["HG","P92・P1911・P18C・R45・Deagle・Skorpion","アイアン",80.3],
- ["HG","R1895","アイアン",80.3],
- ["その他","クロスボウ・タクティカルクロスボウ","レッドドット",60.4],["その他","クロスボウ・タクティカルクロスボウ","アイアン",62.4],
- ["その他","M79スモーク","アイアン",70.4],["その他","スタンガン","アイアン",80.3],
- ["その他","エクスプローシブボウ","肩越し（参考）",61.6,null,2.41]];
+ ["レッドドット","AR：すべて／DMR：Mini14・Mk-12・QBU・SLR・SKS・Mk14・M1 Garand／SR：AWM・AMR・DSR・Kar98k・M24・Mosin Nagant／LMG：M249・MG3・DP-28／SMG：MP5K・PP-19・P90（ADS）／SG：DBS","レッドドット",55.3],
+ ["レッドドット","SMG：UZI・UMP45・Vector・JS9／SG：S12K・NS2000／クロスボウ・タクティカルクロスボウ","レッドドット",60.4],
+ ["レッドドット","HG：P92・P1911・P18C・R45・Deagle／SMG：Skorpion","レッドドット",65.3],
+ ["レッドドット","SMG：トミーガン","レッドドット",80.4],
+ ["アイアン","クロスボウ・タクティカルクロスボウ","アイアン",62.4],
+ ["アイアン","AR：すべて／DMR：Mini14・Mk-12・QBU・SLR・SKS・Mk14／SR：AWM・AMR・DSR・Kar98k・M24・Mosin Nagant／LMG：M249・MG3・DP-28／SMG：MP5K・PP-19・トミーガン／SG：NS2000・DBS・M1014／M79スモーク","アイアン",70.4],
+ ["アイアン","SMG：UZI・UMP45・Vector・JS9／SG：S12K・S1897・S686","アイアン",75.4],
+ ["アイアン","DMR：M1 Garand／HG：P92・P1911・P18C・R45・Deagle・R1895／SMG：Skorpion／SG：Sawed-off／スタンガン","アイアン",80.3],
+ ["武器専用","2倍スコープの感度の枠を使う","P90 ADS 2倍",35.2,"2x"],
+ ["武器専用","3倍スコープの感度の枠を使う","Win94 ADS",29.8,"3x"],
+ ["武器専用","4倍スコープの感度の枠を使う","VSS 内蔵スコープ",20.2,"4x"],
+ ["武器専用","レッドドットの感度の枠を使う。ジャイロは2.41倍回るので補正","エクスプローシブボウ 肩越し（参考）",61.6,null,2.41]];
 const HIPK=1.0062; // 11/4：レッドドット55.3°（方位帯で直接測定）を基準に、10章-8の拡大率から
 const SCOPES=[["1x","レッドドット・ホロ・キャンテッド（1x）",55.3],["2x","2倍",44.7],["3x","3倍",26.8],["4x","4倍",20.2],["6x","6倍",13.5],["8x","8倍",11.2]];
 const SCF={}; SCOPES.forEach(([k,,f])=>SCF[k]=f);
@@ -1013,7 +1008,7 @@ const sel=$("base");
 [["TPP","TPPスコープなし"],["FPP","FPPスコープなし"],...SCOPES].forEach(([k,n])=>{const o=document.createElement("option");o.value=k;o.textContent=n;sel.appendChild(o)});
 sel.value="1x";
 // 指の速さの測定：視点の選択肢を武器別の視野角から作る
-(()=>{ const m=new Map(); WEP.forEach(w=>{ if(w[3]===55.3) return; const k=w[3]; if(!m.has(k)) m.set(k,[]); m.get(k).push(`${w[1]}の${w[2].replace(/（.*）/,"")}`); });
+(()=>{ const m=new Map(); WEP.forEach(w=>{ if(w[3]===55.3) return; const k=w[3]; if(!m.has(k)) m.set(k,[]); m.get(k).push(w[0]==="武器専用"?w[2]:`${w[2]}：${w[1]}`); });
   [...m.entries()].sort((a,b)=>b[0]-a[0]).forEach(([f,l])=>{ const o=document.createElement("option"); o.value="f"+f; let t=l.join("、"); if(t.length>34) t=t.slice(0,33)+"…"; o.textContent=`${f}°（${t}）`; $("spdview").appendChild(o); }); })();
 const rad=d=>d*Math.PI/180, deg=r=>r*180/Math.PI;
 function calc(){
@@ -1034,7 +1029,7 @@ function calc(){
   const v=(s,k,b,ns,isG)=>(b/bm/(isG?gf(base):1))*Math.pow(R[s]/R[base],k)*(isG?gf(s):1);
   const rows=[["TPP No","TPP",true,m],["FPP No","FPP",true,1],...SCOPES.map(([k])=>[k==="1x"?"1x（AR・DMR）":k,k,false,1])];
   const cell=(s)=>`<td class="c">${v(s,kc,S,false,false).toFixed(2)}</td><td class="a">${v(s,ka,S,false,false).toFixed(2)}</td><td class="g">${v(s,kc,G,false,true).toFixed(2)}</td><td class="g">${v(s,ka,G,false,true).toFixed(2)}</td>`;
-  let lastT=""; $("out2").innerHTML=WEP.map((w,i)=>{ const t=w[0]!==lastT; lastT=w[0]; return `<tr class="${t?"wtop":""}"><td><span class="wt">${w[0]}</span> ${w[1]}<span class="wsp">｜</span><small>${w[2]} ${w[3]}°</small></td>${cell("w"+i)}</tr>`; }).join("");
+  let lastT=""; $("out2").innerHTML=WEP.map((w,i)=>{ const t=w[0]!==lastT; lastT=w[0]; return `<tr class="${t?"wtop":""}"><td><b class="wh">${w[2]} ${w[3]}°</b><span class="wsp">｜</span><small>${w[1]}</small></td>${cell("w"+i)}</tr>`; }).join("");
   $("out").innerHTML=rows.map(([lab,s,ns,mul])=>`<tr class="${s===base?"base":""}"><td>${lab}</td>
     <td class="c">${(v(s,kc,S,false,false)*mul).toFixed(2)}</td><td class="a">${(v(s,ka,S,false,false)*mul).toFixed(2)}</td>
     <td class="g">${(v(s,kc,G,ns,true)*mul).toFixed(2)}</td><td class="g">${(v(s,ka,G,ns,true)*mul).toFixed(2)}</td></tr>`).join("");
@@ -1093,13 +1088,18 @@ function drawHead(g,r,W,P,title){
 }
 function newCanvas(W,H){const sc=2,cv=document.createElement("canvas");cv.width=W*sc;cv.height=H*sc;const g=cv.getContext("2d");g.scale(sc,sc);g.fillStyle=IC.bg;g.fillRect(0,0,W,H);return [cv,g]}
 // 表の1列目：「武器｜サイト」は2行に分け、はみ出すときは文字を小さくする
+// 2行目（武器の一覧）は「・」「／」の後ろで折り返す
+function wrapLab(g,s,w){ g.font=`400 11px ${IMGF}`; const out=[]; let cur="";
+  String(s).split(/(?<=[・／、。 ])/).forEach(tk=>{ if(cur&&g.measureText(cur+tk).width>w){ out.push(cur); cur=tk; } else cur+=tk; }); if(cur) out.push(cur); return out; }
+const _lc=document.createElement("canvas").getContext("2d");
+function labH(t,w,RH){ const b=String(t).split("｜")[1]; if(b===undefined) return RH; const n=wrapLab(_lc,b,w).length; return n>1?RH+14*(n-1)+4:RH; }
 function fitLabel(g,t,x,y,w){ const [a,b]=String(t).split("｜"); const fit=(s,px,wt)=>{ let z=px; g.font=`${wt} ${z}px ${IMGF}`; while(z>8&&g.measureText(s).width>w){ z-=0.5; g.font=`${wt} ${z}px ${IMGF}`; } };
   if(b===undefined){ fit(a,13,500); g.fillText(a,x,y+20); return; }
-  fit(a,12.5,500); g.fillText(a,x,y+14); const c=g.fillStyle; g.fillStyle=IC.mu; fit(b,11,400); g.fillText(b,x,y+27); g.fillStyle=c; }
+  fit(a,12.5,600); g.fillText(a,x,y+14); const c=g.fillStyle; g.fillStyle=IC.mu; wrapLab(g,b,w).forEach((l,i)=>g.fillText(l,x,y+27+14*i)); g.fillStyle=c; }
 function drawImage(r){
   const W=860, P=28, RH=30;
   const main=r.main||[], wep=r.weapons||[];
-  const H=P+HEAD_H(r)+RH*(main.length+1)+40+RH*(wep.length+1)+P+10;
+  const LW=230, H=P+HEAD_H(r)+RH+40+RH+[...main,...wep].reduce((a,c)=>a+labH(c[0],LW,RH),0)+P+10;
   const [cv,g]=newCanvas(W,H);
   let y=drawHead(g,r,W,P,"PUBGモバイル感度");
   const cols=[P,P+250,P+390,P+530,P+680], colR=[0,P+330,P+470,P+620,W-P];
@@ -1110,17 +1110,17 @@ function drawImage(r){
     [first,"カメラ","スコープ","ジャイロ カメラ","ジャイロ スコープ"].forEach((t,j)=>{ if(j===0) g.fillText(t,cols[0]+8,y+20); else {g.textAlign="right"; g.fillText(t,colR[j],y+20); g.textAlign="left";} });
     y+=RH;
     rows.forEach(c=>{
-      g.strokeStyle=IC.ln; g.beginPath(); g.moveTo(P,y+RH); g.lineTo(W-P,y+RH); g.stroke();
+      const h=labH(c[0],LW,RH); g.strokeStyle=IC.ln; g.beginPath(); g.moveTo(P,y+h); g.lineTo(W-P,y+h); g.stroke();
       c.forEach((t,j)=>{
-        if(j===0){g.fillStyle=IC.fg; fitLabel(g,t,cols[0]+8,y,colR[1]-cols[0]-80)}
+        if(j===0){g.fillStyle=IC.fg; fitLabel(g,t,cols[0]+8,y,LW)}
         else {g.font=`600 14px ${IMGM}`; g.fillStyle=[0,IC.cam,IC.ads,IC.gy,IC.gy][j]; g.textAlign="right"; g.fillText(t,colR[j],y+20); g.textAlign="left"}
       });
-      y+=RH;
+      y+=labH(c[0],LW,RH);
     });
   };
   table(main,"スコープ");
-  y+=26; g.fillStyle=IC.fg; g.font=`700 14px ${IMGF}`; g.fillText("武器別レッドドット・アイアンサイト",P,y);
-  table(wep,"武器");
+  y+=26; g.fillStyle=IC.fg; g.font=`700 14px ${IMGF}`; g.fillText("武器別レッドドット・アイアンサイト（視野角ごと）",P,y);
+  table(wep,"視野角・武器");
   return cv;
 }
 // 比較モードの画像：入力の要点＋計算値／ゲーム内の設定／差の表＋4つのグラフ
@@ -1204,7 +1204,8 @@ const SET_IDS={dev:["devfrom","ppifrom","devto","ppito","devone"],acc:["accdir",
 function readSet(m){const o={};SET_IDS[m].forEach(id=>o[id]=$(id).value);return o}
 function drawConv(r){
   const W=860,P=28,RH=30, rows=r.rows||[], wrows=r.wrows||[], lines=r.lines||[], kv=r.kv||[];
-  const H=P+HEAD_H(r)+14+kv.length*19+10+lines.length*24+16+RH*(rows.length+1)+(wrows.length?40+RH*(wrows.length+1):0)+(r.one?40:0)+P+10;
+  const LW=230, sh=a=>a.reduce((s,c)=>s+labH(c[0],LW,RH),0);
+  const H=P+HEAD_H(r)+14+kv.length*19+10+lines.length*24+16+RH+sh(rows)+(wrows.length?40+RH+sh(wrows):0)+(r.one?40:0)+P+10;
   const [cv,g]=newCanvas(W,H);
   let y=drawHead(g,r,W,P,r.mode==="dev"?"PUBGモバイル感度 端末換算":"PUBGモバイル感度 加速ON⇔OFF換算");
   // 換算の条件：基礎スコープなどと同じ列（項目名 P、値 P+140）にそろえる
@@ -1220,13 +1221,13 @@ function drawConv(r){
     g.fillStyle=IC.soft; g.fillRect(P,y,W-2*P,RH); g.font=`700 12.5px ${IMGF}`; g.fillStyle=IC.mu;
     head.forEach((t,j)=>{ if(!j) g.fillText(t,P+8,y+20); else {g.textAlign="right"; g.fillText(t,colR[j],y+20); g.textAlign="left"} });
     y+=RH;
-    data.forEach(c=>{ g.strokeStyle=IC.ln; g.beginPath(); g.moveTo(P,y+RH); g.lineTo(W-P,y+RH); g.stroke();
-      c.forEach((t,j)=>{ if(!j){g.fillStyle=IC.fg; fitLabel(g,t,P+8,y,colR[1]-P-80)}
+    data.forEach(c=>{ const h=labH(c[0],LW,RH); g.strokeStyle=IC.ln; g.beginPath(); g.moveTo(P,y+h); g.lineTo(W-P,y+h); g.stroke();
+      c.forEach((t,j)=>{ if(!j){g.fillStyle=IC.fg; fitLabel(g,t,P+8,y,LW)}
         else {g.font=`${j%2===0?700:500} 14px ${IMGM}`; g.fillStyle=j<3?IC.cam:IC.ads; g.textAlign="right"; g.fillText(t,colR[j],y+20); g.textAlign="left"} });
-      y+=RH; });
+      y+=h; });
   };
   table(rows,"スコープ");
-  if(wrows.length){ y+=26; g.fillStyle=IC.fg; g.font=`700 14px ${IMGF}`; g.fillText("武器別レッドドット・アイアンサイト",P,y); y+=14; table(wrows,"武器"); }
+  if(wrows.length){ y+=26; g.fillStyle=IC.fg; g.font=`700 14px ${IMGF}`; g.fillText("武器別レッドドット・アイアンサイト（視野角ごと）",P,y); y+=14; table(wrows,"視野角・武器"); }
   if(r.one){ y+=28; g.font=`700 13.5px ${IMGF}`; g.fillStyle=IC.fg; g.fillText(r.one,P,y); }
   return cv;
 }
@@ -1560,10 +1561,9 @@ function renderSpdRes(){
     yaw+=dx*(dx>0?DEG_R:DEG_L)*sc*m; pitch=Math.max(-60,Math.min(60,pitch-dy*DEG_V*sc)); }
   function fire(){ if(!run) return; shots++; $("spdshots").textContent=shots;
     const i=tg.findIndex(t=>Math.hypot(t[0]-yaw,t[1]-pitch)<=TR);
-    if(i>=0){ tg.splice(i,1); hits++; $("spdhits").textContent=hits;
-      // 画面の外に出た的は消して、今の視界の中に出し直す（常に3つが画面内）
-      tg=tg.filter(t=>{const p=proj(t[0],t[1]); return p&&p[0]>0&&p[0]<W&&p[1]>0&&p[1]<H});
-      while(tg.length<3) spawn(); } }
+    if(i>=0){ hits++; $("spdhits").textContent=hits;
+      // 的は常に1つ。当てたら今の視界の中に次の的を出す
+      tg=[]; spawn(); } }
   fs.addEventListener("pointerdown",e=>{ if(!run||e.target.closest("button")||pid!==null) return; pid=e.pointerId; fs.setPointerCapture(pid); lx=e.clientX; ly=e.clientY; lt=e.timeStamp; accDx=0; accT=0; vbuf=[]; e.preventDefault(); });
   fs.addEventListener("pointermove",e=>{ if(!run||e.pointerId!==pid) return;
     const evs=e.getCoalescedEvents?e.getCoalescedEvents():[]; (evs.length?evs:[e]).forEach(c=>move(c.clientX,c.clientY,c.timeStamp)); e.preventDefault(); });
@@ -1603,7 +1603,7 @@ function renderSpdRes(){
     $("spdcfg").textContent=`${$("spdview").selectedOptions[0].textContent}・感度${sens}・加速${cfg.acc}`+(cfg.gyro==="ON"?`・ジャイロ${cfg.gsens}%`:"");
     msg.textContent="画面をスライドすると開始します"; try{document.activeElement&&document.activeElement.blur()}catch(e){} fs.hidden=false; document.body.style.overflow="hidden";
     holdA=curAngle(); flip=false; fs.style.transform=""; enterLand();
-    resize(); for(let i=0;i<3;i++) spawn(); raf=requestAnimationFrame(loop); }
+    resize(); spawn(); raf=requestAnimationFrame(loop); }
   function finish(){ if(!run) return; run=false; cancelAnimationFrame(raf); flush(); pid=null; stopSensors(); flip=false; fs.style.transform="";
     try{ screen.orientation?.unlock?.() }catch(e){}
     fs.hidden=true; document.body.style.overflow="";
