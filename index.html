@@ -225,7 +225,7 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
       <details class="adv"><summary>詳細設定（MD・視野角・感度調整・武器別の視野角）</summary>
       <div class="fields" style="margin-top:12px">
       <div class="f"><label for="md">モニターディスタンス <output id="mdo"></output></label>
-        <input type="range" id="md" min="1" max="100" value="50">
+        <input type="range" id="md" min="1" max="100" value="1">
         <small>画面中心から端までを100%として、エイムを合わせたい敵の位置</small></div>
       <div class="f"><label for="dist">TPPディスタンス（m）</label>
         <input type="number" id="dist" value="10" min="4" max="300" step="1">
@@ -504,7 +504,7 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
   <div class="eq">θ(F) = atan( MD × tan(F / 2) )</div>
   <p>この敵に照準を合わせるには θ だけ回す必要があります。感度（1pxあたりの回転量）を θ に比例させれば、どのスコープでも「画面上で同じ割合だけ離れた敵」に同じ指の量で合わせられます。</p>
   <div class="eq">S(x) = S(基礎) × ( θ(x) / θ(基礎) ) ^ k</div>
-  <p class="note">MDを小さくするとクロスヘア近くの微調整、大きくすると画面の端の敵への振り向きの感覚がそろいます。初期値は50%です。</p>
+  <p class="note">MDを小さくするとクロスヘア近くの微調整、大きくすると画面の端の敵への振り向きの感覚がそろいます。初期値は1%です（11/8から。それまでは元の計算機と同じ50%）。1%はMDの影響がない設定で、感度の比が拡大率の比になります（下の「MDの考え方」）。</p>
   <p><b>MDの考え方</b></p>
   <ul class="steps">
     <li><b>MD 50% は「視野角を半分にする」ではありません。</b>画面の中心と端のちょうど真ん中の位置のことです。画面は平らなので、視野角90°（端が45°）の真ん中は22.5°ではなく atan(0.5×tan45°) ＝ 約26.6° です。MD 50% では、視野角90°の26.6°とレッドドット55.3°の14.7°を、同じ指の量で回れるように感度を決めます。</li>
@@ -514,7 +514,7 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
   <div class="tbl"><table class="sm">
     <thead><tr><th>MD</th><th>TPPスコープなし</th><th>2倍</th><th>3倍</th><th>4倍</th><th>8倍</th></tr></thead>
     <tbody>
-      <tr><td>0%（1%）</td><td>1.92</td><td>0.785</td><td>0.455</td><td>0.340</td><td>0.187</td></tr>
+      <tr><td>0%（1%、初期値）</td><td>1.92</td><td>0.785</td><td>0.455</td><td>0.340</td><td>0.187</td></tr>
       <tr><td>50%</td><td>1.82</td><td>0.791</td><td>0.463</td><td>0.347</td><td>0.191</td></tr>
       <tr><td>100%</td><td>1.64</td><td>0.808</td><td>0.485</td><td>0.365</td><td>0.203</td></tr>
     </tbody></table></div>
@@ -972,6 +972,7 @@ OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
       <tr><td>11月6日</td><td>ジャイロ検証5〜8（武器別・スコープ別、感度200%）→ スコープ（2〜8倍）・アイアン・P90 2倍・Win94・VSSのジャイロの回り方はレッドドットと同じ（差1%以内）と確認し、補正を1に変更（3倍以上のジャイロの換算値が4〜10%下がります）。エクスプローシブボウ（肩越し）は約2.41倍回るので、その比で武器別の表に追加</td></tr>
       <tr><td>11月7日</td><td>TPPのカメラ位置 検証5（5・10・15・25m、FPP→TPPの切り替え、置き直し 端29回・中央39回）→ d を2.38m→2.35mに変更（約2.31〜2.40m）。カメラの右へのずれは約0.22m。TPPスコープなしの値は D=10mで約0.3%下がる</td></tr>
       <tr><td>11月8日</td><td>2章に「MDの考え方」を追加（MD 50%の意味、MDとkは実測で決まらない好みの設定であること、MD 0%・50%・100%の比の表、MDの影響をなくすときは1%）。計算は変更なし</td></tr>
+      <tr><td>11月8日</td><td>MDの初期値を50%→1%に変更（MDの影響がない設定。感度の比が拡大率の比になる）</td></tr>
     </tbody></table></div>
 </section>
 </div>
