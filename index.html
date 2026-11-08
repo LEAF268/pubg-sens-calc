@@ -163,6 +163,11 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
 .theory{max-width:80ch;font-size:.92rem}
 .theory>*{margin:0 0 10px}
 .theory h3{font-size:1rem;margin:22px 0 8px;padding-top:10px;border-top:1px solid var(--line);scroll-margin-top:12px}
+.theory .thsec{margin:0;scroll-margin-top:12px}
+.theory .thsec>summary{font-size:.95rem;padding:10px 0}
+.theory .thsec[open]>summary{margin-bottom:6px}
+.theory .thsec>*:not(summary){margin:0 0 10px}
+.theory .thsec:last-of-type{border-bottom:1px dashed var(--line)}
 .theory h4{font-size:.9rem;margin:16px 0 6px;color:var(--accent)}
 .theory p{margin:0 0 10px}
 .theory .eq{margin:0 0 10px}
@@ -489,7 +494,7 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
     <a href="#th-1">1. 全体の流れ</a><a href="#th-2">2. MD方式</a><a href="#th-3">3. 視野角</a><a href="#th-4">4. 感度調整 k</a><a href="#th-5">5. TPPスコープなし</a><a href="#th-6">6. ジャイロ</a><a href="#th-7">7. 端末換算</a><a href="#th-8">8. 加速ON⇔OFF</a><a href="#th-9">9. 指の速さの測定</a><a href="#th-10">10. 実測データ一覧</a><a href="#th-11">11. 解析の方法</a><a href="#th-12">12. 未検証・今後</a><a href="#th-13">13. ダメージ</a><a href="#th-14">14. パルス</a><a href="#th-15">15. バッグ容量</a><a href="#th-16">16. 作成・実測の記録</a>
   </nav>
 
-  <h3 id="th-1">1. 全体の流れ</h3>
+  <details class="adv thsec" id="th-1"><summary>1. 全体の流れ</summary>
   <p>PUBGモバイルの指の感度は「画面を1px動かしたときに何度回るか」で決まります。スコープの倍率が上がっても、ゲーム側でその分を補正する仕組みはありません（10章の実測）。そのため、同じ数値のままだと高倍率ほど回りすぎます。この計算機は、基礎スコープで慣れた感覚を他のスコープにそのまま移せるよう、各スコープの感度を次の順で計算します。</p>
   <ol class="steps">
     <li>MD（モニターディスタンス）の位置にいる敵が、クロスヘアから何度離れているかをスコープごとに求める（2章）</li>
@@ -498,8 +503,9 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
     <li>ジャイロは、スコープごとに実測した「端末1°あたりの回転量」の差を打ち消す（6章）</li>
     <li>必要なら、端末の画面の細かさ（7章）や水平スライド加速（8章）の違いを換算する</li>
   </ol>
+  </details>
 
-  <h3 id="th-2">2. MD方式（モニターディスタンス）</h3>
+  <details class="adv thsec" id="th-2"><summary>2. MD方式（モニターディスタンス）</summary>
   <p>視野角 F の画面で、画面中心から端までを100%として MD の位置に映る敵は、クロスヘアから角度 θ だけ離れています。</p>
   <div class="eq">θ(F) = atan( MD × tan(F / 2) )</div>
   <p>この敵に照準を合わせるには θ だけ回す必要があります。感度（1pxあたりの回転量）を θ に比例させれば、どのスコープでも「画面上で同じ割合だけ離れた敵」に同じ指の量で合わせられます。</p>
@@ -522,8 +528,9 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
   ・<b>MDの影響をなくしたいとき</b>は、MDを一番左の1%にします（0%と小数第4位まで同じ結果）。感度の比が純粋に拡大率の比（tan(視野角/2)の比）になり、クロスヘアのすぐ近くの敵に合わせる感覚がどの倍率でもそろいます。<br>
   ・<b>倍率による補正を全くかけない</b>（全スコープ同じ数値）は、MDではなく k=0 にあたります（4章）。<br>
   ・可変倍率スコープの途中の倍率（10章-11）は、MDを0〜100%のどれにしても差が0.4%以内で、MDを決める手がかりにはなりませんでした。</p>
+  </details>
 
-  <h3 id="th-3">3. 視野角</h3>
+  <details class="adv thsec" id="th-3"><summary>3. 視野角</summary>
   <div class="tbl"><table class="sm">
     <thead><tr><th>スコープ</th><th>視野角</th><th>出どころ</th></tr></thead>
     <tbody>
@@ -538,11 +545,13 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
       <tr><td>武器専用の照準</td><td>P90 2倍 35.2° ／ Win94 29.8° ／ VSS 20.2°</td><td>実測（10章-10）。P90 2倍は2倍スコープ、Win94は3倍スコープの感度の枠を使うが、視野角は違う</td></tr>
     </tbody></table></div>
   <p class="note">武器別の値は、同じ場所・同じ向きで撮った静止画を比べて、M416のレッドドット（55.3°）に対する景色の大きさの比から出しています（11/5〜6、約110枚）。以前の値（設定から逆算した 59.8／64.9／79.6°）は実測と0.4〜0.8°の差でした。同じ視野角なら感度の値も同じなので、出力の表は視野角ごとに1行にまとめ、その視野角を使う武器を並べています（11/8に武器の種類ごとの表から変更）。2倍以上のスコープには武器による差がないので共通の値を使います。</p>
+  </details>
 
-  <h3 id="th-4">4. 感度調整 k</h3>
+  <details class="adv thsec" id="th-4"><summary>4. 感度調整 k</summary>
   <p>2章の式の指数 k です。k=1 なら全スコープで同じ感覚になります。k を上げると倍率の差が強調されて、高倍率は遅く、腰撃ちは速くなります。カメラ（射撃していないとき）とスコープ（射撃中）で別々に設定でき、初期値はどちらも 1.00 です。スコープを1より下げると高倍率が少し速くなり、倍率スコープでフルオートを撃つときの縦の反動を抑えやすくなります。</p>
+  </details>
 
-  <h3 id="th-5">5. TPPスコープなし（カメラ位置の補正）</h3>
+  <details class="adv thsec" id="th-5"><summary>5. TPPスコープなし（カメラ位置の補正）</summary>
   <p>TPPのカメラはキャラクターの後ろにあり、キャラクターを中心に回ります。そのため同じ敵でも、カメラから見た角度より「キャラクターから見た角度（実際に回す量）」の方が大きくなります。差は敵が近いほど大きくなります。</p>
   <svg class="diag" viewBox="0 0 520 226" role="img" aria-label="TPPのカメラ位置の図。カメラがキャラクターの d メートル後ろにあり、敵までの角度はカメラから見たθcamよりキャラクターから見たθcharの方が大きい">
     <line x1="40" y1="170" x2="480" y2="170" class="d-axis"/>
@@ -560,21 +569,24 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
 S(TPP) = S(基礎) × ( θcam / θ(基礎) ) ^ k × θchar / θcam</div>
   <p>D は「TPP腰撃ちとFPP腰撃ちの感覚がそろう敵までの距離」です。初期値は10mです。FPPはカメラが目の位置にあるので、この補正はかかりません。TPP視野角とFPP視野角が同じなら S(TPP) = S(FPP) × θchar/θcam になります。</p>
   <p class="note">元の計算式は d = 3m でした。自分の録画で4つの距離（10・25・50・100m）を測って求めた値に置き換えています（10章-4）。10/18にスコープなしの視野角の補正（10章-8）を反映して 1.95m にしたあと、10/19にFPP→TPPの切り替えで同じ的の位置を直接比べる方法で測り直し（10章-4の検証4）、2.45m に更新しました。11/4にスコープなしの視野角を実測値（10章-9）に直したのに合わせて同じデータを計算し直し、2.38m にしました。11/7に5・10・15・25mで置き直しを繰り返して測り直し（10章-4の検証5）、<b>2.35m</b> にしています（距離表示が整数であることを考えると約2.31〜2.40m）。あわせて、D を「キャラ〜敵」の距離として正しく扱う式に直しています（前の式は D を「カメラ〜敵」として扱っていました）。カメラはキャラの真後ろではなく、約0.22m右にずれています。左右で補正量が少し変わりますが、計算機では左右の平均（ずれなし）を使っています。</p>
+  </details>
 
-  <h3 id="th-6">6. ジャイロ</h3>
+  <details class="adv thsec" id="th-6"><summary>6. ジャイロ</summary>
   <p>ジャイロも2章と同じ式で、ジャイロの基礎感度から計算します。ただしジャイロは、同じ感度の数値でも視点によって端末1°あたりの回転量が違います（10章-5）。補正オンのときは、その実測の比を打ち消します。スコープ（2〜8倍）・アイアンサイト・武器固有のADS（P90 2倍・Win94・VSS）はレッドドットと同じでした（11/6）。</p>
   <div class="eq">G(x) = 式の値(x) × R(基礎) / R(x)
 R = 端末1°あたりの回転量（レッドドット＝1）
   TPP・FPPスコープなし 2.342 ／ レッドドット・2〜8倍・アイアン 1
   エクスプローシブボウ（肩越し） 2.41</div>
   <p class="note">例：基礎がレッドドットなら、TPPスコープなしは式の値 ×0.43、エクスプローシブボウは ×0.41、スコープは式の値のままです。FPPスコープなしもTPPと同じ比です（ジャイロ検証4で確認、視野角にもよりません）。元の計算式の補正は 0.42 という1つの定数でしたが、スコープごとの実測値に置き換えました。10/17の測定（10章-5の上の表）では3倍以上が4〜10%回りにくく出ていましたが、11/6に区間を細かく分けて測り直すと（ジャイロ検証8）、2〜8倍のどれもレッドドットとの差は1%以内でした。</p>
+  </details>
 
-  <h3 id="th-7">7. 端末換算</h3>
+  <details class="adv thsec" id="th-7"><summary>7. 端末換算</summary>
   <p>指の感度は「画面1pxあたり」なので、画面が細かい（ppiが高い）端末ほど、同じ指の距離で動くpx数が増えて速く回ります。指の距離あたりの回転量をそろえるには、ppiの比を掛けます。</p>
   <div class="eq">換算後の感度 = 今の感度 × 今の端末のppi ÷ 換算先のppi</div>
   <p class="note">例：Legion Tab Y700 Gen3（343ppi）→ Galaxy S25（416ppi）は ×0.825。換算するのは指の感度（カメラ・スコープ）だけです。ジャイロは端末の傾きで動くので、ppiの影響を受けません。</p>
+  </details>
 
-  <h3 id="th-8">8. 水平スライド加速 ON ⇔ OFF</h3>
+  <details class="adv thsec" id="th-8"><summary>8. 水平スライド加速 ON ⇔ OFF</summary>
   <p>加速ONでは、指の速さ（端末px/秒）に応じて回転量に倍率がかかります。実測から次のカーブにしています（TPP〜8倍で共通、2端末で一致）。</p>
   <div class="eq">v ＜ 610 px/秒        → 1倍
 610 〜 1,330 px/秒    → 1 + (v − 610) / 720 × 1.2   （1倍 → 2.2倍）
@@ -583,14 +595,16 @@ R = 端末1°あたりの回転量（レッドドット＝1）
   <div class="eq">平均倍率 M = Σ 倍率(速さ) × その速さで動いた距離 ÷ Σ 動いた距離
 OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
   <p class="note">速さの分布は、cm/秒 × 端末のppi ÷ 2.54 で端末px/秒に直してから倍率を計算します。同じ指の速さでも、ppiの高い端末の方が加速が強くかかります。</p>
+  </details>
 
-  <h3 id="th-9">9. 指の速さの測定（的当て）</h3>
+  <details class="adv thsec" id="th-9"><summary>9. 指の速さの測定（的当て）</summary>
   <p>加速の換算に使う「自分の指の速さ」を測る機能です。視点の回り方はゲームの実測値を再現しています。</p>
   <div class="eq">回転量 = 指の移動(端末px) × 0.0641°（右）／0.0705°（左） × (感度 / 36) × 加速倍率(ONのとき)
 ジャイロ = 端末の回転(°) × 0.645 × (ジャイロ感度 / 100) ÷ R(TPP) × R(視点)</div>
   <p class="note">指の横方向の動きを約1/60秒ごとに速さにして、動いた距離で重みをつけた分布を作ります（録画の解析と同じ考え方）。ジャイロは、ブラウザがセンサーを読める https のページ（GitHub Pagesなど）でだけ動きます。</p>
+  </details>
 
-  <h3 id="th-10">10. 実測データ一覧</h3>
+  <details class="adv thsec" id="th-10"><summary>10. 実測データ一覧</summary>
   <p class="note">n はスワイプ（または解析区間）の数です。1pxは端末の画面の物理pxです。録画は2560×1440で、ゲーム画面の部分は 端末px × 0.9 で記録されています。</p>
 
   <h4>10-1. 感度の数値と回転量（加速OFF・ジャイロOFF・TPP）<span class="dt">検証8・10/16</span></h4>
@@ -868,16 +882,18 @@ OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
       <tr><td></td><td>レッドドット</td><td>31</td><td>38cm</td><td>12.0cm/秒</td><td>1.94</td></tr>
     </tbody></table></div>
   <p class="note">「普段のプレイの速さ」の初期値には、上の「普段のエイム・全体」の分布を使っています。練習の録画のレッドドットは、データ量（38cm）が少なめです。</p>
+  </details>
 
-  <h3 id="th-11">11. 解析の方法</h3>
+  <details class="adv thsec" id="th-11"><summary>11. 解析の方法</summary>
   <ul class="steps">
     <li><b>指の動き</b>：開発者向けオプションの「ポインタの位置」を表示して録画し、画面の縦線の位置を1フレームずつ追跡しました。カメラ位置の検証3からは、指を離したときに上部に出る「dX」（端末px、小数第1位）を文字認識で直接読んでいます。</li>
     <li><b>回転量</b>：画面上部の方位の数字を読み取り、スワイプの前後の差から求めました（1°単位）。</li>
     <li><b>ジャイロ</b>：phyphoxで端末の角度を記録し、その画面ごと録画しました。端末の角度とゲーム内の方位を時刻で合わせ、比を当てはめています。外れ値は除いています。</li>
     <li><b>代表値</b>：ばらつきや読み取りミスに強い中央値を使っています。</li>
   </ul>
+  </details>
 
-  <h3 id="th-12">12. 未検証の部分と今後</h3>
+  <details class="adv thsec" id="th-12"><summary>12. 未検証の部分と今後</summary>
   <ul class="steps">
     <li>TPPのカメラ位置 d（2.35m）は、角度から d と距離の比を出しているため、距離表示の誤差（±0.5m）で約2.31〜2.40mの幅があります（10章-4）。</li>
     <li>実測は Legion Tab Y700 Gen3 と Galaxy S25 だけです。iPhone・iPadで同じ仕組みかは確かめていません。</li>
@@ -887,8 +903,9 @@ OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
     <li>武器別の視野角（10章-10）は静止画1枚ずつの比から出した値です。角度を直接測ったのはM416のレッドドット・アイアンサイトだけです（10章-9、アイアンサイトは場所によって70.4°・69.7°）。ジャイロの回り方は11/6に主な武器・スコープで測りました（10章-5）。エクスプローシブボウの視野角は比からの参考値です。</li>
   </ul>
   <p class="note">この計算機は、動画で公開されていた計算方法を元にしています（MD 25%・50%、感度調整 1.0／1.15／0.87 の各表と小数第2位まで一致することを確認）。その後、TPPのカメラ位置とジャイロの補正などの定数は、自分の録画による実測値に置き換えています。</p>
+  </details>
 
-  <h3 id="th-13">13. ダメージ（作成中）</h3>
+  <details class="adv thsec" id="th-13"><summary>13. ダメージ（作成中）</summary>
   <div class="dmgwarn"><b>⚠ 実測データは 2025年10月26日〜11月3日（バージョン4.1配信の直前）のものです。</b>その後のアップデートの変更は入っていません。今のバージョンで測り直す予定です。</div>
   <div class="eq">実測の武器：ダメージ = 防具なしの実測値（距離で直線補間） × (1 − 防具の軽減率)
 ネットの武器：ダメージ = 基礎ダメージ × 部位の倍率 × (1 − 防具の軽減率)
@@ -926,22 +943,25 @@ OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
   <ul class="steps"><li>4.1（2025年11月6日）：ARなどのライフルに距離減衰（DMRを除く）、弾速の距離減衰、ショットガンのダメージ減。</li><li>4.2（2026年1月上旬）：AKM・M762・ACE32・ハニーバジャー・Mk47 の基礎ダメージ＋2、グローザ＋1、ショットガン各種−1。</li><li>4.4（2026年5月12日）：スナイパーと多くのDMR（AMR・AWM・DSR・Kar98k・M24・Mini14・Mk12・Mk14・Mosin・QBU・SKS・SLR・Win94・M1ガーランド）は距離減衰なし・防具の耐久を多く削る。ARは近〜中距離のダメージを少し増、M16A4とMk47は減衰を少し軽く。ショットガンは減衰増・防具への削り減。→ 計算機の「4.4の…を反映」をオンにすると、DMR・スナイパーは1mの値を使います。</li><li>4.5（2026年7月9日）：見た目の変更のみ。4.6（2026年9月）：ACE32（または7.62mm）の基礎ダメージ 46→47。</li></ul>
   <h4>13-3. ネットの値（未実測の武器）</h4>
   <ul class="steps"><li>基礎ダメージは PUBG Mobile の公開データ（Sportskeeda、2020年）、連射間隔は PC 版のデータ（PUBG Resource）。連射間隔は実測の武器にも使っています。Mk12・Mosin Nagant・DSR・AMR は連射間隔が分からないため、倒す時間は出していません。</li><li>部位の倍率（基礎ダメージに掛ける頭／胴／手足）：AR 2.35／1.0／0.45、DMR 2.25／1.0／0.46、SR 2.5／1.3／0.52、SMG 1.83／1.05／0.65、LMG 2.4／1.05／0.71（ここまでは実測の「頭÷胴・手足÷胴」から）、SG 1.5／1.0／1.05、HG 2.1／1.0／1.0（PC版の値）。</li><li>ヘルメットは頭、ベストは胴だけを守り、手足はどちらも効きません。防具の耐久値（ベスト Lv1 200・Lv2 220・Lv3 250、ゲーム内で確認済み）はまだ計算に入れていません。</li><li>倒す時間＝（発数−1）× 連射間隔。全弾命中・ダウン（気絶）までの計算です。ショットガンは近距離で全ペレットが胴に当たった合計の値です。</li></ul>
+  </details>
 
-  <h3 id="th-14">14. パルス（作成中）</h3>
+  <details class="adv thsec" id="th-14"><summary>14. パルス（作成中）</summary>
   <div class="eq">体力の変化（0.1秒ごと）= ブーストの回復 − パルスの毎秒ダメージ
 ブーストの回復（毎秒）= 1〜20：0.125 ／ 21〜60：0.25 ／ 61〜90：0.375 ／ 91〜100：0.5
 ブーストの減り方 = 8秒ごとに約2.5
 回復アイテムの差し引き = 回復量 − 使用時間 × 毎秒ダメージ</div>
   <ul class="steps"><li>パルスのダメージ（毎秒）：クラシックはフェーズ1から 0.4／0.6／0.8／1／3／5／7／9／11（PC版エランゲルの値、PUBG Wiki）。トップレはクラシックとダメージが違いますが、値がまだ分からないため同じ値を仮に入れています。モバイル版は「フェーズ5で1〜3、6で5、7で7、8で11」とする資料もあります（Gurugamer）。</li><li>ブーストの回復：ブーストの段階ごとに8秒で 1／2／3／4 回復（0〜20／20〜60／60〜90／90〜100）。ブーストは8秒ごとに約2.5ずつ減ります（鎮痛剤1個で約3分・約40回復になる値）。</li><li>回復アイテム：包帯＋10（75まで）・4秒、応急処置キット 75まで・6秒、医療用キット 100まで・8秒。11月12日のアップデートで包帯は＋12・3秒、医療用キットは6秒になる予定です（「回復アイテムの値」で切り替え。自動なら11月12日から新しい値）。ブーストはエナジードリンク4秒・鎮痛剤6秒・アドレナリン6秒（PC版の値）。</li><li>「ブースト最大で相殺」は、ブースト90以上の回復（毎秒0.5）がパルスのダメージを上回るかどうかです。</li><li>使用時間中もパルスのダメージを受け続けるとして計算しています。体力が尽きると使い終わる前に倒れます。</li></ul>
   <p class="note">確認状況（2026年10月18日）：ブーストで移動速度が上がる境目（60以上）はゲーム内の説明で確認済み。パルスの毎秒ダメージ（クラシック・トップレ）、ブーストの回復・減り方、使用時間は未実測です。11月12日のアップデート予定（包帯・医療用キット）は2026年10月18日に追加しました。</p>
+  </details>
 
-  <h3 id="th-15">15. バッグ容量</h3>
+  <details class="adv thsec" id="th-15"><summary>15. バッグ容量</summary>
   <div class="eq">合計容量 = 素の容量 150 + バッグ（Lv1 150／Lv2 200／Lv3 250）+ ベスト 50
 使った容量 = Σ アイテムの個数 × 1個あたりの容量（弾は1発あたり）</div>
   <ul class="steps"><li>アイテムの容量は、ゲーム内のアイテム説明の「容量」をスクショで確認した値です（2026年10月18日）。弾は1発あたり 5.56mm 0.5、7.62mm 0.6、9mm 0.375、.45ACP 0.4、12ゲージ 1.25。</li><li>すべてゲーム内のアイテム説明で確認済みです（2026年10月18日）。</li><li>説明の ⇈ は性能が大きく上がる、↑ は上がる、↓ は下がる（ゲーム内の矢印と同じ）。</li><li>11月12日のアップデートで、医療用キット 20→15、アドレナリン 20→10、鎮痛剤 10→6 になる予定です（「回復アイテムの値」で切り替え。自動なら11月12日から新しい値）。</li><li>容量の合計もゲーム内で確認済みです：何も着けない 150、ベストのみ 200（Lv1〜3どれでも＋50）、ベスト＋バッグ Lv1 350・Lv2 400・Lv3 450（バッグは＋150／＋200／＋250）。</li></ul>
   <p class="note">確認状況：アイテムの容量と説明・バッグとベストの容量・ベストの耐久値は、2026年10月18日にゲーム内のスクショで確認しました（アイテム約80種、医療用キットとスコープは同日に追加で確認）。</p>
+  </details>
 
-  <h3 id="th-16">16. 作成・実測の記録</h3>
+  <details class="adv thsec" id="th-16"><summary>16. 作成・実測の記録</summary>
   <p class="note">録画の日付は、録画ファイルの保存日時です。</p>
   <div class="tbl"><table class="sm">
     <thead><tr><th>日付（2026年）</th><th>内容</th></tr></thead>
@@ -976,6 +996,7 @@ OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
       <tr><td>11月8日</td><td>指の速さの測定（的当て）で、的を3つ同時に出すのをやめ、1つずつ出して当てたら次が出るように変更。速さの計算は変更なし</td></tr>
       <tr><td>11月8日</td><td>出力の「武器別レッドドット・アイアンサイト」の表を、武器の種類ごとから視野角ごと（レッドドット 55.3／60.4／65.3／80.4°、アイアン 62.4／70.4／75.4／80.3°、武器専用 P90 2倍・Win94・VSS・エクスプローシブボウ）にまとめ直し。計算は変更なし</td></tr>
     </tbody></table></div>
+  </details>
 </section>
 </div>
 
@@ -1072,6 +1093,9 @@ function infoRows(i){return [
   [["基礎感度（ジャイロ）",i.gsens],["感度調整（カメラ）",(+i.kc).toFixed(2)],["ジャイロ適正化",i.gfix?"ON":"OFF"]],
   [["水平スライド加速（指）",i.accel||"—"],["感度調整（スコープ）",(+i.ka).toFixed(2)],null]]}
 const HEAD_H=r=>40+(r.name?20:0)+14+19*4;
+// 保存した日時（端末のローカル時刻）をファイル名に入れる 例 20261109_0058
+const p2=n=>String(n).padStart(2,"0");
+const fileDT=t=>{const d=new Date(t||Date.now());return `${d.getFullYear()}${p2(d.getMonth()+1)}${p2(d.getDate())}_${p2(d.getHours())}${p2(d.getMinutes())}`};
 // タイトル・日時・名前・入力の要点（計算機／比較で共通）
 function drawHead(g,r,W,P,title){
   const i=r.inputs||{}; let y=P+26;
@@ -1238,7 +1262,8 @@ async function saveImage(r){
   if(!raw){msg("画像を作れませんでした。");return}
   const blob=await embedInputs(raw,{v:3,mode:r.mode||"calc",name:r.name||"",inputs:r.inputs||{},game:r.mode==="cmp"?r.game:undefined,settings:r.settings,bag:r.mode==="bag"&&r.bag?r.bag.st:undefined});
   const safe=(r.name||"結果").replace(/[\\/:*?"<>|]/g,"_").slice(0,40);
-  const filename=r.mode==="bag"?`PUBGバッグ容量_${safe}.png`:`PUBG感度${({cmp:"比較",dev:"端末換算",acc:"加速換算"})[r.mode]||""}_${safe}.png`;
+  const fdt=fileDT(r.createdAt);
+  const filename=r.mode==="bag"?`PUBGバッグ容量_${safe}_${fdt}.png`:`PUBG感度${({cmp:"比較",dev:"端末換算",acc:"加速換算"})[r.mode]||""}_${safe}_${fdt}.png`;
   let dl=null; try{ dl=window.claude?.use? await claude.use("downloads"):null }catch(e){}
   if(dl){
     try{ await dl.save({filename,data:blob}); msg("画像を保存しました。") }
@@ -1898,4 +1923,9 @@ function setupVerSel(id){ const el=document.getElementById(id); el.value=itemVer
   $$("plstbl").addEventListener("click",e=>{ const tr=e.target.closest("tr"); if(!tr||!tr.cells[0]) return; const ph=+tr.cells[0].textContent; if(ph){ $$("plsph").value=ph; $$("plsdps").value=dpsOf(ph); draw(); } });
   draw();
 })();
+</script>
+<script>
+(function(){function openTh(h){if(!h||h.slice(0,4)!=="#th-")return;var d=document.getElementById(h.slice(1));if(d&&d.tagName==="DETAILS"){d.open=true;setTimeout(function(){d.scrollIntoView({block:"start"})},0)}}
+document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest('a[href^="#th-"]');if(a)openTh(a.getAttribute("href"))});
+window.addEventListener("hashchange",function(){openTh(location.hash)});openTh(location.hash);})();
 </script>
