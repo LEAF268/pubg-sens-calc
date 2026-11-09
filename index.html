@@ -35,6 +35,11 @@ header p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
 .f label output{font-family:var(--f-mono);color:var(--accent);font-weight:600}
 .f small{display:block;color:var(--muted);font-size:.75rem;line-height:1.4;margin-top:2px}
 input[type=range]{width:100%;accent-color:var(--accent)}
+.rngnum{display:flex;align-items:center;gap:8px}
+.rngnum input[type=range]{flex:1;min-width:0;width:auto}
+.rngnum input[type=number]{width:5.5em;flex:none;padding:4px 6px;font-size:.9rem}
+.spdedit .rngnum{display:inline-flex}
+.spdedit .rngnum input[type=number]{width:4.5em;background:#fff;color:#000}
 input[type=number],select{width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);font-family:var(--f-mono);font-size:.95rem}
 .check{display:flex;gap:8px;align-items:flex-start;font-size:.85rem}
 .check input{accent-color:var(--accent);margin-top:5px}
@@ -257,18 +262,20 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
       <thead><tr><th>スコープ</th><th>カメラ</th><th>スコープ</th><th>ジャイロ<br>カメラ</th><th>ジャイロ<br>スコープ</th></tr></thead>
       <tbody id="out"></tbody>
     </table></div>
-    <h2 style="margin-top:20px">武器別レッドドット・アイアンサイト（視野角ごと）</h2>
+    <details class="adv" id="out2box" style="margin-top:20px"><summary>武器別レッドドット・アイアンサイト（視野角ごと）</summary>
     <div class="tbl"><table>
       <thead><tr><th>視野角・武器</th><th>カメラ</th><th>スコープ</th><th>ジャイロ<br>カメラ</th><th>ジャイロ<br>スコープ</th></tr></thead>
       <tbody id="out2"></tbody>
     </table></div>
     <p class="note" style="margin:6px 0 0">同じ視野角なら感度の値も同じなので、視野角ごとに1行にまとめています（レッドドット55.3°の行は上の表の1xと同じ値）。TPP・FPPスコープなしと2倍以上のスコープは、どの武器も上の表と同じ値を使います。</p>
-    <h2 style="margin-top:20px">可変倍率スコープ（途中の倍率）</h2>
+    </details>
+    <details class="adv" id="out3box" style="margin-top:12px"><summary>可変倍率スコープ（途中の倍率）</summary>
     <div class="tbl"><table>
       <thead><tr><th>倍率の位置</th><th>カメラ<br>ゲーム</th><th>カメラ<br>計算値</th><th>スコープ<br>ゲーム</th><th>スコープ<br>計算値</th></tr></thead>
       <tbody id="out3"></tbody>
     </table></div>
     <p class="note" style="margin:6px 0 0">ゲームに入れる値は上の表の3倍・4倍・6倍・8倍だけです。6倍スコープは3倍〜6倍、8倍スコープは4倍〜8倍の枠を使い、途中の倍率では両端の値の間を視野角に合わせて直線的に変わります（10章-11）。「ゲーム」はそのとき実際にかかる感度、「計算値」はその視野角に合う感度です。8倍スコープを一番下げたときは4倍の枠を使いますが、視野角は4倍スコープより約5%広くなります。ジャイロの途中の倍率は測っていないので出していません。</p>
+    </details>
     <div class="detail" id="detail"></div>
   </section>
 </div>
@@ -499,7 +506,7 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
   <ol class="steps">
     <li>MD（モニターディスタンス）の位置にいる敵が、クロスヘアから何度離れているかをスコープごとに求める（2章）</li>
     <li>その角度の比で感度を割り振り、好みに応じて感度調整 k で強弱をつける（2・4章）</li>
-    <li>TPPスコープなしは、カメラがキャラの後ろにある分を補正する（5章）</li>
+    <li>TPPはカメラがキャラの後ろにあるので、TPPディスタンスの敵でTPPと同じ感覚になるようにFPPスコープなしを補正する（5章）</li>
     <li>ジャイロは、スコープごとに実測した「端末1°あたりの回転量」の差を打ち消す（6章）</li>
     <li>必要なら、端末の画面の細かさ（7章）や水平スライド加速（8章）の違いを換算する</li>
   </ol>
@@ -524,7 +531,7 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
       <tr><td>50%</td><td>1.82</td><td>0.791</td><td>0.463</td><td>0.347</td><td>0.191</td></tr>
       <tr><td>100%</td><td>1.64</td><td>0.808</td><td>0.485</td><td>0.365</td><td>0.203</td></tr>
     </tbody></table></div>
-  <p class="note">スコープ同士ではMDを0〜100%動かしても差は2〜9%で、kを少し動かすのと似た効果です。大きく効くのはスコープなし（TPP・FPP）とスコープの間です。TPPスコープなしの値はカメラ位置の補正（5章）をかける前の比です。<br>
+  <p class="note">スコープ同士ではMDを0〜100%動かしても差は2〜9%で、kを少し動かすのと似た効果です。大きく効くのはスコープなし（TPP・FPP）とスコープの間です。TPP・FPPスコープなしの値は、カメラ位置の補正（5章、FPP側にかけます）をかける前の比です。<br>
   ・<b>MDの影響をなくしたいとき</b>は、MDを一番左の1%にします（0%と小数第4位まで同じ結果）。感度の比が純粋に拡大率の比（tan(視野角/2)の比）になり、クロスヘアのすぐ近くの敵に合わせる感覚がどの倍率でもそろいます。<br>
   ・<b>倍率による補正を全くかけない</b>（全スコープ同じ数値）は、MDではなく k=0 にあたります（4章）。<br>
   ・可変倍率スコープの途中の倍率（10章-11）は、MDを0〜100%のどれにしても差が0.4%以内で、MDを決める手がかりにはなりませんでした。</p>
@@ -566,8 +573,9 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
   </svg>
   <div class="eq">θcam  = atan( MD × tan(TPP視野角 / 2) )
 θchar = θcam + asin( d·sinθcam / D )    d = 2.35m（実測）
-S(TPP) = S(基礎) × ( θcam / θ(基礎) ) ^ k × θchar / θcam</div>
-  <p>D は「TPP腰撃ちとFPP腰撃ちの感覚がそろう敵までの距離」です。初期値は10mです。FPPはカメラが目の位置にあるので、この補正はかかりません。TPP視野角とFPP視野角が同じなら S(TPP) = S(FPP) × θchar/θcam になります。</p>
+S(TPP) = S(基礎) × ( θcam / θ(基礎) ) ^ k
+S(FPP) = S(基礎) × ( θ(FPP) / θ(基礎) ) ^ k × θcam / θchar</div>
+  <p>D は「TPP腰撃ちとFPP腰撃ちの感覚がそろう敵までの距離」です。初期値は10mです。TPPの感度は変えず、FPPの感度を θcam/θchar 倍に下げて、D の距離の敵をTPPと同じ指の量で狙えるようにします。TPP視野角とFPP視野角が同じなら S(FPP) = S(TPP) × θcam/θchar になります（11/9変更：以前はFPPを基準にしてTPPを θchar/θcam 倍に上げていました。TPPとFPPの比は同じで、TPPを変えないかFPPを変えないかの違いです。スコープの値は変わりません）。基礎スコープをFPPスコープなしにしたときは、入力したFPPの値からこの補正を外してから計算します。</p>
   <p class="note">元の計算式は d = 3m でした。自分の録画で4つの距離（10・25・50・100m）を測って求めた値に置き換えています（10章-4）。10/18にスコープなしの視野角の補正（10章-8）を反映して 1.95m にしたあと、10/19にFPP→TPPの切り替えで同じ的の位置を直接比べる方法で測り直し（10章-4の検証4）、2.45m に更新しました。11/4にスコープなしの視野角を実測値（10章-9）に直したのに合わせて同じデータを計算し直し、2.38m にしました。11/7に5・10・15・25mで置き直しを繰り返して測り直し（10章-4の検証5）、<b>2.35m</b> にしています（距離表示が整数であることを考えると約2.31〜2.40m）。あわせて、D を「キャラ〜敵」の距離として正しく扱う式に直しています（前の式は D を「カメラ〜敵」として扱っていました）。カメラはキャラの真後ろではなく、約0.22m右にずれています。左右で補正量が少し変わりますが、計算機では左右の平均（ずれなし）を使っています。</p>
   </details>
 
@@ -996,6 +1004,8 @@ OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
       <tr><td>11月8日</td><td>指の速さの測定（的当て）で、的を3つ同時に出すのをやめ、1つずつ出して当てたら次が出るように変更。速さの計算は変更なし</td></tr>
       <tr><td>11月8日</td><td>出力の「武器別レッドドット・アイアンサイト」の表を、武器の種類ごとから視野角ごと（レッドドット 55.3／60.4／65.3／80.4°、アイアン 62.4／70.4／75.4／80.3°、武器専用 P90 2倍・Win94・VSS・エクスプローシブボウ）にまとめ直し。計算は変更なし</td></tr>
       <tr><td>11月9日</td><td>ダメージ計算の武器に ACE32・FAMAS・MG3・Deagle・DBS・Sawed-off・クロスボウ（PC版のデータ、「参考(PC)」）、ハニーバジャー・ASM Abakan（「参考(ネット)」）、M1 Garand・JS9・NS2000・M1014・タクティカルクロスボウ・エクスプローシブボウ・溶接ガン（「値なし」）を追加。どれも未実測。実測の21武器は変更なし</td></tr>
+      <tr><td>11月9日</td><td>TPPディスタンスの補正を、TPPの感度を上げる形から、TPPの感度はそのままでFPPの感度を下げて合わせる形に変更（TPPとFPPの比は同じ。スコープの値は変わらない）</td></tr>
+      <tr><td>11月9日</td><td>出力の「武器別レッドドット・アイアンサイト（視野角ごと）」と「可変倍率スコープ（途中の倍率）」の表を折りたたみ表示に変更（初期は閉じる）。スライダーで調整する項目（モニターディスタンス・FPP／TPP視野角・感度調整・指の速さ・撃つボタンの大きさ）に数値入力欄を追加し、スライダーと連動して直接入力もできるように変更。計算は変更なし</td></tr>
     </tbody></table></div>
   </details>
 </section>
@@ -1045,11 +1055,11 @@ function calc(){
   const R={FPP:thh(fpp),TPP:thh(tpp)}; SCOPES.forEach(([k,,f])=>R[k]=th(f));
   WEP.forEach((w,i)=>{ R["w"+i]=th(w[3]); GYRO_REL["w"+i]=w[5]||(w[4]?GYRO_REL[w[4]]:1); });
   const tc=thh(tpp), ch=tc+Math.asin(Math.min(1,2.35*Math.sin(tc)/D)), m=ch/tc;
-  // 基礎がTPP/FPPのときは、入力値からTPP倍率を外して基準に戻す。
+  // TPPディスタンス：TPPはそのまま、FPPを 1/m 倍してTPPに合わせる（11/9変更）。基礎がFPPのときは入力値からその倍率を外して基準に戻す。
   // ジャイロは実測の回転量の比で補正：回りやすいスコープほど数値を下げる（値 × 基礎の比 ÷ そのスコープの比）
-  const bm=base==="TPP"?m:1, gf=x=>gfix?1/(GYRO_REL[x]||1):1;
+  const bm=base==="FPP"?1/m:1, gf=x=>gfix?1/(GYRO_REL[x]||1):1;
   const v=(s,k,b,ns,isG)=>(b/bm/(isG?gf(base):1))*Math.pow(R[s]/R[base],k)*(isG?gf(s):1);
-  const rows=[["TPP No","TPP",true,m],["FPP No","FPP",true,1],...SCOPES.map(([k])=>[k==="1x"?"1x（AR・DMR）":k,k,false,1])];
+  const rows=[["TPP No","TPP",true,1],["FPP No","FPP",true,1/m],...SCOPES.map(([k])=>[k==="1x"?"1x（AR・DMR）":k,k,false,1])];
   const cell=(s)=>`<td class="c">${v(s,kc,S,false,false).toFixed(2)}</td><td class="a">${v(s,ka,S,false,false).toFixed(2)}</td><td class="g">${v(s,kc,G,false,true).toFixed(2)}</td><td class="g">${v(s,ka,G,false,true).toFixed(2)}</td>`;
   let lastT=""; $("out2").innerHTML=WEP.map((w,i)=>{ const t=w[0]!==lastT; lastT=w[0]; return `<tr class="${t?"wtop":""}"><td><b class="wh">${w[2]} ${w[3]}°</b><span class="wsp">｜</span><small>${w[1]}</small></td>${cell("w"+i)}</tr>`; }).join("");
   $("out").innerHTML=rows.map(([lab,s,ns,mul])=>`<tr class="${s===base?"base":""}"><td>${lab}</td>
@@ -1071,7 +1081,7 @@ function calc(){
   });
   $("out3").innerHTML=o3;
   $("detail").innerHTML=`<div>どのスコープでもクロスヘアから <b>${Math.round(md*100)}%</b> 離れた敵に同じ感覚でエイムできます。</div>
-    <div>TPP: カメラから <b>${deg(tc).toFixed(2)}°</b>、キャラクターから <b>${deg(ch).toFixed(2)}°</b> → TPP腰撃ち感度を <b>${m.toFixed(2)}倍</b></div>
+    <div>TPP: カメラから <b>${deg(tc).toFixed(2)}°</b>、キャラクターから <b>${deg(ch).toFixed(2)}°</b> → TPP腰撃ち感度はそのままで、FPP腰撃ち感度を <b>${(1/m).toFixed(2)}倍</b>にしてTPPに合わせます</div>
     <div>実際のゲームの設定は整数なので、四捨五入して入れてください。</div>`;
 }
 document.querySelectorAll(".grid input,.grid select").forEach(e=>e.addEventListener("input",calc));
@@ -1925,6 +1935,30 @@ function setupVerSel(id){ const el=document.getElementById(id); el.value=itemVer
   setupVerSel("plsver"); verHooks.push(draw);
   $$("plstbl").addEventListener("click",e=>{ const tr=e.target.closest("tr"); if(!tr||!tr.cells[0]) return; const ph=+tr.cells[0].textContent; if(ph){ $$("plsph").value=ph; $$("plsdps").value=dpsOf(ph); draw(); } });
   draw();
+})();
+
+// スライダーに数値入力欄を付ける（スライダーと連動、直接入力も可）
+(function(){
+  const desc=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value");
+  const dec=r=>{const st=r.getAttribute("step"); if(!st||st==="any") return 0; const i=st.indexOf("."); return i<0?0:st.length-i-1;};
+  document.querySelectorAll('input[type=range]').forEach(r=>{
+    if(r.dataset.numbox) return; r.dataset.numbox="1";
+    const n=document.createElement("input"); n.type="number"; n.min=r.min; n.max=r.max; n.step=r.getAttribute("step")||"1"; n.inputMode="decimal";
+    n.className="rngnumbox"; n.setAttribute("aria-label",(r.labels&&r.labels[0]?r.labels[0].textContent.trim():"値")+"（数値入力）");
+    const d=dec(r); const fmt=v=>{const x=+v; return isFinite(x)?x.toFixed(d):v;};
+    const show=()=>{ if(document.activeElement!==n) n.value=fmt(desc.get.call(r)); };
+    const w=document.createElement("span"); w.className="rngnum"; r.parentNode.insertBefore(w,r); w.appendChild(r); w.appendChild(n);
+    Object.defineProperty(r,"value",{configurable:true,get(){return desc.get.call(this)},set(v){desc.set.call(this,v); show();}});
+    r.addEventListener("input",show); r.addEventListener("change",show);
+    n.addEventListener("click",e=>e.stopPropagation());
+    n.addEventListener("input",e=>{ e.stopPropagation(); const v=parseFloat(n.value); if(!isFinite(v)) return; const lo=+r.min,hi=+r.max; if(v<lo||v>hi) return;
+      desc.set.call(r,String(v)); r.dispatchEvent(new Event("input",{bubbles:true})); });
+    n.addEventListener("change",e=>{ e.stopPropagation(); let v=parseFloat(n.value); if(!isFinite(v)) v=+desc.get.call(r); v=Math.min(+r.max,Math.max(+r.min,v));
+      desc.set.call(r,String(v)); n.value=fmt(desc.get.call(r)); r.dispatchEvent(new Event("input",{bubbles:true})); r.dispatchEvent(new Event("change",{bubbles:true})); });
+    n.addEventListener("keydown",e=>{ if(e.key==="Enter"){ n.blur(); } });
+    n.addEventListener("blur",()=>{ n.value=fmt(desc.get.call(r)); });
+    show();
+  });
 })();
 </script>
 <script>
