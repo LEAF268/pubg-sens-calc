@@ -146,6 +146,9 @@ body[data-mode="sv"] .grid{display:none} body[data-mode="sv"] .m-sv{display:bloc
 .svtbl td.svwarn{background:color-mix(in srgb,var(--warn) 18%,transparent)}.svtbl td.svbad{background:color-mix(in srgb,var(--bad) 18%,transparent)}
 .svw{color:var(--warn);font-weight:700;margin:0 0 6px}
 #svmemo{display:block;width:100%;box-sizing:border-box;margin-top:4px;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--fg);font-family:var(--f-body);font-size:.9rem;resize:vertical}
+#svprev[hidden]{display:none!important}.svopt label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.svopt{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;gap:8px 10px;align-items:end;margin-top:10px}.svopt .btn{white-space:nowrap}
+@media (max-width:520px){.svopt{grid-template-columns:repeat(3,minmax(0,1fr))}.svopt label{font-size:.76rem}.svopt .btn{grid-column:1/-1}}
 #svprev{display:block;max-width:100%;height:auto;margin:10px 0 0;border:1px solid var(--line);border-radius:6px}
 @media (max-width:520px){.svtbl input{width:44px;padding:4px 3px}.svtbl th,.svtbl td{padding:5px 2px;font-size:.74rem}}
 #plstbl td,#plstbl th,#plsitm td,#plsitm th{padding:5px 7px;font-size:.85rem}
@@ -524,10 +527,17 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
   <p class="note" style="margin:0 0 10px">ゲームの感度設定画面のスクショをまとめて選ぶと、「基本設定」の画面は基本感度に、「詳細設定」の画面は武器ごとに分けて値を読み取り、1枚の画像にまとめます。武器ごとのスクショは、武器名のタブが写る一番上から下へスクロールして撮り、ファイル名の順（撮った順）に並ぶようにしてください。画像はこの端末のブラウザ内だけで読み取り、どこにも送信しません。</p>
   <div class="saverow">
     <button class="btn" id="svbtn" type="button">スクショを選ぶ（まとめて）</button>
+    <button class="btn ghost" id="svqrbtn" type="button">QRコードだけ保存</button>
     <button class="btn ghost" id="svclear" type="button">消す</button>
     <input type="file" id="svfile" accept="image/*" multiple hidden>
   </div>
   <div id="svres"></div>
+  <div class="svopt">
+    <div class="f"><label for="svtpp">TPP視野角</label><input type="number" id="svtpp" min="80" max="90" step="1" inputmode="numeric" placeholder="80〜90"></div>
+    <div class="f"><label for="svfpp">FPP視野角</label><input type="number" id="svfpp" min="80" max="103" step="1" inputmode="numeric" placeholder="80〜103"></div>
+    <div class="f"><label for="svacc">水平スライド加速</label><select id="svacc"><option value="">未入力</option><option value="ON">ON</option><option value="OFF">OFF</option></select></div>
+    <button class="btn ghost" id="svoptfill" type="button">感度計算の設定を入れる</button>
+  </div>
   <div class="f" style="margin-top:10px"><label for="svmemo">メモ（保存する画像のQRコードの横に入ります）</label><textarea id="svmemo" rows="3" maxlength="300" placeholder="例：使っている端末、指の本数、設定した日など"></textarea></div>
   <img id="svprev" alt="保存する画像のプレビュー" hidden>
   <p class="note" style="margin:8px 0 0">武器名はスクショの武器のタブから読み取ります（今はARの一部の武器だけ。読めないときはダメージ計算と同じ武器一覧から選ぶか入力すると、この端末に覚えて次から自動で入ります）。武器種はタブの位置から決めます。値は下の「画像で保存」で画像にできます。保存した画像にはQRコードが入り、スマホのカメラで読むか「画像から読み込む」でその画像を選ぶと、ほかの人もこの感度を読み込めます。</p>
@@ -1067,7 +1077,7 @@ OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
       <tr><td>11月9日</td><td>出力の「武器別レッドドット・アイアンサイト（視野角ごと）」と「可変倍率スコープ（途中の倍率）」の表を折りたたみ表示に変更（初期は閉じる）。スライダーで調整する項目（モニターディスタンス・FPP／TPP視野角・感度調整・指の速さ・撃つボタンの大きさ）に数値入力欄を追加し、スライダーと連動して直接入力もできるように変更。計算は変更なし</td></tr>
       <tr><td>11月10日</td><td>感度比較に「スクショから読み込む」を追加。ゲームの感度設定画面（基本設定・武器ごとの詳細設定）のスクショから項目名と%の値を読み取り、確認表で直してから比較表に入れる。列は見出し（カメラ感度／射撃時のカメラ感度／ジャイロセンサ感度(通常時)／(射撃時)）から決め、見出しのない画像は前の画像から引き継ぐ（前の画像と同じ行で始まれば重なりとして続き、項目の並びがTPPに戻れば次の見出しへ進む。つまみの範囲とも照合）。全画像をまとめた一覧で空き・食い違いを表示。画像はブラウザ内だけで処理（%の数字・項目名・見出しはLegionのスクショから作った見本と照合、6と8は形で見分け、つまみ位置との食い違いを警告）。計算は変更なし。</td></tr>
       <tr><td>11月10日</td><td>「感度比較」タブをなくし、感度計算の中（出力の下）に折りたたみで入れた（初期は閉じる）。比較の画像保存は折りたたみの中のボタンから。計算は変更なし。</td></tr>
-      <tr><td>11月10日</td><td>「感度保存」タブを追加。ゲームの感度設定画面のスクショをまとめて選ぶと、基本設定の画面は基本感度、詳細設定の画面は武器ごと（武器名のタブで区切り、スクロールした続きはファイル名の順でつなぐ）に分けて読み取り、1枚の画像にまとめる（基本感度と違う値は赤字）。読み取りは感度比較のスクショ読み込みと同じ方法。武器種はタブの位置、武器名は見本と照合（ARの一部のみ。読めないときはダメージ計算の武器一覧から武器種で絞った候補を選ぶか入力し、端末に覚える）。保存する画像には基本感度の右にQRコードとメモ（保存前に入力した文字）を入れる。QRコードは（中身はサイトのURL＋基本感度と、武器ごとに基本感度と違う値だけ。読み込むと省いた値は基本感度で埋める）。スマホのカメラで読むとサイトが開いて感度保存に入り、「画像から読み込む」でもQRコードを読む（LINEなどで送ってPNGのデータが消えた画像・JPEGでも可）。QRコードを作る・読む処理もサイト内に自前で書いた（外部ライブラリなし）。計算は変更なし。</td></tr>
+      <tr><td>11月10日</td><td>「感度保存」タブを追加。ゲームの感度設定画面のスクショをまとめて選ぶと、基本設定の画面は基本感度、詳細設定の画面は武器ごと（武器名のタブで区切り、スクロールした続きはファイル名の順でつなぐ）に分けて読み取り、1枚の画像にまとめる（基本感度と違う値は赤字）。読み取りは感度比較のスクショ読み込みと同じ方法。武器種はタブの位置、武器名は見本と照合（ARの一部のみ。読めないときはダメージ計算の武器一覧から武器種で絞った候補を選ぶか入力し、端末に覚える）。保存する画像には右上の隅にQRコード、基本感度の右にTPP視野角・FPP視野角・水平スライド加速（感度保存タブで入力、感度計算の設定から入れるボタンあり）とメモ（保存前に入力した文字）を入れる。QRコードは（「QRコードだけ保存」でQRコードだけの画像も作れる（データ量に合わせて大きさが変わり、画像に印刷の解像度を記録。100%で印刷するとQRコード本体が最小15mm角、1マス0.4mm以上）。QRコードの中身は設定をビットに詰めて数字だけにしたもの（URLの後ろに数字が続く形。前の形式のQRコードも読める）で、文字のままより約半分の面積になる。中身はサイトのURL＋基本感度と、武器ごとに基本感度と違う値だけ。読み込むと省いた値は基本感度で埋める）。スマホのカメラで読むとサイトが開いて感度保存に入り、「画像から読み込む」でもQRコードを読む（LINEなどで送ってPNGのデータが消えた画像・JPEGでも可）。QRコードを作る・読む処理もサイト内に自前で書いた（外部ライブラリなし）。計算は変更なし。</td></tr>
       <tr><td>11月10日</td><td>10章-12「端末による視野角の違い」を追加。Mk14のスコープ別スクショをLegionとGalaxy S25で比べ、横の視野角は端末によらず同じ（S25は上下が切れる形）、各スコープの視野角は両端末とも計算に使っている値と0.07°以内で一致。3章・12章に追記。計算は変更なし</td></tr>
     </tbody></table></div>
   </details>
@@ -1331,13 +1341,14 @@ function drawConv(r){
 }
 async function saveImage(r){
   try{ if(document.fonts?.ready) await document.fonts.ready }catch(e){}
-  const cv=r.mode==="sv"?drawSave(r):r.mode==="cmp"?drawCompare(r):r.mode==="bag"?drawBag(r):(r.mode==="dev"||r.mode==="acc")?drawConv(r):drawImage(r);
+  const cv=r.mode==="svqr"?drawSaveQR(r):r.mode==="sv"?drawSave(r):r.mode==="cmp"?drawCompare(r):r.mode==="bag"?drawBag(r):(r.mode==="dev"||r.mode==="acc")?drawConv(r):drawImage(r);
   const raw=await new Promise(res=>cv.toBlob(res,"image/png"));
   if(!raw){msg("画像を作れませんでした。");return}
-  const blob=await embedInputs(raw,{v:3,mode:r.mode||"calc",name:r.name||"",inputs:r.inputs||{},game:r.mode==="cmp"?r.game:undefined,settings:r.settings,bag:r.mode==="bag"&&r.bag?r.bag.st:undefined,sv:r.mode==="sv"?r.sv:undefined});
+  let blob=await embedInputs(raw,{v:3,mode:r.mode==="svqr"?"sv":r.mode||"calc",name:r.name||"",inputs:r.inputs||{},game:r.mode==="cmp"?r.game:undefined,settings:r.settings,bag:r.mode==="bag"&&r.bag?r.bag.st:undefined,sv:r.mode==="sv"||r.mode==="svqr"?r.sv:undefined});
+  if(r.dpi) blob=await pngDPI(blob,r.dpi);
   const safe=(r.name||"結果").replace(/[\\/:*?"<>|]/g,"_").slice(0,40);
   const fdt=fileDT(r.createdAt);
-  const filename=r.mode==="bag"?`PUBGバッグ容量_${safe}_${fdt}.png`:r.mode==="sv"?`PUBG感度保存_${safe}_${fdt}.png`:`PUBG感度${({cmp:"比較",dev:"端末換算",acc:"加速換算"})[r.mode]||""}_${safe}_${fdt}.png`;
+  const filename=r.mode==="bag"?`PUBGバッグ容量_${safe}_${fdt}.png`:r.mode==="sv"?`PUBG感度保存_${safe}_${fdt}.png`:r.mode==="svqr"?`PUBG感度QR_${safe}_${fdt}.png`:`PUBG感度${({cmp:"比較",dev:"端末換算",acc:"加速換算"})[r.mode]||""}_${safe}_${fdt}.png`;
   let dl=null; try{ dl=window.claude?.use? await claude.use("downloads"):null }catch(e){}
   if(dl){
     try{ await dl.save({filename,data:blob}); msg("画像を保存しました。") }
@@ -1688,13 +1699,18 @@ const QR=(()=>{
   for(let k=0;k<2;k++)for(let a=0;a<n;a++){let run=1;for(let b=1;b<n;b++){const c=k?M[b][a]:M[a][b],d=k?M[b-1][a]:M[a][b-1];if(c===d){run++;if(run===5)p+=3;else if(run>5)p++}else run=1}}
   for(let y=0;y<n-1;y++)for(let x=0;x<n-1;x++){const c=M[y][x];if(c===M[y][x+1]&&c===M[y+1][x]&&c===M[y+1][x+1])p+=3}
   let dark=0;for(let y=0;y<n;y++)for(let x=0;x<n;x++)dark+=M[y][x];p+=Math.floor(Math.abs(dark*20-n*n*10)/(n*n))*10;return p}
- function encode(bytes,minE){// bytes: Uint8Array → {n,M}
+ // 区切り（セグメント）：{m:"b",d:Uint8Array}（バイト）または {m:"n",d:"0123…"}（数字だけ。1桁約3.3ビットで小さく入る）
+ const segLen=(s,v)=>s.m==="n"?4+(v<=9?10:v<=26?12:14)+10*Math.floor(s.d.length/3)+[0,4,7][s.d.length%3]:4+(v<=9?8:16)+8*s.d.length;
+ function encode(segs,minE,noBoost){// segs: Uint8Array または区切りの配列 → {n,M}
+  if(segs instanceof Uint8Array)segs=[{m:"b",d:segs}];const need=v=>segs.reduce((a,s)=>a+segLen(s,v),0);
   let v=0,e=minE==null?1:minE;
-  for(const ee of [e,0]){for(let vv=1;vv<=40;vv++){const cap=dataCw(vv,ee)*8,need=4+(vv<=9?8:16)+bytes.length*8;if(need<=cap){v=vv;e=ee;break}}if(v)break}
+  for(const ee of [e,0]){for(let vv=1;vv<=40;vv++){if(need(vv)<=dataCw(vv,ee)*8){v=vv;e=ee;break}}if(v)break}
   if(!v)return null;
-  for(const he of [3,2,1]){if(he>e&&FB[he]!=null&&4+(v<=9?8:16)+bytes.length*8<=dataCw(v,he)*8){e=he;break}}// 同じ大きさで入るなら強い訂正に
+  if(!noBoost)for(const he of [3,2,1]){if(he>e&&need(v)<=dataCw(v,he)*8){e=he;break}}// 同じ大きさで入るなら強い訂正に
   const cap=dataCw(v,e),bits=[];const put=(x,l)=>{for(let i=l-1;i>=0;i--)bits.push((x>>>i)&1)};
-  put(4,4);put(bytes.length,v<=9?8:16);for(const b of bytes)put(b,8);put(0,Math.min(4,cap*8-bits.length));while(bits.length%8)bits.push(0);
+  for(const s of segs){if(s.m==="n"){put(1,4);put(s.d.length,v<=9?10:v<=26?12:14);for(let i=0;i<s.d.length;i+=3){const t=s.d.slice(i,i+3);put(+t,[0,4,7,10][t.length])}}
+   else{put(4,4);put(s.d.length,v<=9?8:16);for(const b of s.d)put(b,8)}}
+  put(0,Math.min(4,cap*8-bits.length));while(bits.length%8)bits.push(0);
   const data=[];for(let i=0;i<bits.length;i+=8){let b=0;for(let j=0;j<8;j++)b=b<<1|bits[i+j];data.push(b)}for(let p=0xEC;data.length<cap;p^=0xEC^0x11)data.push(p);
   // ブロックに分けて誤り訂正を付け、交互に並べる
   const nb=NB[e][v],ec=ECC[e][v],raw=Math.floor(rawMods(v)/8),ns=nb-raw%nb,sl=Math.floor(raw/nb),dv=rsDiv(ec),blocks=[];
@@ -1731,7 +1747,9 @@ const QR=(()=>{
   let k=0;for(let i=0;i<=sl;i++)for(let j=0;j<nb;j++){if(i===sl-ec&&j<ns)continue;blocks[j].push(all[k++])}
   const data=[];for(let j=0;j<nb;j++){const b=blocks[j];const fx=rsFix(b,ec);if(!fx)return null;data.push(...fx.slice(0,fx.length-ec))}
   let p=0;const get=l=>{let x=0;for(let i=0;i<l;i++){const q=p+i;x=x<<1|((data[q>>3]>>(7-(q&7)))&1)}p+=l;return x};
-  const out=[];while(p+4<=data.length*8){const mode=get(4);if(mode===0)break;if(mode!==4)return out.length?new Uint8Array(out):null;const len=get(v<=9?8:16);if(p+len*8>data.length*8)return null;for(let i=0;i<len;i++)out.push(get(8))}
+  const out=[];while(p+4<=data.length*8){const mode=get(4);if(mode===0)break;
+   if(mode===1){const len=get(v<=9?10:v<=26?12:14);for(let i=0;i<len;i+=3){const k=Math.min(3,len-i),x=get([0,4,7,10][k]);if(x>=10**k)return null;const t=String(x).padStart(k,"0");for(const c of t)out.push(c.charCodeAt(0))}continue}
+   if(mode!==4)return out.length?new Uint8Array(out):null;const len=get(v<=9?8:16);if(p+len*8>data.length*8)return null;for(let i=0;i<len;i++)out.push(get(8))}
   return new Uint8Array(out)}
  // 画像から：まっすぐ置かれたQR（この計算機で作った画像を縮小・JPEGにしたもの）を探す
  function scan(g,W,H){
@@ -1829,12 +1847,70 @@ SV.pack=function(S,title){const E=encodeURIComponent,B=S.groups.find(g=>g.kind==
  const bv=B?B.M.flat().map(v=>v==null?"":v).join(",").replace(/,+$/,""):"";
  const ws=S.groups.filter(g=>g.kind==="wpn").map(w=>{let m=0;const d=[];w.M.flat().forEach((v,c)=>{if(v==null)return;m|=1<<c;const b=B?B.M[c>>2][c&3]:null;if(b!==v)d.push(c.toString(36)+v)});
   const ci=SV.CATS.indexOf(w.cat);return [E(w.name||""),ci<0?"":ci,(m>>>0).toString(16),...d].join(":")});
- return SV.URL+"#sv="+["1",E(title||""),(B?"b":"")+bv,...ws].join(";")};
-SV.unpack=function(url){const i=String(url).indexOf("#sv=");if(i<0)return null;const p=String(url).slice(i+4).split(";");if(p[0]!=="1")return null;const D=x=>{try{return decodeURIComponent(x)}catch(e){return x}};
+ const o=S.opt||{},ov=[o.tpp??"",o.fpp??"",o.acc==="ON"?1:o.acc==="OFF"?0:""].join(",").replace(/,+$/,"");
+ return SV.URL+"#sv="+["2",E(title||""),ov,(B?"b":"")+bv,...ws].join(";")};
+
+// QRの中身（形式3）：URL＋「#q」＋数字だけ。設定をビットに詰めて13ビットずつ4桁の数字にする（QRの数字モードは1桁約3.3ビットなので、文字より小さく入る）
+// 武器名は下の一覧の番号（一覧は後から並べ替えない。足すときは末尾に）。一覧にない名前は文字で入れる
+SV.QN=["AKM","ACE32","M762","Groza","Mk47 Mutant","HONEY BADGER","M416","SCAR-L","M16A4","QBZ","AUG","G36C","ASM Abakan","FAMAS","Mk14","Mk12","SLR","SKS","QBU","Mini14","M1 Garand","VSS","AMR","AWM","DSR","M24","Kar98k","Mosin Nagant","Win94","トミーガン","JS9","UMP45","PP-19 Bizon","MP5K","Vector","P90","UZI","S686","S1897","S12K","DBS","Sawed-off","NS2000","M1014","DP-28","M249","MG3","R1895","R45","Deagle","P1911","P92","P18C","スコーピオン","クロスボウ","タクティカルクロスボウ","エクスプローシブボウ","デュアルMP7","M79","溶接ガン","スタンガン"];
+SV.QURL=SV.URL+"#q";
+// 形式4：形式3をさらに詰めた版。武器の種類は名前から分かれば1ビット、武器の組は一覧の印（64ビット）か番号、
+// 値は「基本感度」か「前に入れた武器」のうち一番近いものとの違いだけ。違いが±15以内なら6ビット、それ以外は10ビット
+SV.QCAT=n=>{for(const c in SV.NAMES)if(SV.NAMES[c].includes(n))return c;return null};
+SV.qrSegs=function(S,title){const bits=[];const put=(x,l,a)=>{a=a||bits;for(let i=l-1;i>=0;i--)a.push((x/2**i|0)&1)};const E=new TextEncoder();
+ const B=S.groups.find(g=>g.kind==="basic"),o=S.opt||{};const val=v=>Math.max(0,Math.min(511,Math.round(v)));
+ put(4,4);let tb=E.encode(title||"");if(tb.length>63){let t=[...(title||"")];while(E.encode(t.join("")).length>63)t.pop();tb=E.encode(t.join(""))}put(tb.length,6);tb.forEach(b=>put(b,8));
+ put(o.tpp>=80&&o.tpp<=90?o.tpp-79:0,4);put(o.fpp>=80&&o.fpp<=103?o.fpp-79:0,5);put(o.acc==="ON"?1:o.acc==="OFF"?2:0,2);
+ const cells=g=>g.M.flat().map(v=>v==null?null:val(v));const mask=c=>c.map(v=>v!=null);
+ const putMask=(m,rm,a)=>{if(rm){if(m.every((x,i)=>x===rm[i])){put(0,1,a);return}put(1,1,a)}
+  const rows=[...Array(8)].map((_,r)=>m.slice(r*4,r*4+4).some(x=>x)),cols=[0,1,2,3].map(c=>rows.some((x,r)=>m[r*4+c]));
+  if(m.every((x,i)=>x===(rows[i>>2]&&cols[i&3]))){put(1,1,a);rows.forEach(x=>put(x?1:0,1,a));cols.forEach(x=>put(x?1:0,1,a))}else{put(0,1,a);m.forEach(x=>put(x?1:0,1,a))}};
+ const BC=B?cells(B):null;put(B?1:0,1);if(B){putMask(mask(BC),null);BC.forEach(v=>{if(v!=null)put(v,9)})}
+ let Ws=S.groups.filter(g=>g.kind==="wpn").slice(0,63);put(Ws.length,6);
+ const idx=w=>SV.QN.indexOf(w.name),known=Ws.filter(w=>idx(w)>=0&&idx(w)<64);const dup=new Set(known.map(idx)).size<known.length;
+ const useSet=!dup&&known.length*7>64;put(useSet?1:0,1);
+ const nameB=w=>{let nb=E.encode(w.name||"");if(nb.length>31){let t=[...w.name];while(E.encode(t.join("")).length>31)t.pop();nb=E.encode(t.join(""))}return nb};
+ if(useSet){Ws=[...known.sort((a,b)=>idx(a)-idx(b)),...Ws.filter(w=>!known.includes(w))];let m=Array(64).fill(0);known.forEach(w=>m[idx(w)]=1);m.forEach(x=>put(x,1));
+  Ws.filter(w=>!known.includes(w)).forEach(w=>{const nb=nameB(w);put(nb.length,5);nb.forEach(b=>put(b,8))})}
+ else Ws.forEach(w=>{const ni=idx(w);if(ni>=0&&ni<127)put(ni,7);else{put(127,7);const nb=nameB(w);put(nb.length,5);nb.forEach(b=>put(b,8))}});
+ const done=[];Ws.forEach((w,i)=>{const dc=SV.QCAT(w.name);if(dc&&dc===w.cat)put(1,1);else{put(0,1);put(SV.CATS.indexOf(w.cat)+1,4)}
+  const C=cells(w),m=mask(C),lr=Math.ceil(Math.log2(i+1));let best=null;
+  for(let r=0;r<=i;r++){const R=r===0?BC:done[i-r];const a=[];put(r,lr,a);putMask(m,R?mask(R):Array(32).fill(false),a);
+   const pos=[];C.forEach((v,c)=>{if(v!=null&&!(R&&R[c]===v))pos.push(c)});const on=[];C.forEach((v,c)=>{if(v!=null)on.push(c)});
+   put(pos.length,6,a);const lp=Math.ceil(Math.log2(Math.max(2,on.length)));if(pos.length){if(on.length<=pos.length*lp)on.forEach(c=>put(pos.includes(c)?1:0,1,a));else pos.forEach(c=>put(on.indexOf(c),lp,a))}
+   pos.forEach(c=>{const v=C[c],rv=R?R[c]:null;if(rv!=null){if(Math.abs(v-rv)<=15){put(0,1,a);put(v-rv+15,5,a)}else{put(1,1,a);put(v,9,a)}}else put(v,9,a)});
+   if(!best||a.length<best.length)best=a}
+  best.forEach(b=>bits.push(b));done.push(C)});
+ while(bits.length%13)bits.push(0);let dg="";for(let i=0;i<bits.length;i+=13){let x=0;for(let j=0;j<13;j++)x=x*2+bits[i+j];dg+=String(x).padStart(4,"0")}
+ return [{m:"b",d:E.encode(SV.QURL)},{m:"n",d:dg}]};
+SV.unpack4=function(get,rd){const name=rd(get(6));const t=get(4),f=get(5),a=get(2);const opt={tpp:t?t+79:null,fpp:f?f+79:null,acc:a===1?"ON":a===2?"OFF":""};
+ const getMask=rm=>{if(rm&&!get(1))return rm.slice();if(get(1)){const rows=[...Array(8)].map(()=>get(1)),cols=[0,1,2,3].map(()=>get(1));return [...Array(32)].map((_,i)=>!!(rows[i>>2]&&cols[i&3]))}return [...Array(32)].map(()=>!!get(1))};
+ const toM=C=>SV_ROWS.map((_,r)=>SV_COLS.map((_,c)=>C[r*4+c]));const groups=[];let BC=null;
+ if(get(1)){const m=getMask(null);BC=m.map(x=>x?get(9):null);groups.push({kind:"basic",name:"",cat:"",M:toM(BC)})}
+ const n=get(6),useSet=get(1);const names=[];
+ if(useSet){const m=[...Array(64)].map(()=>get(1));m.forEach((x,i)=>{if(x)names.push(SV.QN[i]||"")});const k=n-names.length;for(let i=0;i<k;i++)names.push(rd(get(5)))}
+ else for(let i=0;i<n;i++){const ni=get(7);names.push(ni<127?(SV.QN[ni]||""):rd(get(5)))}
+ if(names.length!==n)return null;const done=[];
+ for(let i=0;i<n;i++){const wn=names[i];const cat=get(1)?SV.QCAT(wn):(SV.CATS[get(4)-1]||"");const lr=Math.ceil(Math.log2(i+1));const r=get(lr);if(r>i)return null;const R=r===0?BC:done[i-r];
+  const m=getMask(R?R.map(v=>v!=null):Array(32).fill(false));const on=[];m.forEach((x,c)=>{if(x)on.push(c)});const np=get(6);const lp=Math.ceil(Math.log2(Math.max(2,on.length)));let pos=[];
+  if(np){if(on.length<=np*lp)on.forEach(c=>{if(get(1))pos.push(c)});else for(let j=0;j<np;j++)pos.push(on[get(lp)])}
+  const C=m.map((x,c)=>x?(R&&R[c]!=null?R[c]:null):null);pos.forEach(c=>{const rv=R?R[c]:null;C[c]=rv!=null?(get(1)?get(9):rv+get(5)-15):get(9)});
+  done.push(C);groups.push({kind:"wpn",name:wn,cat:cat||"",M:toM(C)})}
+ return {name,groups,opt}};
+SV.unpack3=function(dg){if(!/^\d+$/.test(dg)||dg.length%4)return null;const bits=[];for(let i=0;i<dg.length;i+=4){const x=+dg.slice(i,i+4);if(x>8191)return null;for(let j=12;j>=0;j--)bits.push((x>>j)&1)}
+ let p=0;const get=l=>{let x=0;for(let i=0;i<l;i++)x=x*2+(bits[p++]||0);return x};const D=new TextDecoder(),rd=n=>D.decode(Uint8Array.from({length:n},()=>get(8)));
+ const ver=get(4);if(ver===4){const o=SV.unpack4(get,rd);return o&&p<=bits.length?o:null}if(ver!==3)return null;const name=rd(get(6));const t=get(4),f=get(5),a=get(2);const opt={tpp:t?t+79:null,fpp:f?f+79:null,acc:a===1?"ON":a===2?"OFF":""};
+ const groups=[];let B=null,bm=0;const fill=(m,fn)=>SV_ROWS.map((_,r)=>SV_COLS.map((_,c)=>{const k=r*4+c;return Math.floor(m/2**k)%2?fn(k,r,c):null}));
+ if(get(1)){bm=get(32);B={kind:"basic",name:"",cat:"",M:fill(bm,()=>get(9))};groups.push(B)}
+ const n=get(6);for(let i=0;i<n;i++){const ni=get(7);const wn=ni<127?(SV.QN[ni]||""):rd(get(5));const ci=get(4);const m=get(1)?bm:get(32);const dn=get(6),dv={};for(let j=0;j<dn;j++){const c=get(5);dv[c]=get(9)}
+  groups.push({kind:"wpn",name:wn,cat:SV.CATS[ci-1]||"",M:fill(m,(k,r,c)=>k in dv?dv[k]:B&&B.M[r][c]!=null?B.M[r][c]:null)})}
+ if(p>bits.length)return null;return {name,groups,opt}};
+SV.unpack=function(url){{const k=String(url).indexOf("#q");if(k>=0)return SV.unpack3(String(url).slice(k+2).replace(/[^0-9].*$/,""))}const i=String(url).indexOf("#sv=");if(i<0)return null;let p=String(url).slice(i+4).split(";");if(p[0]!=="1"&&p[0]!=="2")return null;let opt={};
+ if(p[0]==="2"){const v=(p[2]||"").split(",");const n=x=>x!=null&&x!==""&&isFinite(x)?+x:null;opt={tpp:n(v[0]),fpp:n(v[1]),acc:v[2]==="1"?"ON":v[2]==="0"?"OFF":""};p=[p[0],p[1],...p.slice(3)]}const D=x=>{try{return decodeURIComponent(x)}catch(e){return x}};
  const groups=[];let B=null;if(p[2]&&p[2][0]==="b"){const v=p[2].slice(1).split(",");B={kind:"basic",name:"",cat:"",M:SV_ROWS.map((_,r)=>SV_COLS.map((_,c)=>{const x=v[r*4+c];return x==null||x===""?null:+x}))};groups.push(B)}
  for(const w of p.slice(3)){if(!w)continue;const [n,ci,mh,...d]=w.split(":");const m=parseInt(mh||"0",16)>>>0,dv={};d.forEach(t=>{dv[parseInt(t[0],36)]=+t.slice(1)});
   groups.push({kind:"wpn",name:D(n||""),cat:SV.CATS[+ci]&&ci!==""?SV.CATS[+ci]:"",M:SV_ROWS.map((_,r)=>SV_COLS.map((_,c)=>{const k=r*4+c;if(!((m>>>k)&1))return null;if(k in dv)return dv[k];const b=B?B.M[r][c]:null;return b==null?null:b}))})}
- return {name:D(p[1]||""),groups}};
+ return {name:D(p[1]||""),groups,opt}};
 // 画像からQRを読む（PNGのデータが消えた画像でも）
 SV.readQR=async function(file){const u=URL.createObjectURL(file);try{const im=new Image();im.src=u;await im.decode();let W=im.width,H=im.height;const k=Math.min(1,4000/Math.max(W,H));W=Math.round(W*k);H=Math.round(H*k);
   const cv=document.createElement("canvas");cv.width=W;cv.height=H;const cx=cv.getContext("2d",{willReadFrequently:true});cx.drawImage(im,0,0,W,H);const r=QR.decode(SS.gray(cx.getImageData(0,0,W,H).data,W,H),W,H);
@@ -1861,16 +1937,20 @@ SV.warn=function(R,r){const why=[],gyro=r.col>=2;
  if(r.val>(gyro?400:300))why.push("範囲外の値");return why};
 const SV_ROWS=["TPPスコープなし","FPPスコープなし","レッドドット等","2倍","3倍","4倍","6倍","8倍"],SV_COLS=["カメラ","射撃時","ジャイロ通常時","ジャイロ射撃時"];
 (()=>{
- const SK="pubg-sens-save";let IMGS=[],G=[],MEMO="";// G: [{kind:"basic"|"wpn",name,cat,M:[8][4],alt,warn,crop,t}]
+ const SK="pubg-sens-save";let IMGS=[],G=[],MEMO="",OPTV={tpp:null,fpp:null,acc:""};// G: [{kind:"basic"|"wpn",name,cat,M:[8][4],alt,warn,crop,t}]
  const res=$("svres"),file=$("svfile");
  const blank=()=>SV_ROWS.map(()=>SV_COLS.map(()=>null));
- function save(){try{localStorage.setItem(SK,JSON.stringify({groups:G.map(g=>({kind:g.kind,name:g.name,cat:g.cat,M:g.M})),memo:MEMO}))}catch(e){}}
- function load(o){G=(o&&o.groups||[]).map(g=>({kind:g.kind==="basic"?"basic":"wpn",name:String(g.name||""),cat:String(g.cat||""),M:SV_ROWS.map((_,i)=>SV_COLS.map((_,j)=>{const v=g.M&&g.M[i]&&g.M[i][j];return v==null||v===""||!isFinite(v)?null:+v})),alt:blank(),warn:blank()}));if(o&&"memo" in o){MEMO=String(o.memo||"");$("svmemo").value=MEMO}IMGS=[];render()}
+ function save(){try{localStorage.setItem(SK,JSON.stringify({groups:G.map(g=>({kind:g.kind,name:g.name,cat:g.cat,M:g.M})),memo:MEMO,opt:OPTV}))}catch(e){}}
+ function load(o){G=(o&&o.groups||[]).map(g=>({kind:g.kind==="basic"?"basic":"wpn",name:String(g.name||""),cat:String(g.cat||""),M:SV_ROWS.map((_,i)=>SV_COLS.map((_,j)=>{const v=g.M&&g.M[i]&&g.M[i][j];return v==null||v===""||!isFinite(v)?null:+v})),alt:blank(),warn:blank()}));if(o&&"memo" in o){MEMO=String(o.memo||"");$("svmemo").value=MEMO}if(o&&o.opt){const n=x=>x!=null&&x!==""&&isFinite(x)?+x:null;OPTV={tpp:n(o.opt.tpp),fpp:n(o.opt.fpp),acc:o.opt.acc==="ON"||o.opt.acc==="OFF"?o.opt.acc:""};showOpt()}IMGS=[];render()}
  $("svmemo").addEventListener("input",()=>{MEMO=$("svmemo").value;save();preview()});
- window.SV_API={snapshot:()=>({groups:G.map(g=>({kind:g.kind,name:g.name,cat:g.cat,M:g.M})),memo:MEMO}),load:o=>{load(o);save()},groups:()=>G};
+ function showOpt(){$("svtpp").value=OPTV.tpp??"";$("svfpp").value=OPTV.fpp??"";$("svacc").value=OPTV.acc||""}
+ function readOpt(){const n=(id,lo,hi)=>{const t=$(id).value.trim();if(t==="")return null;const v=Math.round(+t);return isFinite(v)?Math.max(lo,Math.min(hi,v)):null};OPTV={tpp:n("svtpp",80,90),fpp:n("svfpp",80,103),acc:$("svacc").value};save();preview()}
+ ["svtpp","svfpp"].forEach(id=>$(id).addEventListener("change",()=>{readOpt();showOpt()}));$("svacc").addEventListener("change",readOpt);
+ $("svoptfill").addEventListener("click",()=>{$("svtpp").value=$("tpp").value;$("svfpp").value=$("fpp").value;$("svacc").value=$("accel").value;readOpt()});
+ window.SV_API={snapshot:()=>({groups:G.map(g=>({kind:g.kind,name:g.name,cat:g.cat,M:g.M})),memo:MEMO,opt:OPTV}),load:o=>{load(o);save()},groups:()=>G};
  try{const o=JSON.parse(localStorage.getItem(SK)||"null");if(o)load(o)}catch(e){}
  $("svbtn").addEventListener("click",()=>{file.value="";file.click()});
- $("svclear").addEventListener("click",()=>{IMGS=[];G=[];MEMO="";$("svmemo").value="";save();render()});
+ $("svclear").addEventListener("click",()=>{IMGS=[];G=[];MEMO="";$("svmemo").value="";OPTV={tpp:null,fpp:null,acc:""};showOpt();save();render()});
  file.addEventListener("change",async()=>{const fs=[...file.files].sort((a,b)=>a.name.localeCompare(b.name));if(!fs.length)return;res.innerHTML='<p class="note">読み取り中…（0/'+fs.length+'）</p>';IMGS=[];
   for(const [i,f] of fs.entries()){let R;try{const img=await new Promise((ok,ng)=>{const u=URL.createObjectURL(f),im=new Image();im.onload=()=>ok(im);im.onerror=ng;im.src=u});
     await new Promise(r=>setTimeout(r,20));R=SS.read(img);URL.revokeObjectURL(img.src);R.scr=SV.screen(R)}catch(e){R={rows:[],heads:[],err:true,scr:{kind:null}}}
@@ -1940,22 +2020,27 @@ function drawSave(r){const S=r.sv||{groups:[]};const B=S.groups.find(g=>g.kind==
  const used=g=>SV_ROWS.map((_,i)=>i).filter(i=>g.M[i].some(v=>v!=null));
  const ch=g=>40+HH+Math.max(1,used(g).length)*RH+6;
  // QRコード（基本感度＋基本と違う値だけ。読み込むと基本で埋める）。メモ（利用者が入力）はQRの横
- const q=QR.encode(new TextEncoder().encode(SV.pack(S,r.name||"")));const memo=String(S.memo||"").trim();
+ const q=QR.encode(SV.qrSegs(S,r.name||""));const memo=String(S.memo||"").trim();
  const MF=`400 13px ${IMGF}`,ML=19;
  const wrap=(t,w)=>{_lc.font=MF;const out=[];for(const para of t.split(/\r?\n/)){let cur="";for(const ch of [...para]){if(cur&&_lc.measureText(cur+ch).width>w&&!"、。，．,.）」』】！？!?ー…・".includes(ch)){out.push(cur);cur=ch}else cur+=ch}out.push(cur)}return out};
- const qcell=qm=>{const qs=q?(q.n+8)*qm:0;let mx,my,mw;if(cw-qs-12>=150){mx=qs+12;my=0;mw=cw-qs-12}else{mx=0;my=qs+10;mw=cw}
-  const lines=memo?wrap(memo,mw-20):[];const mh=memo?lines.length*ML+18:0;return {qs,mx,my,mw,mh:Math.max(mh,my?0:qs),lines,h:Math.max(qs,my+(memo?mh:0))}};
- const items=[...(B?[{c:B}]:[]),...(q||memo?[{qr:true}]:[]),...Ws.map(c=>({c}))];
- const layout=qm=>{const Q=qcell(qm),hs=items.map(it=>it.qr?Q.h:ch(it.c)),rows=[];for(let i=0;i<items.length;i+=2)rows.push(Math.max(hs[i],hs[i+1]||0));
-  return {Q,rows,H:P+44+(B&&Ws.length?20:0)+rows.reduce((a,b)=>a+b+GAP,0)+30}};
+ const opt=S.opt||{},OPT=[["TPP視野角",opt.tpp],["FPP視野角",opt.fpp],["水平スライド加速",opt.acc]].filter(x=>x[1]!=null&&x[1]!=="");const OH=OPT.length?62:0,OG=OPT.length&&memo?12:0;
+ // 基本感度の右：設定（視野角・加速）とメモ。QRコードは右下の隅
+ const lines=memo?wrap(memo,cw-20):[],MH=memo?lines.length*ML+18:0,infoH=OH+OG+MH;
+ const items=[...(B?[{c:B}]:[]),...(infoH?[{info:true}]:[]),...Ws.map(c=>({c}))];
+ const hs=items.map(it=>it.info?infoH:ch(it.c)),rows=[];for(let i=0;i<items.length;i+=2)rows.push(Math.max(hs[i],hs[i+1]||0));
+ const headT=P+44+(B&&Ws.length?20:0),rowsH=rows.reduce((a,b)=>a+b+GAP,0);
+ const layout=qm=>{const qs=q?(q.n+8)*qm:0;const top=Math.max(headT,q?P+qs+GAP:0);return {Q:{qs},top,H:top+rowsH+30}};
  // 1マスは2px（保存画像では4px）以上。縦長の画像は長い辺を1280pxに縮められても読めるよう大きくする
  let qm=2,L=layout(qm);if(q)while(qm*1280/(2*L.H)<0.85&&qm<6){qm+=0.5;L=layout(qm)}
- const {Q,rows,H}=L;
+ const {Q,H,top}=L;
  const [cv,g]=newCanvas(W,H);
  g.fillStyle=IC.fg;g.font=`700 22px ${IMGF}`;let y=P+24;g.fillText(r.name||"感度設定",P,y);
- g.font=`400 13px ${IMGF}`;g.fillStyle=IC.mu;g.textAlign="right";g.fillText(new Date(r.createdAt||Date.now()).toLocaleString("ja-JP"),W-P,y);g.textAlign="left";
- y+=20;
- if(B&&Ws.length){g.font=`400 11.5px ${IMGF}`;g.fillStyle=IC.cam;g.fillText("武器の赤字＝基本感度と違う値",P,y+6);y+=20}
+ g.font=`400 13px ${IMGF}`;g.fillStyle=IC.mu;y+=22;g.fillText(new Date(r.createdAt||Date.now()).toLocaleString("ja-JP"),P,y);
+ if(B&&Ws.length){g.font=`400 11.5px ${IMGF}`;g.fillStyle=IC.cam;g.fillText("武器の赤字＝基本感度と違う値",P,y+20)}
+ // QRコードは右上の隅
+ if(q){const qs=Q.qs,x=W-P-qs,y2=P;g.fillStyle="#fff";g.fillRect(x,y2,qs,qs);g.fillStyle="#000";for(let yy=0;yy<q.n;yy++)for(let xx=0;xx<q.n;xx++)if(q.M[yy][xx])g.fillRect(x+(xx+4)*qm,y2+(yy+4)*qm,qm,qm);
+  g.strokeStyle=IC.ln;g.lineWidth=1;g.strokeRect(x+0.5,y2+0.5,qs-1,qs-1)}
+ y=top;
  const drawCard=(c,x,y,h)=>{const isB=c===B,title=isB?"基本感度":(c.name||"（武器名なし）");
   g.fillStyle=isB?IC.soft:"#fff";g.fillRect(x,y,cw,h);g.strokeStyle=isB?IC.ac:IC.ln;g.lineWidth=isB?1.5:1;g.strokeRect(x+0.5,y+0.5,cw-1,h-1);
   g.fillStyle=isB?IC.ac:IC.fg;g.font=`700 15.5px ${IMGF}`;g.fillText(title,x+12,y+25);
@@ -1969,11 +2054,12 @@ function drawSave(r){const S=r.sv||{groups:[]};const B=S.groups.find(g=>g.kind==
     if(v==null){g.fillStyle=IC.mu;g.font=`400 12px ${IMGF}`;g.fillText("—",cx,yy+17)}
     else{const diff=!isB&&B&&B.M[i][j]!=null&&B.M[i][j]!==v;g.fillStyle=diff?IC.cam:IC.fg;g.font=`${diff?800:600} 14px ${IMGM}`;g.fillText(v+"%",cx,yy+18)}g.textAlign="left"});yy+=RH});
   if(!rs.length){g.fillStyle=IC.mu;g.font=`400 12px ${IMGF}`;g.fillText("値なし",tx+4,yy+17)}};
- const drawQR=(x,y)=>{if(q){const qs=Q.qs;g.fillStyle="#fff";g.fillRect(x,y,qs,qs);g.fillStyle="#000";for(let yy=0;yy<q.n;yy++)for(let xx=0;xx<q.n;xx++)if(q.M[yy][xx])g.fillRect(x+(xx+4)*qm,y+(yy+4)*qm,qm,qm);
-   g.strokeStyle=IC.ln;g.lineWidth=1;g.strokeRect(x+0.5,y+0.5,qs-1,qs-1)}
-  if(memo){const mx=x+Q.mx,my=y+Q.my;g.fillStyle="#fff";g.fillRect(mx,my,Q.mw,Q.mh);g.strokeStyle=IC.ln;g.lineWidth=1;g.strokeRect(mx+0.5,my+0.5,Q.mw-1,Q.mh-1);
-   g.fillStyle=IC.fg;g.font=MF;Q.lines.forEach((t,k)=>g.fillText(t,mx+10,my+22+k*ML))}};
- for(let i=0;i<items.length;i+=2){const h=rows[i/2];[items[i],items[i+1]].forEach((it,k)=>{if(!it)return;const x=P+k*(cw+GAP);if(it.qr)drawQR(x,y);else drawCard(it.c,x,y,h)});y+=h+GAP}
+ const drawInfo=(x,y,h)=>{const y0=y;if(OPT.length){g.fillStyle="#fff";g.fillRect(x,y,cw,OH);g.strokeStyle=IC.ln;g.lineWidth=1;g.strokeRect(x+0.5,y+0.5,cw-1,OH-1);
+   const w=cw/OPT.length;OPT.forEach(([k,v],i)=>{const cx=x+w*i;if(i){g.strokeStyle=IC.ln;g.beginPath();g.moveTo(cx+0.5,y+10);g.lineTo(cx+0.5,y+OH-10);g.stroke()}
+    g.textAlign="center";g.fillStyle=IC.mu;g.font=`600 11.5px ${IMGF}`;g.fillText(k,cx+w/2,y+22);g.fillStyle=IC.fg;g.font=`700 19px ${typeof v==="number"?IMGM:IMGF}`;g.fillText(typeof v==="number"?v+"°":v,cx+w/2,y+48);g.textAlign="left"});y+=OH+OG}
+  if(memo){const mh=Math.max(MH,y0+h-y);g.fillStyle="#fff";g.fillRect(x,y,cw,mh);g.strokeStyle=IC.ln;g.lineWidth=1;g.strokeRect(x+0.5,y+0.5,cw-1,mh-1);
+   g.fillStyle=IC.fg;g.font=MF;lines.forEach((t,k)=>g.fillText(t,x+10,y+22+k*ML))}};
+ for(let i=0;i<items.length;i+=2){const h=rows[i/2];[items[i],items[i+1]].forEach((it,k)=>{if(!it)return;const x=P+k*(cw+GAP);if(it.info)drawInfo(x,y,h);else drawCard(it.c,x,y,h)});y+=h+GAP}
  g.fillStyle=IC.mu;g.font=`400 11px ${IMGF}`;g.fillText("PUBGモバイル計算機「感度保存」で作成（ゲームの設定画面のスクショから読み取り）",P,H-14);
  return cv}
 // 感度保存タブでは「画像で保存」の欄を感度保存の下に移す（ほかのタブでは元の位置）
@@ -1982,8 +2068,24 @@ function drawSave(r){const S=r.sv||{groups:[]};const B=S.groups.find(g=>g.kind==
  window.SV_API.mode(typeof MODE!=="undefined"?MODE:"");}
 
 // QRコードのURL（#sv=…）から開いたとき
-try{if(location.hash.startsWith("#sv=")){const o=SV.unpack(location.href);if(o&&o.groups.length){window.SV_API.load(o);if(o.name)$("savename").value=o.name;setMode("sv");msg("QRコードの感度を「感度保存」に読み込みました。")}
+try{if(location.hash.startsWith("#sv=")||/^#q\d/.test(location.hash)){const o=SV.unpack(location.href);if(o&&o.groups.length){window.SV_API.load(o);if(o.name)$("savename").value=o.name;setMode("sv");msg("QRコードの感度を「感度保存」に読み込みました。")}
  history.replaceState(null,"",location.pathname+location.search)}}catch(e){}
+
+// QRコードだけの画像：印刷したときの大きさを画像に記録（PNGの解像度）。1マス0.4mm、QRコード本体は最小15mm角。下に題名と日時を小さく
+function drawSaveQR(r){const q=QR.encode(SV.qrSegs(r.sv||{groups:[]},r.name||""),0,true);// できるだけ小さく：誤り訂正は一番低いL
+ const mm=Math.max(0.4,15/q.n),px=10,k=px/mm;// k: 1mmあたりのピクセル
+ r.dpi=25.4*k;r.qrmm=q.n*mm;
+ const qs=(q.n+8)*px,W=qs,fs1=Math.round(2.2*k),fs2=Math.round(1.6*k),H=qs+Math.round(fs1*1.3+fs2*1.6);
+ const cv=document.createElement("canvas");cv.width=W;cv.height=H;const g=cv.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,W,H);
+ g.fillStyle="#000";for(let yy=0;yy<q.n;yy++)for(let xx=0;xx<q.n;xx++)if(q.M[yy][xx])g.fillRect((xx+4)*px,(yy+4)*px,px,px);
+ g.textAlign="center";g.fillStyle=IC.fg;g.font=`700 ${fs1}px ${IMGF}`;let t=r.name||"感度設定";while(t.length>1&&g.measureText(t).width>W-4*px)t=t.slice(0,-1);g.fillText(t,W/2,qs-px+fs1);
+ g.fillStyle=IC.mu;g.font=`400 ${fs2}px ${IMGF}`;g.fillText(new Date(r.createdAt||Date.now()).toLocaleString("ja-JP"),W/2,qs-px+fs1*1.25+fs2*1.1);return cv}
+// PNGに解像度（pHYs）を入れる：印刷したときの大きさが決まる
+async function pngDPI(blob,dpi){const png=new Uint8Array(await blob.arrayBuffer()),ppm=Math.round(dpi/0.0254);
+ const c=new Uint8Array(21),dv=new DataView(c.buffer);dv.setUint32(0,9);c.set([112,72,89,115],4);dv.setUint32(8,ppm);dv.setUint32(12,ppm);c[16]=1;dv.setUint32(17,crc32(c.subarray(4,17)));
+ const at=8+25,out=new Uint8Array(png.length+21);out.set(png.subarray(0,at));out.set(c,at);out.set(png.subarray(at),at+21);return new Blob([out],{type:"image/png"})}
+$("svqrbtn").addEventListener("click",()=>{const s=window.SV_API.snapshot();if(!s.groups.length){msg("先にスクショを読み込んでください。");return}
+ saveImage({name:$("savename").value.trim()||"感度設定",createdAt:Date.now(),inputs:readInputs(),mode:"svqr",sv:s})});
 
 $("savename").addEventListener("input",()=>{if(MODE==="sv"&&window.SV_API)SV_API.preview()});
 /* ---- 端末間の感度換算 ---- */
