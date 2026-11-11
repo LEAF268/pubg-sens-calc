@@ -151,7 +151,9 @@ body[data-mode="sv"] .grid{display:none} body[data-mode="sv"] .m-sv{display:bloc
 .svopt{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;gap:8px 10px;align-items:end;margin-top:10px}.svopt .btn{white-space:nowrap}
 @media (max-width:520px){.svopt{grid-template-columns:repeat(3,minmax(0,1fr))}.svopt label{font-size:.76rem}.svopt .btn{grid-column:1/-1}}
 #svprev{display:block;max-width:100%;height:auto;margin:10px 0 0;border:1px solid var(--line);border-radius:6px}
-@media (max-width:520px){.svtbl input{width:44px;padding:4px 3px}.svtbl th,.svtbl td{padding:5px 2px;font-size:.74rem}}
+.svtbl input[type=number]{appearance:textfield;-moz-appearance:textfield;text-align:center}.svtbl input::-webkit-outer-spin-button,.svtbl input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+@media (max-width:520px){.svtbl input{width:44px;padding:4px 1px;font-size:.84rem}.svtbl th,.svtbl td{padding:5px 2px;font-size:.74rem}.svtbl td:first-child{white-space:normal;min-width:4.5em}}
+@media (max-width:360px){.svtbl input{width:40px;font-size:.8rem}.svtbl td:first-child{font-size:.7rem}}
 #plstbl td,#plstbl th,#plsitm td,#plsitm th{padding:5px 7px;font-size:.85rem}
 #plstbl tr.sel td{outline:2px solid var(--accent);outline-offset:-2px}
 td.pos{color:var(--ok)} td.neg{color:var(--bad)}
@@ -1945,12 +1947,14 @@ const SV_ROWS=["TPPスコープなし","FPPスコープなし","レッドドッ�
  const SK="pubg-sens-save";let IMGS=[],G=[],MEMO="",OPTV={tpp:null,fpp:null,acc:""};// G: [{kind:"basic"|"wpn",name,cat,M:[8][4],alt,warn,crop,t}]
  const MAN=new Set();// 武器名を手入力にしているグループ
  // 「2つだけ」の切り替え一覧：武器名の一覧と同じく武器種ごとに分け、名前だけ（並びは武器名の一覧の順）
- const slotOpts=sel=>{const op=(x,xi)=>`<option value="${xi}"${xi===sel?" selected":""}>${esc(x.kind==="basic"?"基本感度":(x.name||"（武器名なし）"))}</option>`;
-  let h=G.map((x,xi)=>x.kind==="basic"?op(x,xi):"").join("");const W=G.map((x,xi)=>[x,xi]).filter(([x])=>x.kind==="wpn");
-  for(const c of [...SV.CATS,""]){const L=W.filter(([x])=>(SV.CATS.includes(x.cat)?x.cat:"")===c);if(!L.length)continue;const ord=n=>{const i=(SV.NAMES[c]||[]).indexOf(n);return i<0?999:i};
-   L.sort((a,b)=>ord(a[0].name)-ord(b[0].name)||a[1]-b[1]);h+=`<optgroup label="${esc(c||"武器種なし")}">${L.map(([x,xi])=>op(x,xi)).join("")}</optgroup>`}return h};
+ const slotOpts=sel=>{const op=(v,t)=>`<option value="${esc(String(v))}"${v===sel?" selected":""}>${esc(t)}</option>`;
+  let h=G.map((x,xi)=>x.kind==="basic"?op(xi,"基本感度"):"").join("");const W=G.map((x,xi)=>[x,xi]).filter(([x])=>x.kind==="wpn");
+  for(const c of [...SV.CATS,""]){const nm=SV.NAMES[c]||[];let L="";
+   for(const n of nm){const gs=W.filter(([x])=>x.name===n);L+=gs.length?gs.map(([x,xi])=>op(xi,n)).join(""):op("n:"+n,n)}
+   W.filter(([x])=>(SV.CATS.includes(x.cat)?x.cat:"")===c&&!nm.includes(x.name)).forEach(([x,xi])=>{L+=op(xi,x.name||"（武器名なし）")});
+   if(L)h+=`<optgroup label="${esc(c||"武器種なし")}">${L}</optgroup>`}return h};
  const SV_VIEW={get(){try{return localStorage.getItem("pubg-sens-svview")==="two"?"two":"all"}catch(e){return "all"}},set(v){try{localStorage.setItem("pubg-sens-svview",v)}catch(e){}},
-  S:null,slots(){const n=G.length;let s=this.S;if(!s||s.some(i=>!(i>=0&&i<n))){const b=G.findIndex(g=>g.kind==="basic"),w=G.findIndex(g=>g.kind==="wpn");s=[b>=0?b:0,w>=0&&w!==(b>=0?b:0)?w:Math.min(1,n-1)]}
+  S:null,slots(){const n=G.length;let s=this.S;if(s)s=s.map(i=>{if(typeof i==="string"){const j=G.findIndex(g=>g.kind==="wpn"&&g.name===i.slice(2));return j>=0?j:i}return i});if(!s||s.some(i=>typeof i==="string"?!i.startsWith("n:"):!(i>=0&&i<n))){const b=G.findIndex(g=>g.kind==="basic"),w=G.findIndex(g=>g.kind==="wpn");s=[b>=0?b:0,w>=0&&w!==(b>=0?b:0)?w:Math.min(1,n-1)]}
    if(n<2)s=[0];this.S=s;return s},setSlot(k,v){const s=this.slots().slice();s[k]=v;this.S=s},opts:sel=>slotOpts(sel)};
  const res=$("svres"),file=$("svfile");
  const blank=()=>SV_ROWS.map(()=>SV_COLS.map(()=>null));
@@ -2005,8 +2009,14 @@ const SV_ROWS=["TPPスコープなし","FPPスコープなし","レッドドッ�
     ${SV_ROWS.map((rn,i)=>`<tr><td>${rn}</td>${SV_COLS.map((_,j)=>{const a=g.alt[i][j],w=g.warn[i][j];const tip=[a?"画像ごとに違う値："+a.join("／"):"",w||""].filter(Boolean).join("。");
       return `<td class="${a?"svbad":w?"svwarn":""}" title="${esc(tip)}"><input type="number" inputmode="numeric" min="0" max="400" step="1" class="svv" data-g="${gi}" data-i="${i}" data-j="${j}" value="${g.M[i][j]==null?"":g.M[i][j]}"></td>`}).join("")}</tr>`).join("")}
     </tbody></table></div></div>`;return h};
+  const vcard=(n,slot)=>{const B=G.find(g=>g.kind==="basic");return `<div class="svgrp"><div class="svhead"><select class="svslot" data-s="${slot}" aria-label="表示する感度">${SV_VIEW.opts("n:"+n)}</select></div>
+    <p class="note">この武器は詳細感度が入っていません。ゲームでは基本感度が使われます（下は基本感度の値）。</p>
+    <div class="saverow" style="margin:4px 0 8px"><button type="button" class="btn ghost svmk" data-n="${esc(n)}">この武器の詳細感度を作る（基本感度をコピー）</button></div>
+    <div class="tbl"><table class="sstbl svtbl"><thead><tr><th>項目</th>${["カメラ<br>通常","カメラ<br>射撃時","ジャイロ<br>通常","ジャイロ<br>射撃時"].map(c=>`<th>${c}</th>`).join("")}</tr></thead><tbody>
+    ${SV_ROWS.map((rn,i)=>`<tr><td>${rn}</td>${SV_COLS.map((_,j)=>{const v=B?B.M[i][j]:null;return `<td style="text-align:center;color:var(--muted)">${v==null?"—":v+"%"}</td>`}).join("")}</tr>`).join("")}
+    </tbody></table></div></div>`};
   const VW=SV_VIEW.get();h+=`<div class="saverow svview" role="radiogroup" aria-label="表示"><span class="muted">表示：</span><label><input type="radio" name="svview" value="all"${VW==="all"?" checked":""}> すべて</label><label><input type="radio" name="svview" value="two"${VW==="two"?" checked":""}> 2つだけ</label></div>`;
-  if(VW==="two"&&G.length){const sl=SV_VIEW.slots();sl.forEach((gi,k)=>{h+=card(G[gi],gi,k)})}else G.forEach((g,gi)=>{h+=card(g,gi,null)});
+  if(VW==="two"&&G.length){const sl=SV_VIEW.slots();sl.forEach((gi,k)=>{h+=typeof gi==="string"?vcard(gi.slice(2),k):card(G[gi],gi,k)})}else G.forEach((g,gi)=>{h+=card(g,gi,null)});
   h+=`<div class="saverow" style="margin-top:8px"><button class="btn ghost" id="svaddw" type="button">武器を手で追加</button>${G.some(g=>g.kind==="basic")?"":`<button class="btn ghost" id="svaddb" type="button">基本感度を手で追加</button>`}</div>`;
   res.innerHTML=h;
   res.querySelectorAll(".svto").forEach(s=>s.addEventListener("change",()=>{const R=IMGS[s.dataset.i];let v=s.value;
@@ -2016,7 +2026,8 @@ const SV_ROWS=["TPPスコープなし","FPPスコープなし","レッドドッ�
   res.querySelectorAll(".svname").forEach(s=>s.addEventListener("change",()=>{const g=G[s.dataset.g];g.name=s.value.trim();if(g.t&&g.name)SV.learn(g.name,g.cat,g.t);save();render()}));
   res.querySelectorAll(".svnsel").forEach(s=>s.addEventListener("change",()=>{const gi=+s.dataset.g,g=G[gi];if(s.value==="\u0001"){MAN.add(gi);render();const t=res.querySelector(`.svname[data-g="${gi}"]`);if(t)t.focus();return}
    MAN.delete(gi);g.name=s.value;if(g.name){const c=SV.QCAT(g.name);if(c)g.cat=c}if(g.t&&g.name)SV.learn(g.name,g.cat,g.t);save();render()}));
-  res.querySelectorAll(".svslot").forEach(s=>s.addEventListener("change",()=>{SV_VIEW.setSlot(+s.dataset.s,+s.value);render()}));
+  res.querySelectorAll(".svmk").forEach(bt=>bt.addEventListener("click",()=>{const n=bt.dataset.n,B=G.find(g=>g.kind==="basic");G.push({kind:"wpn",name:n,cat:SV.QCAT(n)||"",M:B?B.M.map(r=>r.slice()):blank(),alt:blank(),warn:blank()});save();render()}));
+  res.querySelectorAll(".svslot").forEach(s=>s.addEventListener("change",()=>{SV_VIEW.setSlot(+s.dataset.s,/^\d+$/.test(s.value)?+s.value:s.value);render()}));
   res.querySelectorAll('input[name="svview"]').forEach(s=>s.addEventListener("change",()=>{SV_VIEW.set(s.value);render()}));
   res.querySelectorAll(".svcat").forEach(s=>s.addEventListener("change",()=>{const g=G[s.dataset.g];g.cat=s.value;if(g.t&&g.name)SV.learn(g.name,g.cat,g.t);save();render()}));
   res.querySelectorAll(".svdel").forEach(s=>s.addEventListener("click",()=>{const gi=+s.dataset.g;MAN.clear();G.splice(gi,1);IMGS.forEach(R=>{if(R.g===gi)R.g=-1;else if(R.g>gi)R.g--});save();render()}));
