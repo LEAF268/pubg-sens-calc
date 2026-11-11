@@ -141,6 +141,7 @@ body[data-mode="sv"] .grid{display:none} body[data-mode="sv"] .m-sv{display:bloc
 .svhead{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin-bottom:6px}.svhead b{font-size:.95rem;color:var(--accent)}
 .svhead input,.svhead select{width:auto!important;flex:0 1 auto;margin:0!important;padding:5px 7px;border:1px solid var(--line);border-radius:5px;background:var(--panel);color:var(--fg);font-family:var(--f-body);font-size:.88rem;min-width:0}.svhead input{width:9em}
 .svhead .svdel{margin-left:auto;padding:4px 10px;font-size:.8rem}
+.svhead select.svslot{font-weight:700;color:var(--accent);border-color:var(--accent);font-size:.95rem}.svview{margin:2px 0 10px;gap:14px;align-items:center}.svview{display:flex;flex-wrap:wrap}.svview label{display:inline-flex!important;align-items:center;gap:5px;width:auto!important;margin:0!important;font-size:.9rem;white-space:nowrap;cursor:pointer}.svview input{width:auto!important;margin:0!important}
 .svcrop{height:26px;max-width:40vw;border-radius:3px;background:#222}
 .svtbl input{width:62px}.svtbl td,.svtbl th{text-align:center}.svtbl td:first-child{text-align:left;white-space:nowrap}
 .svtbl td.svwarn{background:color-mix(in srgb,var(--warn) 18%,transparent)}.svtbl td.svbad{background:color-mix(in srgb,var(--bad) 18%,transparent)}
@@ -1912,8 +1913,11 @@ SV.unpack=function(url){{const k=String(url).indexOf("#q");if(k>=0)return SV.unp
   groups.push({kind:"wpn",name:D(n||""),cat:SV.CATS[+ci]&&ci!==""?SV.CATS[+ci]:"",M:SV_ROWS.map((_,r)=>SV_COLS.map((_,c)=>{const k=r*4+c;if(!((m>>>k)&1))return null;if(k in dv)return dv[k];const b=B?B.M[r][c]:null;return b==null?null:b}))})}
  return {name:D(p[1]||""),groups,opt}};
 // 画像からQRを読む（PNGのデータが消えた画像でも）
-SV.readQR=async function(file){const u=URL.createObjectURL(file);try{const im=new Image();im.src=u;await im.decode();let W=im.width,H=im.height;const k=Math.min(1,4000/Math.max(W,H));W=Math.round(W*k);H=Math.round(H*k);
-  const cv=document.createElement("canvas");cv.width=W;cv.height=H;const cx=cv.getContext("2d",{willReadFrequently:true});cx.drawImage(im,0,0,W,H);const r=QR.decode(SS.gray(cx.getImageData(0,0,W,H).data,W,H),W,H);
+SV.readQR=async function(file){const u=URL.createObjectURL(file);try{const im=new Image();im.src=u;await im.decode();
+  // この計算機の画像はQRコードが上の方にあるので、まず上の部分（幅と同じ高さ）を細かく読む。だめなら画像全体
+  const tryR=(sh)=>{let W=im.width,H=sh;const k=Math.min(1,4000/Math.max(W,H));const w=Math.round(W*k),h=Math.round(H*k);
+   const cv=document.createElement("canvas");cv.width=w;cv.height=h;const cx=cv.getContext("2d",{willReadFrequently:true});cx.drawImage(im,0,0,W,H,0,0,w,h);return QR.decode(SS.gray(cx.getImageData(0,0,w,h).data,w,h),w,h)};
+  let r=null;if(im.height>im.width*1.3)r=tryR(Math.round(im.width*1.15));if(!r)r=tryR(im.height);
   return r?new TextDecoder().decode(r):null}catch(e){return null}finally{URL.revokeObjectURL(u)}};
 // 列（カメラ／射撃時／ジャイロ通常時／射撃時）の決め方は感度比較のスクショ読み取りと同じ
 SS.assign=function(RES){
@@ -1938,6 +1942,10 @@ SV.warn=function(R,r){const why=[],gyro=r.col>=2;
 const SV_ROWS=["TPPスコープなし","FPPスコープなし","レッドドット等","2倍","3倍","4倍","6倍","8倍"],SV_COLS=["カメラ","射撃時","ジャイロ通常時","ジャイロ射撃時"];
 (()=>{
  const SK="pubg-sens-save";let IMGS=[],G=[],MEMO="",OPTV={tpp:null,fpp:null,acc:""};// G: [{kind:"basic"|"wpn",name,cat,M:[8][4],alt,warn,crop,t}]
+ const MAN=new Set();// 武器名を手入力にしているグループ
+ const SV_VIEW={get(){try{return localStorage.getItem("pubg-sens-svview")==="two"?"two":"all"}catch(e){return "all"}},set(v){try{localStorage.setItem("pubg-sens-svview",v)}catch(e){}},
+  S:null,slots(){const n=G.length;let s=this.S;if(!s||s.some(i=>!(i>=0&&i<n))){const b=G.findIndex(g=>g.kind==="basic"),w=G.findIndex(g=>g.kind==="wpn");s=[b>=0?b:0,w>=0&&w!==(b>=0?b:0)?w:Math.min(1,n-1)]}
+   if(n<2)s=[0];this.S=s;return s},setSlot(k,v){const s=this.slots().slice();s[k]=v;this.S=s}};
  const res=$("svres"),file=$("svfile");
  const blank=()=>SV_ROWS.map(()=>SV_COLS.map(()=>null));
  function save(){try{localStorage.setItem(SK,JSON.stringify({groups:G.map(g=>({kind:g.kind,name:g.name,cat:g.cat,M:g.M})),memo:MEMO,opt:OPTV}))}catch(e){}}
@@ -1979,10 +1987,10 @@ const SV_ROWS=["TPPスコープなし","FPPスコープなし","レッドドッ�
   if(IMGS.length){h+=`<details class="adv" ${IMGS.some(R=>R.g<0)?"open":""}><summary>読み込んだ画像（${IMGS.length}枚）と振り分け</summary><div class="tbl"><table class="sstbl svimgs"><thead><tr><th>画像</th><th>画面</th><th>入れる先</th></tr></thead><tbody>${IMGS.map((R,ii)=>{const s=R.scr||{};
     const kind=R.err?"読めない画像":!R.rows.length?"感度の行なし":s.kind==="basic"?"基本設定":s.kind==="detail"?(s.wpn?"詳細設定（武器のタブあり）":"詳細設定（続き）"):"不明（前の続き）";
     return `<tr><td style="word-break:break-all">${esc(R.name)}</td><td>${kind}</td><td><select class="svto" data-i="${ii}">${opts(R.g)}</select></td></tr>`}).join("")}</tbody></table></div></details>`}
-  G.forEach((g,gi)=>{const nwarn=g.warn.flat().filter(Boolean).length+g.alt.flat().filter(Boolean).length;
-   h+=`<div class="svgrp"><div class="svhead">${g.kind==="basic"?`<b>基本感度</b>`:`<b>武器${G.slice(0,gi+1).filter(x=>x.kind==="wpn").length}</b>
+  const card=(g,gi,slot)=>{let h="";const nwarn=g.warn.flat().filter(Boolean).length+g.alt.flat().filter(Boolean).length;
+   h+=`<div class="svgrp"><div class="svhead">${slot!=null?`<select class="svslot" data-s="${slot}" aria-label="表示する感度">${G.map((x,xi)=>`<option value="${xi}"${xi===gi?" selected":""}>${esc(x.kind==="basic"?"基本感度":(x.name||"（武器名なし）")+(x.cat?"（"+x.cat+"）":""))}</option>`).join("")}</select>`:""}${g.kind==="basic"?(slot!=null?"":`<b>基本感度</b>`):`${slot!=null?"":`<b>武器${G.slice(0,gi+1).filter(x=>x.kind==="wpn").length}</b>`}
      ${g.crop?`<img class="svcrop" src="${g.crop}" alt="スクショの武器名">`:""}
-     <input type="text" class="svname" data-g="${gi}" maxlength="24" placeholder="武器名（選ぶか入力）" list="${SV.NAMES[g.cat]?"svdl-"+SV.CATS.indexOf(g.cat):"svdl-all"}" value="${esc(g.name)}">
+     ${(()=>{const cand=SV.NAMES[g.cat]?SV.NAMES[g.cat]:null;const all=Object.values(SV.NAMES).flat();const known=all.includes(g.name);const manual=MAN.has(gi)||(g.name&&!known);const grp=cand?cand.map(n=>`<option${n===g.name?" selected":""}>${esc(n)}</option>`).join(""):SV.CATS.filter(c=>SV.NAMES[c]).map(c=>`<optgroup label="${c}">${SV.NAMES[c].map(n=>`<option${n===g.name?" selected":""}>${esc(n)}</option>`).join("")}</optgroup>`).join("");const extra=known&&cand&&!cand.includes(g.name)?`<option selected>${esc(g.name)}</option>`:"";return `<select class="svnsel" data-g="${gi}" aria-label="武器名"><option value=""${!g.name&&!manual?" selected":""}>武器名を選ぶ</option>${extra}${grp}<option value="\u0001"${manual?" selected":""}>手入力…</option></select>${manual?`<input type="text" class="svname" data-g="${gi}" maxlength="24" placeholder="武器名を入力" value="${esc(g.name)}">`:""}`})()}
      <select class="svcat" data-g="${gi}"><option value="">武器種</option>${SV.CATS.map(c=>`<option${c===g.cat?" selected":""}>${c}</option>`).join("")}</select>`}
      <button type="button" class="btn ghost svdel" data-g="${gi}">削除</button></div>
     ${g.kind==="wpn"&&!g.name?`<p class="note svw">武器名を読み取れませんでした。左の切り抜きを見て、候補（ダメージ計算の武器一覧から、武器種で絞り込み）から選ぶか入力してください（この端末に覚えて、次から自動で入ります）。</p>`:""}
@@ -1990,17 +1998,22 @@ const SV_ROWS=["TPPスコープなし","FPPスコープなし","レッドドッ�
     <div class="tbl"><table class="sstbl svtbl"><thead><tr><th>項目</th>${["カメラ<br>通常","カメラ<br>射撃時","ジャイロ<br>通常","ジャイロ<br>射撃時"].map(c=>`<th>${c}</th>`).join("")}</tr></thead><tbody>
     ${SV_ROWS.map((rn,i)=>`<tr><td>${rn}</td>${SV_COLS.map((_,j)=>{const a=g.alt[i][j],w=g.warn[i][j];const tip=[a?"画像ごとに違う値："+a.join("／"):"",w||""].filter(Boolean).join("。");
       return `<td class="${a?"svbad":w?"svwarn":""}" title="${esc(tip)}"><input type="number" inputmode="numeric" min="0" max="400" step="1" class="svv" data-g="${gi}" data-i="${i}" data-j="${j}" value="${g.M[i][j]==null?"":g.M[i][j]}"></td>`}).join("")}</tr>`).join("")}
-    </tbody></table></div></div>`});
+    </tbody></table></div></div>`;return h};
+  const VW=SV_VIEW.get();h+=`<div class="saverow svview" role="radiogroup" aria-label="表示"><span class="muted">表示：</span><label><input type="radio" name="svview" value="all"${VW==="all"?" checked":""}> すべて</label><label><input type="radio" name="svview" value="two"${VW==="two"?" checked":""}> 2つだけ</label></div>`;
+  if(VW==="two"&&G.length){const sl=SV_VIEW.slots();sl.forEach((gi,k)=>{h+=card(G[gi],gi,k)})}else G.forEach((g,gi)=>{h+=card(g,gi,null)});
   h+=`<div class="saverow" style="margin-top:8px"><button class="btn ghost" id="svaddw" type="button">武器を手で追加</button>${G.some(g=>g.kind==="basic")?"":`<button class="btn ghost" id="svaddb" type="button">基本感度を手で追加</button>`}</div>`;
-  h+=SV.CATS.map((c,k)=>SV.NAMES[c]?`<datalist id="svdl-${k}">${SV.NAMES[c].map(n=>`<option value="${esc(n)}">`).join("")}</datalist>`:"").join("")+`<datalist id="svdl-all">${Object.values(SV.NAMES).flat().map(n=>`<option value="${esc(n)}">`).join("")}</datalist>`;
   res.innerHTML=h;
   res.querySelectorAll(".svto").forEach(s=>s.addEventListener("change",()=>{const R=IMGS[s.dataset.i];let v=s.value;
    if(v==="new"){G.push({kind:"wpn",name:"",cat:"",M:blank(),alt:blank(),warn:blank()});v=G.length-1}else if(v==="newb"){let i=G.findIndex(g=>g.kind==="basic");if(i<0){G.unshift({kind:"basic",name:"",cat:"",M:blank(),alt:blank(),warn:blank()});IMGS.forEach(Q=>{if(Q.g>=0)Q.g++});i=0}v=i}
    R.g=+v;build();tidy();save();render()}));
   res.querySelectorAll(".svv").forEach(s=>s.addEventListener("change",()=>{const g=G[s.dataset.g],i=+s.dataset.i,j=+s.dataset.j;const t=s.value.trim();g.M[i][j]=t===""?null:Math.max(0,Math.min(400,Math.round(+t)));g.alt[i][j]=null;g.warn[i][j]=null;save();render()}));
   res.querySelectorAll(".svname").forEach(s=>s.addEventListener("change",()=>{const g=G[s.dataset.g];g.name=s.value.trim();if(g.t&&g.name)SV.learn(g.name,g.cat,g.t);save();render()}));
+  res.querySelectorAll(".svnsel").forEach(s=>s.addEventListener("change",()=>{const gi=+s.dataset.g,g=G[gi];if(s.value==="\u0001"){MAN.add(gi);render();const t=res.querySelector(`.svname[data-g="${gi}"]`);if(t)t.focus();return}
+   MAN.delete(gi);g.name=s.value;if(g.name&&!g.cat){const c=SV.QCAT(g.name);if(c)g.cat=c}if(g.t&&g.name)SV.learn(g.name,g.cat,g.t);save();render()}));
+  res.querySelectorAll(".svslot").forEach(s=>s.addEventListener("change",()=>{SV_VIEW.setSlot(+s.dataset.s,+s.value);render()}));
+  res.querySelectorAll('input[name="svview"]').forEach(s=>s.addEventListener("change",()=>{SV_VIEW.set(s.value);render()}));
   res.querySelectorAll(".svcat").forEach(s=>s.addEventListener("change",()=>{const g=G[s.dataset.g];g.cat=s.value;if(g.t&&g.name)SV.learn(g.name,g.cat,g.t);save();render()}));
-  res.querySelectorAll(".svdel").forEach(s=>s.addEventListener("click",()=>{const gi=+s.dataset.g;G.splice(gi,1);IMGS.forEach(R=>{if(R.g===gi)R.g=-1;else if(R.g>gi)R.g--});save();render()}));
+  res.querySelectorAll(".svdel").forEach(s=>s.addEventListener("click",()=>{const gi=+s.dataset.g;MAN.clear();G.splice(gi,1);IMGS.forEach(R=>{if(R.g===gi)R.g=-1;else if(R.g>gi)R.g--});save();render()}));
   $("svaddw").addEventListener("click",()=>{G.push({kind:"wpn",name:"",cat:"",M:blank(),alt:blank(),warn:blank()});save();render()});
   if($("svaddb"))$("svaddb").addEventListener("click",()=>{G.unshift({kind:"basic",name:"",cat:"",M:blank(),alt:blank(),warn:blank()});IMGS.forEach(Q=>{if(Q.g>=0)Q.g++});save();render()});
   preview()}
@@ -2024,22 +2037,29 @@ function drawSave(r){const S=r.sv||{groups:[]};const B=S.groups.find(g=>g.kind==
  const MF=`400 13px ${IMGF}`,ML=19;
  const wrap=(t,w)=>{_lc.font=MF;const out=[];for(const para of t.split(/\r?\n/)){let cur="";for(const ch of [...para]){if(cur&&_lc.measureText(cur+ch).width>w&&!"、。，．,.）」』】！？!?ー…・".includes(ch)){out.push(cur);cur=ch}else cur+=ch}out.push(cur)}return out};
  const opt=S.opt||{},OPT=[["TPP視野角",opt.tpp],["FPP視野角",opt.fpp],["水平スライド加速",opt.acc]].filter(x=>x[1]!=null&&x[1]!=="");const OH=OPT.length?62:0,OG=OPT.length&&memo?12:0;
- // 基本感度の右：設定（視野角・加速）とメモ。QRコードは右下の隅
- const lines=memo?wrap(memo,cw-20):[],MH=memo?lines.length*ML+18:0,infoH=OH+OG+MH;
- const items=[...(B?[{c:B}]:[]),...(infoH?[{info:true}]:[]),...Ws.map(c=>({c}))];
- const hs=items.map(it=>it.info?infoH:ch(it.c)),rows=[];for(let i=0;i<items.length;i+=2)rows.push(Math.max(hs[i],hs[i+1]||0));
- const headT=P+44+(B&&Ws.length?20:0),rowsH=rows.reduce((a,b)=>a+b+GAP,0);
- const layout=qm=>{const qs=q?(q.n+8)*qm:0;const top=Math.max(headT,q?P+qs+GAP:0);return {Q:{qs},top,H:top+rowsH+30}};
- // 1マスは2px（保存画像では4px）以上。縦長の画像は長い辺を1280pxに縮められても読めるよう大きくする
- let qm=2,L=layout(qm);if(q)while(qm*1280/(2*L.H)<0.85&&qm<6){qm+=0.5;L=layout(qm)}
- const {Q,H,top}=L;
+ // 上：左に題名・日付、メモ、視野角など。右にQRコード（大きさは全武器で詳細感度を使ったときに合わせて固定＝右の列の幅の正方形）
+ const QS=cw;const qm=q?Math.max(1,Math.floor(2*QS/(q.n+8)))/2:0;
+ const headH=44,lines=memo?wrap(memo,cw-24):[];const OHx=OPT.length?OH:0;
+ const minMemo=Math.max(60,lines.length*ML+34);
+ const leftTop=P+headH,needL=minMemo+(OPT.length?GAP:0)+OHx;const topH=Math.max(QS,headH+needL);
+ const memoH=topH-headH-OHx-(OPT.length?GAP:0);
+ const items=[...(B?[B]:[]),...Ws];
+ const hs=items.map(c=>ch(c)),rows=[];for(let i=0;i<items.length;i+=2)rows.push(Math.max(hs[i],hs[i+1]||0));
+ const top=P+topH+GAP+4,H=top+rows.reduce((a,b)=>a+b+GAP,0)+30;
  const [cv,g]=newCanvas(W,H);
- g.fillStyle=IC.fg;g.font=`700 22px ${IMGF}`;let y=P+24;g.fillText(r.name||"感度設定",P,y);
- g.font=`400 13px ${IMGF}`;g.fillStyle=IC.mu;y+=22;g.fillText(new Date(r.createdAt||Date.now()).toLocaleString("ja-JP"),P,y);
- if(B&&Ws.length){g.font=`400 11.5px ${IMGF}`;g.fillStyle=IC.cam;g.fillText("武器の赤字＝基本感度と違う値",P,y+20)}
- // QRコードは右上の隅
- if(q){const qs=Q.qs,x=W-P-qs,y2=P;g.fillStyle="#fff";g.fillRect(x,y2,qs,qs);g.fillStyle="#000";for(let yy=0;yy<q.n;yy++)for(let xx=0;xx<q.n;xx++)if(q.M[yy][xx])g.fillRect(x+(xx+4)*qm,y2+(yy+4)*qm,qm,qm);
-  g.strokeStyle=IC.ln;g.lineWidth=1;g.strokeRect(x+0.5,y2+0.5,qs-1,qs-1)}
+ g.fillStyle=IC.fg;g.font=`700 22px ${IMGF}`;let y=P+22;g.fillText(r.name||"感度設定",P,y);const tw0=g.measureText(r.name||"感度設定").width;
+ g.font=`400 13px ${IMGF}`;g.fillStyle=IC.mu;const ds=new Date(r.createdAt||Date.now()).toLocaleString("ja-JP");
+ if(tw0+14+g.measureText(ds).width<cw)g.fillText(ds,P+tw0+14,y);else g.fillText(ds,P,y+18);
+ // QRコード（右上）
+ if(q){const x=W-P-QS,y2=P,inner=(q.n+8)*qm,o=(QS-inner)/2;g.fillStyle="#fff";g.fillRect(x,y2,QS,QS);g.fillStyle="#000";for(let yy=0;yy<q.n;yy++)for(let xx=0;xx<q.n;xx++)if(q.M[yy][xx])g.fillRect(x+o+(xx+4)*qm,y2+o+(yy+4)*qm,qm,qm);
+  g.strokeStyle=IC.ln;g.lineWidth=1;g.strokeRect(x+0.5,y2+0.5,QS-1,QS-1)}
+ // メモ → 視野角など（左、QRコードの下端まで）
+ {let yl=leftTop;{g.fillStyle="#fff";g.fillRect(P,yl,cw,memoH);g.strokeStyle=IC.ln;g.lineWidth=1;g.strokeRect(P+0.5,yl+0.5,cw-1,memoH-1);
+   g.fillStyle=IC.mu;g.font=`600 11px ${IMGF}`;g.fillText("メモ",P+12,yl+18);g.fillStyle=IC.fg;g.font=MF;lines.forEach((t,k)=>g.fillText(t,P+12,yl+38+k*ML));yl+=memoH+GAP}
+  if(OPT.length){const x=P,yo=yl;g.fillStyle="#fff";g.fillRect(x,yo,cw,OH);g.strokeStyle=IC.ln;g.lineWidth=1;g.strokeRect(x+0.5,yo+0.5,cw-1,OH-1);
+   const w=cw/OPT.length;OPT.forEach(([k,v],i)=>{const cx=x+w*i;if(i){g.strokeStyle=IC.ln;g.beginPath();g.moveTo(cx+0.5,yo+10);g.lineTo(cx+0.5,yo+OH-10);g.stroke()}
+    g.textAlign="center";g.fillStyle=IC.mu;g.font=`600 11.5px ${IMGF}`;g.fillText(k,cx+w/2,yo+22);g.fillStyle=IC.fg;g.font=`700 19px ${typeof v==="number"?IMGM:IMGF}`;g.fillText(typeof v==="number"?v+"°":v,cx+w/2,yo+48);g.textAlign="left"})}}
+ if(B&&Ws.length){g.font=`400 11.5px ${IMGF}`;g.fillStyle=IC.cam;g.textAlign="right";g.fillText("武器の赤字＝基本感度と違う値",W-P,top-6);g.textAlign="left"}
  y=top;
  const drawCard=(c,x,y,h)=>{const isB=c===B,title=isB?"基本感度":(c.name||"（武器名なし）");
   g.fillStyle=isB?IC.soft:"#fff";g.fillRect(x,y,cw,h);g.strokeStyle=isB?IC.ac:IC.ln;g.lineWidth=isB?1.5:1;g.strokeRect(x+0.5,y+0.5,cw-1,h-1);
@@ -2054,12 +2074,7 @@ function drawSave(r){const S=r.sv||{groups:[]};const B=S.groups.find(g=>g.kind==
     if(v==null){g.fillStyle=IC.mu;g.font=`400 12px ${IMGF}`;g.fillText("—",cx,yy+17)}
     else{const diff=!isB&&B&&B.M[i][j]!=null&&B.M[i][j]!==v;g.fillStyle=diff?IC.cam:IC.fg;g.font=`${diff?800:600} 14px ${IMGM}`;g.fillText(v+"%",cx,yy+18)}g.textAlign="left"});yy+=RH});
   if(!rs.length){g.fillStyle=IC.mu;g.font=`400 12px ${IMGF}`;g.fillText("値なし",tx+4,yy+17)}};
- const drawInfo=(x,y,h)=>{const y0=y;if(OPT.length){g.fillStyle="#fff";g.fillRect(x,y,cw,OH);g.strokeStyle=IC.ln;g.lineWidth=1;g.strokeRect(x+0.5,y+0.5,cw-1,OH-1);
-   const w=cw/OPT.length;OPT.forEach(([k,v],i)=>{const cx=x+w*i;if(i){g.strokeStyle=IC.ln;g.beginPath();g.moveTo(cx+0.5,y+10);g.lineTo(cx+0.5,y+OH-10);g.stroke()}
-    g.textAlign="center";g.fillStyle=IC.mu;g.font=`600 11.5px ${IMGF}`;g.fillText(k,cx+w/2,y+22);g.fillStyle=IC.fg;g.font=`700 19px ${typeof v==="number"?IMGM:IMGF}`;g.fillText(typeof v==="number"?v+"°":v,cx+w/2,y+48);g.textAlign="left"});y+=OH+OG}
-  if(memo){const mh=Math.max(MH,y0+h-y);g.fillStyle="#fff";g.fillRect(x,y,cw,mh);g.strokeStyle=IC.ln;g.lineWidth=1;g.strokeRect(x+0.5,y+0.5,cw-1,mh-1);
-   g.fillStyle=IC.fg;g.font=MF;lines.forEach((t,k)=>g.fillText(t,x+10,y+22+k*ML))}};
- for(let i=0;i<items.length;i+=2){const h=rows[i/2];[items[i],items[i+1]].forEach((it,k)=>{if(!it)return;const x=P+k*(cw+GAP);if(it.info)drawInfo(x,y,h);else drawCard(it.c,x,y,h)});y+=h+GAP}
+ for(let i=0;i<items.length;i+=2){const h=rows[i/2];[items[i],items[i+1]].forEach((c,k)=>{if(c)drawCard(c,P+k*(cw+GAP),y,h)});y+=h+GAP}
  g.fillStyle=IC.mu;g.font=`400 11px ${IMGF}`;g.fillText("PUBGモバイル計算機「感度保存」で作成（ゲームの設定画面のスクショから読み取り）",P,H-14);
  return cv}
 // 感度保存タブでは「画像で保存」の欄を感度保存の下に移す（ほかのタブでは元の位置）
