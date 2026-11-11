@@ -1944,9 +1944,14 @@ const SV_ROWS=["TPPスコープなし","FPPスコープなし","レッドドッ�
 (()=>{
  const SK="pubg-sens-save";let IMGS=[],G=[],MEMO="",OPTV={tpp:null,fpp:null,acc:""};// G: [{kind:"basic"|"wpn",name,cat,M:[8][4],alt,warn,crop,t}]
  const MAN=new Set();// 武器名を手入力にしているグループ
+ // 「2つだけ」の切り替え一覧：武器名の一覧と同じく武器種ごとに分け、名前だけ（並びは武器名の一覧の順）
+ const slotOpts=sel=>{const op=(x,xi)=>`<option value="${xi}"${xi===sel?" selected":""}>${esc(x.kind==="basic"?"基本感度":(x.name||"（武器名なし）"))}</option>`;
+  let h=G.map((x,xi)=>x.kind==="basic"?op(x,xi):"").join("");const W=G.map((x,xi)=>[x,xi]).filter(([x])=>x.kind==="wpn");
+  for(const c of [...SV.CATS,""]){const L=W.filter(([x])=>(SV.CATS.includes(x.cat)?x.cat:"")===c);if(!L.length)continue;const ord=n=>{const i=(SV.NAMES[c]||[]).indexOf(n);return i<0?999:i};
+   L.sort((a,b)=>ord(a[0].name)-ord(b[0].name)||a[1]-b[1]);h+=`<optgroup label="${esc(c||"武器種なし")}">${L.map(([x,xi])=>op(x,xi)).join("")}</optgroup>`}return h};
  const SV_VIEW={get(){try{return localStorage.getItem("pubg-sens-svview")==="two"?"two":"all"}catch(e){return "all"}},set(v){try{localStorage.setItem("pubg-sens-svview",v)}catch(e){}},
   S:null,slots(){const n=G.length;let s=this.S;if(!s||s.some(i=>!(i>=0&&i<n))){const b=G.findIndex(g=>g.kind==="basic"),w=G.findIndex(g=>g.kind==="wpn");s=[b>=0?b:0,w>=0&&w!==(b>=0?b:0)?w:Math.min(1,n-1)]}
-   if(n<2)s=[0];this.S=s;return s},setSlot(k,v){const s=this.slots().slice();s[k]=v;this.S=s}};
+   if(n<2)s=[0];this.S=s;return s},setSlot(k,v){const s=this.slots().slice();s[k]=v;this.S=s},opts:sel=>slotOpts(sel)};
  const res=$("svres"),file=$("svfile");
  const blank=()=>SV_ROWS.map(()=>SV_COLS.map(()=>null));
  function save(){try{localStorage.setItem(SK,JSON.stringify({groups:G.map(g=>({kind:g.kind,name:g.name,cat:g.cat,M:g.M})),memo:MEMO,opt:OPTV}))}catch(e){}}
@@ -1989,7 +1994,7 @@ const SV_ROWS=["TPPスコープなし","FPPスコープなし","レッドドッ�
     const kind=R.err?"読めない画像":!R.rows.length?"感度の行なし":s.kind==="basic"?"基本設定":s.kind==="detail"?(s.wpn?"詳細設定（武器のタブあり）":"詳細設定（続き）"):"不明（前の続き）";
     return `<tr><td style="word-break:break-all">${esc(R.name)}</td><td>${kind}</td><td><select class="svto" data-i="${ii}">${opts(R.g)}</select></td></tr>`}).join("")}</tbody></table></div></details>`}
   const card=(g,gi,slot)=>{let h="";const nwarn=g.warn.flat().filter(Boolean).length+g.alt.flat().filter(Boolean).length;
-   h+=`<div class="svgrp"><div class="svhead">${slot!=null?`<select class="svslot" data-s="${slot}" aria-label="表示する感度">${G.map((x,xi)=>`<option value="${xi}"${xi===gi?" selected":""}>${esc(x.kind==="basic"?"基本感度":(x.name||"（武器名なし）")+(x.cat?"（"+x.cat+"）":""))}</option>`).join("")}</select>`:""}${g.kind==="basic"?(slot!=null?"":`<b>基本感度</b>`):`${slot!=null?"":`<b>武器${G.slice(0,gi+1).filter(x=>x.kind==="wpn").length}</b>`}
+   h+=`<div class="svgrp"><div class="svhead">${slot!=null?`<select class="svslot" data-s="${slot}" aria-label="表示する感度">${SV_VIEW.opts(gi)}</select>`:""}${g.kind==="basic"?(slot!=null?"":`<b>基本感度</b>`):`${slot!=null?"":`<b>武器${G.slice(0,gi+1).filter(x=>x.kind==="wpn").length}</b>`}
      ${g.crop?`<img class="svcrop" src="${g.crop}" alt="スクショの武器名">`:""}
      ${(()=>{const cand=SV.NAMES[g.cat]?SV.NAMES[g.cat]:null;const all=Object.values(SV.NAMES).flat();const known=all.includes(g.name);const manual=MAN.has(gi)||(g.name&&!known);const grp=cand?cand.map(n=>`<option${n===g.name?" selected":""}>${esc(n)}</option>`).join(""):SV.CATS.filter(c=>SV.NAMES[c]).map(c=>`<optgroup label="${c}">${SV.NAMES[c].map(n=>`<option${n===g.name?" selected":""}>${esc(n)}</option>`).join("")}</optgroup>`).join("");const extra=known&&cand&&!cand.includes(g.name)?`<option selected>${esc(g.name)}</option>`:"";return `<select class="svnsel" data-g="${gi}" aria-label="武器名"><option value=""${!g.name&&!manual?" selected":""}>武器名を選ぶ</option>${extra}${grp}<option value="\u0001"${manual?" selected":""}>手入力…</option></select>${manual?`<input type="text" class="svname" data-g="${gi}" maxlength="24" placeholder="武器名を入力" value="${esc(g.name)}">`:""}`})()}
      <select class="svcat" data-g="${gi}"><option value="">武器種</option>${SV.CATS.map(c=>`<option${c===g.cat?" selected":""}>${c}</option>`).join("")}</select>`}
