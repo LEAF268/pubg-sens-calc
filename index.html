@@ -2055,8 +2055,8 @@ function drawSave(r){const S=r.sv||{groups:[]};const B=S.groups.find(g=>g.kind==
  const wrap=(t,w)=>{_lc.font=MF;const out=[];for(const para of t.split(/\r?\n/)){let cur="";for(const ch of [...para]){if(cur&&_lc.measureText(cur+ch).width>w&&!"、。，．,.）」』】！？!?ー…・".includes(ch)){out.push(cur);cur=ch}else cur+=ch}out.push(cur)}return out};
  const opt=S.opt||{},OPT=[["TPP視野角",opt.tpp],["FPP視野角",opt.fpp],["水平スライド加速",opt.acc]].filter(x=>x[1]!=null&&x[1]!=="");const OH=OPT.length?62:0,OG=OPT.length&&memo?12:0;
  // 上：左に題名・日付、メモ、視野角など。右にQRコード（大きさは全武器で詳細感度を使ったときに合わせて固定＝右の列の幅の正方形）
- const QS=cw;const qm=q?Math.max(1,Math.floor(2*QS/(q.n+8)))/2:0;
- const headH=44,lines=memo?wrap(memo,cw-24):[];const OHx=OPT.length?OH:0;
+ const QS=Math.min(cw,360),LW=W-2*P-GAP-QS;/* QRの枠：全武器でカメラ2列が視野角ごとにそろい射撃時2列が武器ごとに違う場合（約153マス）に合わせる（スマホ表示で約26mm）。左（メモ・視野角）は残りの幅 */const qm=q?Math.max(1,Math.floor(2*QS/(q.n+8)))/2:0;
+ const headH=44,lines=memo?wrap(memo,LW-24):[];const OHx=OPT.length?OH:0;
  const minMemo=Math.max(60,lines.length*ML+34);
  const leftTop=P+headH,needL=minMemo+(OPT.length?GAP:0)+OHx;const topH=Math.max(QS,headH+needL);
  const memoH=topH-headH-OHx-(OPT.length?GAP:0);
@@ -2071,10 +2071,10 @@ function drawSave(r){const S=r.sv||{groups:[]};const B=S.groups.find(g=>g.kind==
  if(q){const x=W-P-QS,y2=P,inner=(q.n+8)*qm,o=(QS-inner)/2;g.fillStyle="#fff";g.fillRect(x,y2,QS,QS);g.fillStyle="#000";for(let yy=0;yy<q.n;yy++)for(let xx=0;xx<q.n;xx++)if(q.M[yy][xx])g.fillRect(x+o+(xx+4)*qm,y2+o+(yy+4)*qm,qm,qm);
   g.strokeStyle=IC.ln;g.lineWidth=1;g.strokeRect(x+0.5,y2+0.5,QS-1,QS-1)}
  // メモ → 視野角など（左、QRコードの下端まで）
- {let yl=leftTop;{g.fillStyle="#fff";g.fillRect(P,yl,cw,memoH);g.strokeStyle=IC.ln;g.lineWidth=1;g.strokeRect(P+0.5,yl+0.5,cw-1,memoH-1);
+ {let yl=leftTop;{g.fillStyle="#fff";g.fillRect(P,yl,LW,memoH);g.strokeStyle=IC.ln;g.lineWidth=1;g.strokeRect(P+0.5,yl+0.5,LW-1,memoH-1);
    g.fillStyle=IC.mu;g.font=`600 11px ${IMGF}`;g.fillText("メモ",P+12,yl+18);g.fillStyle=IC.fg;g.font=MF;lines.forEach((t,k)=>g.fillText(t,P+12,yl+38+k*ML));yl+=memoH+GAP}
-  if(OPT.length){const x=P,yo=yl;g.fillStyle="#fff";g.fillRect(x,yo,cw,OH);g.strokeStyle=IC.ln;g.lineWidth=1;g.strokeRect(x+0.5,yo+0.5,cw-1,OH-1);
-   const w=cw/OPT.length;OPT.forEach(([k,v],i)=>{const cx=x+w*i;if(i){g.strokeStyle=IC.ln;g.beginPath();g.moveTo(cx+0.5,yo+10);g.lineTo(cx+0.5,yo+OH-10);g.stroke()}
+  if(OPT.length){const x=P,yo=yl;g.fillStyle="#fff";g.fillRect(x,yo,LW,OH);g.strokeStyle=IC.ln;g.lineWidth=1;g.strokeRect(x+0.5,yo+0.5,LW-1,OH-1);
+   const w=LW/OPT.length;OPT.forEach(([k,v],i)=>{const cx=x+w*i;if(i){g.strokeStyle=IC.ln;g.beginPath();g.moveTo(cx+0.5,yo+10);g.lineTo(cx+0.5,yo+OH-10);g.stroke()}
     g.textAlign="center";g.fillStyle=IC.mu;g.font=`600 11.5px ${IMGF}`;g.fillText(k,cx+w/2,yo+22);g.fillStyle=IC.fg;g.font=`700 19px ${typeof v==="number"?IMGM:IMGF}`;g.fillText(typeof v==="number"?v+"°":v,cx+w/2,yo+48);g.textAlign="left"})}}
  if(B&&Ws.length){g.font=`400 11.5px ${IMGF}`;g.fillStyle=IC.cam;g.textAlign="right";g.fillText("武器の赤字＝基本感度と違う値",W-P,top-6);g.textAlign="left"}
  y=top;
