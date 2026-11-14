@@ -26,6 +26,7 @@ body{background:var(--bg);color:var(--fg);font-family:var(--f-body);line-height:
 header h1{font-family:var(--f-display);font-size:1.75rem;margin:0;letter-spacing:.02em;white-space:nowrap}
 @media (max-width:420px){header h1{font-size:1.45rem}}
 header p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+header p.unof{margin-top:2px;font-size:.78rem}
 .grid{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:20px;align-items:start}
 @media (max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
@@ -227,7 +228,8 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
 <div class="wrap">
 <header>
   <h1>PUBGモバイル計算機</h1>
-  <p>感度（モニターディスタンス方式）・ダメージ・バッグ容量の計算機です。</p>
+  <p>感度・ダメージ・バッグ容量の計算機です。</p>
+  <p class="unof">非公式のファンメイドツールです（PUBG MOBILE公式・KRAFTON・Tencentとは関係ありません）。</p>
 </header>
 
 <div class="tabs" role="tablist" aria-label="表示の切り替え">
@@ -1087,6 +1089,7 @@ OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
       <tr><td>11月10日</td><td>「感度保存」タブを追加。ゲームの感度設定画面のスクショをまとめて選ぶと、基本設定の画面は基本感度、詳細設定の画面は武器ごと（武器名のタブで区切り、スクロールした続きはファイル名の順でつなぐ）に分けて読み取り、1枚の画像にまとめる（基本感度と違う値は赤字）。読み取りは感度比較のスクショ読み込みと同じ方法。武器種はタブの位置、武器名は見本と照合（ARの一部のみ。読めないときはダメージ計算の武器一覧から武器種で絞った候補を選ぶか入力し、端末に覚える）。保存する画像には右上の隅にQRコード、基本感度の右にTPP視野角・FPP視野角・水平スライド加速（感度保存タブで入力、感度計算の設定から入れるボタンあり）とメモ（保存前に入力した文字）を入れる。QRコードは（「QRコードだけ保存」でQRコードだけの画像も作れる（データ量に合わせて大きさが変わり、画像に印刷の解像度を記録。100%で印刷するとQRコード本体が最小15mm角、1マス0.4mm以上）。QRコードの中身は設定をビットに詰めて数字だけにしたもの（URLの後ろに数字が続く形。前の形式のQRコードも読める）で、文字のままより約半分の面積になる。中身はサイトのURL＋基本感度と、武器ごとに基本感度と違う値だけ。読み込むと省いた値は基本感度で埋める）。スマホのカメラで読むとサイトが開いて感度保存に入り、「画像から読み込む」でもQRコードを読む（LINEなどで送ってPNGのデータが消えた画像・JPEGでも可）。QRコードを作る・読む処理もサイト内に自前で書いた（外部ライブラリなし）。計算は変更なし。</td></tr>
       <tr><td>11月14日</td><td>感度計算の出力と端末換算・加速換算の表に「アイアン（AR・DMR）」（アイアンサイト70.4°）の行を追加。基礎スコープにアイアンサイトも選べるように。ゲームではアイアンサイトもレッドドットの感度の枠を使うので、感度比較には入れていません。ほかの値の計算は変更なし</td></tr>
       <tr><td>11月14日</td><td>スクショの読み取りを改善：1枚に見出しが何個も入る画面（VSS・Win94・SMG・SG・ハンドガンなど、1つの見出しに3行だけ）で項目がずれていたのを、見出しや間隔ごとに並びを読み直すように。オン/オフのある見出し（黄色い線がない）や、FPS表示が重なった・上が切れた見出しも判定。「…キャンテッドサイト398%」のように数字の先頭が項目名と重なるときは、つまみ位置から補正（警告を出す）。武器名の見本をAR以外の27武器にも追加（ゲームの表記：Skorpion・M79スモークグレネード・迫撃砲。Sawed-off・Skorpion・デュアルMP7・スタンガン・M79・迫撃砲はゲームと同じくハンドガンに）</td></tr>
+      <tr><td>11月15日</td><td>タイトルの下に「非公式」の注記を追加し、説明文の「（モニターディスタンス方式）」を削除。計算は変更なし</td></tr>
       <tr><td>11月10日</td><td>10章-12「端末による視野角の違い」を追加。Mk14のスコープ別スクショをLegionとGalaxy S25で比べ、横の視野角は端末によらず同じ（S25は上下が切れる形）、各スコープの視野角は両端末とも計算に使っている値と0.07°以内で一致。3章・12章に追記。計算は変更なし</td></tr>
     </tbody></table></div>
   </details>
