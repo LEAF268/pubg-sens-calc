@@ -529,12 +529,14 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
 
 <section class="panel ms m-sv" aria-label="感度保存">
   <h2>感度保存</h2>
-  <p class="note" style="margin:0 0 10px">ゲームの感度設定画面のスクショをまとめて選ぶと、「基本設定」の画面は基本感度に、「詳細設定」の画面は武器ごとに分けて値を読み取り、1枚の画像にまとめます。武器ごとのスクショは、武器名のタブが写る一番上から下へスクロールして撮り、ファイル名の順（撮った順）に並ぶようにしてください。一度に選べない枚数のときは、何回かに分けて選べます（前に読み込んだスクショに足して、ファイル名の順につなげます）。最初からやり直すときは「消す」を押してください。画像はこの端末のブラウザ内だけで読み取り、どこにも送信しません。</p>
+  <p class="note" style="margin:0 0 10px">ゲームの感度設定画面のスクショをまとめて選ぶと、「基本設定」の画面は基本感度に、「詳細設定」の画面は武器ごとに分けて値を読み取り、1枚の画像にまとめます。武器ごとのスクショは、武器名のタブが写る一番上から下へスクロールして撮り、ファイル名の順（撮った順）に並ぶようにしてください。スマホの写真の選択画面は一度に100枚までなので、それより多いときは「ファイルから選ぶ（100枚以上）」でファイルの画面からスクリーンショットのフォルダを開き、まとめて選んでください（全選択も使えます）。何回かに分けて選ぶこともできます（前に読み込んだスクショに足して、ファイル名の順につなげます）。最初からやり直すときは「消す」を押してください。画像はこの端末のブラウザ内だけで読み取り、どこにも送信しません。</p>
   <div class="saverow">
     <button class="btn" id="svbtn" type="button">スクショを選ぶ（まとめて）</button>
+    <button class="btn ghost" id="svbtn2" type="button">ファイルから選ぶ（100枚以上）</button>
     <button class="btn ghost" id="svqrbtn" type="button">QRコードだけ保存</button>
     <button class="btn ghost" id="svclear" type="button">消す</button>
     <input type="file" id="svfile" accept="image/*" multiple hidden>
+    <input type="file" id="svfile2" multiple hidden>
   </div>
   <div id="svres"></div>
   <div class="svopt">
@@ -2011,6 +2013,9 @@ const SV_ROWS=["TPPスコープなし","FPPスコープなし","レッドドッ�
  window.SV_API={snapshot:()=>({groups:G.map(g=>({kind:g.kind,name:g.name,cat:g.cat,M:g.M,...(g.kind==="basic"?{X:SV_XN(g)}:{})})),memo:MEMO,opt:OPTV}),load:o=>{load(o);save()},groups:()=>G};
  try{const o=JSON.parse(localStorage.getItem(SK)||"null");if(o)load(o)}catch(e){}
  $("svbtn").addEventListener("click",()=>{file.value="";file.click()});
+ /* 写真の選択画面（Androidは100枚まで）を通らないよう、画像の種類を指定しない入力からファイルの画面で選ぶ。画像だけ取り出して同じ読み込みへ */
+ {const f2=$("svfile2");$("svbtn2").addEventListener("click",()=>{f2.value="";f2.click()});
+  f2.addEventListener("change",()=>{const dt=new DataTransfer();[...f2.files].filter(x=>/^image\//.test(x.type)||/\.(png|jpe?g|webp)$/i.test(x.name)).forEach(x=>dt.items.add(x));if(!dt.files.length)return;file.files=dt.files;file.dispatchEvent(new Event("change"))})}
  $("svclear").addEventListener("click",()=>{IMGS=[];G=[];MEMO="";$("svmemo").value="";OPTV={tpp:null,fpp:null,acc:""};showOpt();save();render()});
  file.addEventListener("change",async()=>{const fs=[...file.files].sort((a,b)=>a.name.localeCompare(b.name));if(!fs.length)return;res.innerHTML='<p class="note">読み取り中…（0/'+fs.length+'）</p>';const NEW=[];/* 何回かに分けて選んだときは前のスクショに足す（同じ名前は新しい方） */
   for(const [i,f] of fs.entries()){let R;try{const img=await new Promise((ok,ng)=>{const u=URL.createObjectURL(f),im=new Image();im.onload=()=>ok(im);im.onerror=ng;im.src=u});
