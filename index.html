@@ -27,6 +27,11 @@ header h1{font-family:var(--f-display);font-size:1.75rem;margin:0;letter-spacing
 @media (max-width:420px){header h1{font-size:1.45rem}}
 header p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
 header p.unof{margin-top:2px;font-size:.78rem}
+.lsbox{border:1px solid var(--line);background:var(--accent-soft);border-radius:10px;padding:8px 10px;margin:0 0 12px;font-size:.85rem}
+.lsbox .lsrow{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+.lsbox select{flex:1 1 140px;min-width:0}
+.lsbox .btn{padding:4px 10px;font-size:.8rem}
+.lsbox p{margin:6px 0 0;font-size:.78rem;color:var(--muted)}
 .grid{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:20px;align-items:start}
 @media (max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
@@ -250,6 +255,7 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
 <div class="grid">
   <section class="panel" aria-label="入力">
     <h2>入力</h2>
+    <div class="lsbox" id="lsbox" hidden></div>
     <div class="fields">
       <div class="f"><label for="base">基礎スコープ</label>
         <select id="base"></select>
@@ -539,6 +545,11 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
     <button class="btn ghost" id="svclear" type="button">消す</button>
     <input type="file" id="svfile" accept="image/*" multiple hidden>
     <input type="file" id="svfile2" multiple hidden>
+  </div>
+  <div class="saverow svuserow" style="align-items:center;margin-top:8px"><span style="font-size:.85rem">この感度をほかのタブで使う</span>
+    <button class="btn ghost svuse" type="button" data-to="calc">感度計算</button>
+    <button class="btn ghost svuse" type="button" data-to="dev">端末換算</button>
+    <button class="btn ghost svuse" type="button" data-to="acc">加速換算</button>
   </div>
   <div id="svres"></div>
   <div class="svopt">
@@ -1089,6 +1100,8 @@ OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
       <tr><td>11月10日</td><td>「感度保存」タブを追加。ゲームの感度設定画面のスクショをまとめて選ぶと、基本設定の画面は基本感度、詳細設定の画面は武器ごと（武器名のタブで区切り、スクロールした続きはファイル名の順でつなぐ）に分けて読み取り、1枚の画像にまとめる（基本感度と違う値は赤字）。読み取りは感度比較のスクショ読み込みと同じ方法。武器種はタブの位置、武器名は見本と照合（ARの一部のみ。読めないときはダメージ計算の武器一覧から武器種で絞った候補を選ぶか入力し、端末に覚える）。保存する画像には右上の隅にQRコード、基本感度の右にTPP視野角・FPP視野角・水平スライド加速（感度保存タブで入力、感度計算の設定から入れるボタンあり）とメモ（保存前に入力した文字）を入れる。QRコードは（「QRコードだけ保存」でQRコードだけの画像も作れる（データ量に合わせて大きさが変わり、画像に印刷の解像度を記録。100%で印刷するとQRコード本体が最小15mm角、1マス0.4mm以上）。QRコードの中身は設定をビットに詰めて数字だけにしたもの（URLの後ろに数字が続く形。前の形式のQRコードも読める）で、文字のままより約半分の面積になる。中身はサイトのURL＋基本感度と、武器ごとに基本感度と違う値だけ。読み込むと省いた値は基本感度で埋める）。スマホのカメラで読むとサイトが開いて感度保存に入り、「画像から読み込む」でもQRコードを読む（LINEなどで送ってPNGのデータが消えた画像・JPEGでも可）。QRコードを作る・読む処理もサイト内に自前で書いた（外部ライブラリなし）。計算は変更なし。</td></tr>
       <tr><td>11月14日</td><td>感度計算の出力と端末換算・加速換算の表に「アイアン（AR・DMR）」（アイアンサイト70.4°）の行を追加。基礎スコープにアイアンサイトも選べるように。ゲームではアイアンサイトもレッドドットの感度の枠を使うので、感度比較には入れていません。ほかの値の計算は変更なし</td></tr>
       <tr><td>11月14日</td><td>スクショの読み取りを改善：1枚に見出しが何個も入る画面（VSS・Win94・SMG・SG・ハンドガンなど、1つの見出しに3行だけ）で項目がずれていたのを、見出しや間隔ごとに並びを読み直すように。オン/オフのある見出し（黄色い線がない）や、FPS表示が重なった・上が切れた見出しも判定。「…キャンテッドサイト398%」のように数字の先頭が項目名と重なるときは、つまみ位置から補正（警告を出す）。武器名の見本をAR以外の27武器にも追加（ゲームの表記：Skorpion・M79スモークグレネード・迫撃砲。Sawed-off・Skorpion・デュアルMP7・スタンガン・M79・迫撃砲はゲームと同じくハンドガンに）</td></tr>
+      <tr><td>11月15日</td><td>感度保存タブに「この感度をほかのタブで使う」（感度計算・端末換算・加速換算）ボタンを追加。押すとそのタブに移り、画像から読み込んだときと同じように使える</td></tr>
+      <tr><td>11月15日</td><td>感度計算・端末換算・加速換算で「画像から読み込む」に感度保存の画像（QRコードだけの画像も）を選ぶと、そのタブで使えるように。最初は基本感度が入り、入力の上の「使う感度」で武器を切り替え。感度計算は基礎スコープの値を基礎スコープ感度に、全部の値を感度比較の表に入れる。端末換算・加速換算は計算結果の代わりにその感度を換算する。視野角・水平スライド加速の設定も入れる</td></tr>
       <tr><td>11月15日</td><td>タイトルの下に「非公式」の注記を追加し、説明文の「（モニターディスタンス方式）」を削除。計算は変更なし</td></tr>
       <tr><td>11月10日</td><td>10章-12「端末による視野角の違い」を追加。Mk14のスコープ別スクショをLegionとGalaxy S25で比べ、横の視野角は端末によらず同じ（S25は上下が切れる形）、各スコープの視野角は両端末とも計算に使っている値と0.07°以内で一致。3章・12章に追記。計算は変更なし</td></tr>
     </tbody></table></div>
@@ -1412,7 +1425,9 @@ $("imgfile").addEventListener("change",async ev=>{
   const f=ev.target.files&&ev.target.files[0]; ev.target.value=""; if(!f) return;
   try{
     const d=readEmbedded(await f.arrayBuffer());
-    if(!d&&typeof SV!=="undefined"){ const t=await SV.readQR(f); const o=t&&SV.unpack(t); if(o&&o.groups.length){ SV_API.load(o); if(o.name) $("savename").value=o.name; setMode("sv"); msg(`画像「${f.name}」のQRコードから感度を読み込みました。`); window.scrollTo({top:0,behavior:"smooth"}); return; } }
+    const LSM=["calc","dev","acc"].includes(MODE)&&typeof lsLoad==="function";
+    if(!d&&typeof SV!=="undefined"){ const t=await SV.readQR(f); const o=t&&SV.unpack(t); if(o&&o.groups.length&&LSM){ lsLoad(o,o.name||""); msg(`画像「${f.name}」のQRコードから感度を読み込みました。上の「読み込んだ感度」で基本感度・武器を切り替えられます。`); window.scrollTo({top:0,behavior:"smooth"}); return; } if(o&&o.groups.length){ SV_API.load(o); if(o.name) $("savename").value=o.name; setMode("sv"); msg(`画像「${f.name}」のQRコードから感度を読み込みました。`); window.scrollTo({top:0,behavior:"smooth"}); return; } }
+    if(d&&d.mode==="sv"&&d.sv&&LSM){ lsLoad(d.sv,d.name||""); msg(`画像「${d.name||f.name}」の感度を読み込みました。上の「読み込んだ感度」で基本感度・武器を切り替えられます。`); window.scrollTo({top:0,behavior:"smooth"}); return; }
     if(d&&d.mode==="sv"&&d.sv){ if(window.SV_API) SV_API.load(d.sv); if(d.name) $("savename").value=d.name; setMode("sv"); msg(`画像「${d.name||f.name}」の感度を読み込みました。`); window.scrollTo({top:0,behavior:"smooth"}); return; }
     if(d&&d.mode==="bag"&&d.bag){ if(window.BAG_API) BAG_API.load(d.bag); if(d.name) $("savename").value=d.name; setMode("bag"); msg(`画像「${d.name||f.name}」のバッグの中身を反映しました。`); window.scrollTo({top:0,behavior:"smooth"}); return; }
     if(!d||!d.inputs){msg("この画像には入力データが入っていません。計算機の「画像で保存」で作った画像を選んでください（SNSやLINEで送り直した画像はデータが消えることがあります）。");return}
@@ -1430,11 +1445,12 @@ $("imgbtn").addEventListener("click",()=>{
   if(MODE==="sv"){ const s=window.SV_API?SV_API.snapshot():{groups:[]}; if(!s.groups.length){msg("先にスクショを読み込んでください。");return} saveImage({...base,name:$("savename").value.trim()||"感度設定",mode:"sv",sv:s}); return; }
   if(MODE==="cmp") saveImage({...base,mode:"cmp",calc:calcVals(),game:gameVals()});
   else if(MODE==="dev"||MODE==="acc"){
-    const pre=MODE; const rows=readTable(pre+"out"); const wrows=readTable(pre+"wout");
+    const pre=MODE; const rows=readTable(pre+"out"); const wrows=typeof lsCur==="function"&&lsCur()?[]:readTable(pre+"wout");
     const opt=id=>$(id).selectedOptions[0].textContent;
     const lines=[$(pre+"res").textContent];
     const kv=pre==="dev"?[["今の端末",opt("devfrom")+($("devfrom").value==="custom"?" "+$("ppifrom").value+"ppi":"")],["換算先",opt("devto")+($("devto").value==="custom"?" "+$("ppito").value+"ppi":"")]]
       :[["向き",opt("accdir")],["端末",opt("accdev")+($("accdev").value==="custom"?" "+$("accppi").value+"ppi":"")],["指の速さ",$("accmode").value==="fixed"?$("accspd").value+" cm/秒":$("accmode").value==="my"&&myHist()?`自分で測った速さ（${myHist().n}回・${myHist().sec.toFixed(0)}秒）`:opt("accmode")]];
+    if(typeof lsCur==="function"&&lsCur())kv.push(["使った感度",lsLabel()]);
     const one=$(pre+"one").value?`1つの値：${$(pre+"one").value} ${$(pre+"oneout").textContent}`:"";
     saveImage({...base,name:$("savename").value.trim()||(pre==="dev"?"端末換算":"加速換算"),mode:pre,rows,wrows,lines,kv,one,settings:readSet(pre)});
   }
@@ -2209,9 +2225,10 @@ function renderDev(){
   if(!a||!b){$("devres").textContent="ppiを入力してください。";$("devout").innerHTML="";$("devoneout").textContent="";return}
   const f=a/b;
   $("devres").innerHTML=`換算倍率 <b>×${f.toFixed(3)}</b>（${a}ppi → ${b}ppi）　${f<1?"換算先の方が画面が細かいので、感度を下げます。":f>1?"換算先の方が画面が粗いので、感度を上げます。":"同じppiなので換算は不要です。"}`;
-  const rows=readTable("out");
-  window.DEV_F=f; $("devwout").innerHTML=convRows(readTable("out2"),f);
-  $("devout").innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td class="c">${(+r[1]).toFixed(2)}</td><td class="c"><b>${(r[1]*f).toFixed(2)}</b></td><td class="a">${(+r[2]).toFixed(2)}</td><td class="a"><b>${(r[2]*f).toFixed(2)}</b></td></tr>`).join("");
+  const L=typeof lsRows==="function"?lsRows():null,rows=L||readTable("out");
+  window.DEV_F=f; $("devwout").innerHTML=L?"":convRows(readTable("out2"),f);{const t=$("devwout").closest(".tbl");t.hidden=!!L;t.previousElementSibling.hidden=!!L}
+  const n2=v=>v==null||v===""?"—":(+v).toFixed(2),c2=v=>v==null||v===""?"—":(v*f).toFixed(2);
+  $("devout").innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td class="c">${n2(r[1])}</td><td class="c"><b>${c2(r[1])}</b></td><td class="a">${n2(r[2])}</td><td class="a"><b>${c2(r[2])}</b></td></tr>`).join("");
   const v=+$("devone").value; $("devoneout").textContent=v?`→ ${(v*f).toFixed(1)}（整数なら ${Math.round(v*f)}）`:"";
 }
 ["devfrom","devto","ppifrom","ppito","devone"].forEach(id=>$(id).addEventListener("input",renderDev));
@@ -2471,12 +2488,57 @@ function renderAcc(){
   const f=dir==="on2off"?m:1/m;
   $("accres").innerHTML=`加速ONは${mode==="fixed"?"この速さで":mode==="my"?"測った速さの平均で":"普段の速さの平均で"} OFFの <b>${m.toFixed(2)}倍</b> 回ります → 換算倍率 <b>×${f.toFixed(2)}</b>`+(mode==="fixed"?`（端末上で約${Math.round(+$("accspd").value*pxPerCm)}px/秒）`:"");
   renderSpdRes();
-  const rows=readTable("out");
-  window.ACC_F=f; $("accwout").innerHTML=convRows(readTable("out2"),f);
-  $("accout").innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td class="c">${(+r[1]).toFixed(2)}</td><td class="c"><b>${(r[1]*f).toFixed(2)}</b></td><td class="a">${(+r[2]).toFixed(2)}</td><td class="a"><b>${(r[2]*f).toFixed(2)}</b></td></tr>`).join("");
+  const L=typeof lsRows==="function"?lsRows():null,rows=L||readTable("out");
+  window.ACC_F=f; $("accwout").innerHTML=L?"":convRows(readTable("out2"),f);{const t=$("accwout").closest(".tbl");t.hidden=!!L;t.previousElementSibling.hidden=!!L}
+  const n2=v=>v==null||v===""?"—":(+v).toFixed(2),c2=v=>v==null||v===""?"—":(v*f).toFixed(2);
+  $("accout").innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td class="c">${n2(r[1])}</td><td class="c"><b>${c2(r[1])}</b></td><td class="a">${n2(r[2])}</td><td class="a"><b>${c2(r[2])}</b></td></tr>`).join("");
   const v=+$("accone").value; $("acconeout").textContent=v?`→ ${(v*f).toFixed(1)}（整数なら ${Math.round(v*f)}）`:"";
 }
 ["accdir","accdev","accppi","accmode","accspd","accone"].forEach(id=>$(id).addEventListener("input",renderAcc));
+
+/* ---- 感度保存の画像（埋め込み・QR）を感度計算・端末換算・加速換算で使う ----
+   読み込むと基本感度を選んだ状態にし、「使う感度」で武器を切り替える。選んだ感度は
+   ・感度計算：基礎スコープの行の値を「基礎スコープ感度」（カメラ列→カメラ・スコープ、ジャイロ通常時→ジャイロ）に、全部の値を「感度比較」の表に入れる
+   ・端末換算・加速換算：計算結果の代わりに、この感度（カメラ・射撃時）を換算する */
+const LSK="pubg-sens-loaded";var LSRC=null;/* var：前に書いた換算の表が先に呼ぶため */
+try{const o=JSON.parse(localStorage.getItem(LSK)||"null");if(o&&Array.isArray(o.groups)&&o.groups.length)LSRC=o}catch(e){}
+const LS_ROWS=["TPPスコープなし","FPPスコープなし","レッドドット等","2倍スコープ","3倍スコープ","4倍スコープ","6倍スコープ","8倍スコープ"];
+function lsSave(){try{if(LSRC)localStorage.setItem(LSK,JSON.stringify(LSRC));else localStorage.removeItem(LSK)}catch(e){}}
+function lsCur(){return LSRC&&LSRC.groups[LSRC.i]||null}
+function lsLabel(){const g=lsCur();return g?(g.kind==="basic"?"基本感度":(g.name||"（武器名なし）"))+(LSRC.name?`（${LSRC.name}）`:""):""}
+function lsRows(){const g=lsCur();if(!g)return null;return LS_ROWS.map((n,i)=>[n,g.M[i][0],g.M[i][1]]).filter(r=>r[1]!=null||r[2]!=null)}
+function lsOpts(){const G=LSRC.groups,op=(i,t)=>`<option value="${i}"${i===LSRC.i?" selected":""}>${esc(t)}</option>`;let h="";
+ G.forEach((g,i)=>{if(g.kind==="basic")h+=op(i,"基本感度")});
+ const cats=typeof SV!=="undefined"?[...SV.CATS,""]:[""];
+ for(const c of cats){const L=G.map((g,i)=>[g,i]).filter(([g])=>g.kind!=="basic"&&(c===""?!cats.includes(g.cat)||!g.cat:g.cat===c));if(!L.length)continue;
+  const ord=n=>{const a=typeof SV!=="undefined"&&SV.NAMES[c]||[];const k=a.indexOf(n);return k<0?999:k};L.sort((a,b)=>ord(a[0].name)-ord(b[0].name));
+  h+=`<optgroup label="${esc(c||"武器種なし")}">${L.map(([g,i])=>op(i,g.name||"（武器名なし）")).join("")}</optgroup>`}
+ return h}
+function lsRender(){const b=$("lsbox");if(!LSRC){b.hidden=true;b.innerHTML="";return}b.hidden=false;
+ const g=lsCur(),bk=sel.value==="IR"?"1x":sel.value,ri=SS_KEYS.indexOf(bk),miss=g&&ri>=0&&g.M[ri][0]==null;
+ b.innerHTML=`<div class="lsrow"><b>読み込んだ感度${LSRC.name?"「"+esc(LSRC.name)+"」":""}</b></div>
+  <div class="lsrow" style="margin-top:4px"><label for="lssel">使う感度</label><select id="lssel">${lsOpts()}</select><button class="btn ghost" id="lsoff" type="button">使わない</button></div>
+  <p>感度計算：基礎スコープの行の値を「基礎スコープ感度」に、全部の値を「感度比較」の表に入れます。端末換算・加速換算：計算結果の代わりにこの感度（カメラ・射撃時）を換算します。${miss?`<br><b style="color:var(--warn)">この感度には基礎スコープ（${esc(sel.options[sel.selectedIndex].textContent)}）の値がないので、基礎スコープ感度は変えていません。</b>`:""}</p>`;
+ $("lssel").addEventListener("change",e=>{LSRC.i=+e.target.value;lsSave();lsApply()});
+ $("lsoff").addEventListener("click",()=>{LSRC=null;lsSave();lsRender();renderDev();renderAcc()})}
+function lsApply(){const g=lsCur();if(!g)return;const bk=sel.value==="IR"?"1x":sel.value,ri=SS_KEYS.indexOf(bk);
+ if(ri>=0){const a=g.M[ri][0],c=g.M[ri][2];if(a!=null)$("sens").value=a;if(c!=null)$("gsens").value=c}
+ g.M.forEach((r,i)=>r.forEach((v,j)=>{const e=$(`cmp_${i}_${j}`);if(e)e.value=v==null?"":v}));saveCmp();
+ calc();renderCompare();renderDev();renderAcc();lsRender()}
+function lsLoad(sv,name){const G=(sv.groups||[]).filter(g=>g&&Array.isArray(g.M)).map(g=>({kind:g.kind==="basic"?"basic":"wpn",name:typeof SV!=="undefined"?SV.fix(String(g.name||"")):String(g.name||""),cat:String(g.cat||""),
+  M:[0,1,2,3,4,5,6,7].map(i=>[0,1,2,3].map(j=>{const v=g.M[i]&&g.M[i][j];return v==null||v===""||!isFinite(v)?null:+v}))}));
+ if(!G.length)return;G.forEach(g=>{if(g.kind!=="basic"&&typeof SV!=="undefined"){const c=SV.QCAT(g.name);if(c)g.cat=c}});
+ const bi=G.findIndex(g=>g.kind==="basic"),o=sv.opt||{};LSRC={name:String(name||""),groups:G,i:bi<0?0:bi,opt:{tpp:o.tpp??null,fpp:o.fpp??null,acc:o.acc||""}};
+ lsSave();lsOpt();lsApply()}
+/* 画像にTPP視野角・FPP視野角・水平スライド加速があれば入力にも入れる（ページを開き直したときも） */
+function lsOpt(){const o=LSRC&&LSRC.opt||{},setv=(id,v)=>{const e=$(id);if(e){e.value=v;e.dispatchEvent(new Event("input",{bubbles:true}))}};
+ if(o.tpp>=80&&o.tpp<=90)setv("tpp",o.tpp);if(o.fpp>=80&&o.fpp<=103)setv("fpp",o.fpp);if(o.acc==="ON"||o.acc==="OFF")setv("accel",o.acc)}
+sel.addEventListener("change",()=>{if(LSRC)lsApply()});
+/* 感度保存タブの今の感度を、感度計算・端末換算・加速換算に送る（画像から読み込んだのと同じ扱い） */
+document.querySelectorAll(".svuse").forEach(b=>b.addEventListener("click",()=>{const s=window.SV_API?SV_API.snapshot():{groups:[]};
+ if(!s.groups.length){msg("先にスクショか画像を読み込んでください。");return}
+ lsLoad(s,$("savename").value.trim());setMode(b.dataset.to);msg(`感度保存の感度を${b.textContent}に入れました。入力の上の「使う感度」で基本感度・武器を切り替えられます。`);window.scrollTo({top:0,behavior:"smooth"})}));
+if(LSRC){lsOpt();lsApply()}else{lsRender();renderDev();renderAcc()}
 document.querySelectorAll(".grid input,.grid select").forEach(e=>e.addEventListener("input",()=>setTimeout(renderAcc)));
 renderAcc();
 
