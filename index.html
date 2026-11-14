@@ -143,6 +143,7 @@ body[data-mode="sv"] .grid{display:none} body[data-mode="sv"] .m-sv{display:bloc
 .svhead .svdel{margin-left:auto;padding:4px 10px;font-size:.8rem}
 .svhead select.svslot{font-weight:700;color:var(--accent);border-color:var(--accent);font-size:.95rem}.svview{margin:2px 0 10px;gap:14px;align-items:center}.svview{display:flex;flex-wrap:wrap}.svview label{display:inline-flex!important;align-items:center;gap:5px;width:auto!important;margin:0!important;font-size:.9rem;white-space:nowrap;cursor:pointer}.svview input{width:auto!important;margin:0!important}
 .svcrop{height:26px;max-width:40vw;border-radius:3px;background:#222}
+.svxt{margin-top:6px}.svxt td:first-child{white-space:normal}
 .svtbl input{width:62px}.svtbl td,.svtbl th{text-align:center}.svtbl td:first-child{text-align:left;white-space:nowrap}
 .svtbl td.svwarn{background:color-mix(in srgb,var(--warn) 18%,transparent)}.svtbl td.svbad{background:color-mix(in srgb,var(--bad) 18%,transparent)}
 .svw{color:var(--warn);font-weight:700;margin:0 0 6px}
@@ -276,7 +277,7 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
       <div class="f"><label for="ka">感度調整（スコープ＝射撃中） <output id="kao"></output></label>
         <input type="range" id="ka" min="0.5" max="1.5" step="0.01" value="1.00">
         <small>下げると高倍率が速くなる（倍フルの縦ブレを抑えやすい）</small></div>
-      <p class="note" style="grid-column:1/-1;margin:4px 0">武器別のレッドドット・アイアンサイトなどの視野角は、武器ごとの実測値（10章-10）を使います。基礎感度はAR・DMRのレッドドット（55.3°）の値で入力してください。</p>
+      <p class="note" style="grid-column:1/-1;margin:4px 0">武器別のレッドドット・アイアンサイトなどの視野角は、武器ごとの実測値（10章-10）を使います。基礎感度はAR・DMRのレッドドット（55.3°）の値で入力してください（基礎スコープで「アイアンサイト」を選んだときは、AR・DMRなどのアイアンサイト（70.4°）の値）。</p>
       <label class="check"><input type="checkbox" id="gfix" checked><span>ジャイロを実測値で補正（TPP・FPP ×0.43、エクスプローシブボウ ×0.41。スコープ・アイアンはレッドドットと同じ）</span></label>
       </div></details>
     </div>
@@ -293,7 +294,7 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
       <thead><tr><th>視野角・武器</th><th>カメラ</th><th>スコープ</th><th>ジャイロ<br>カメラ</th><th>ジャイロ<br>スコープ</th></tr></thead>
       <tbody id="out2"></tbody>
     </table></div>
-    <p class="note" style="margin:6px 0 0">同じ視野角なら感度の値も同じなので、視野角ごとに1行にまとめています（レッドドット55.3°の行は上の表の1xと同じ値）。TPP・FPPスコープなしと2倍以上のスコープは、どの武器も上の表と同じ値を使います。</p>
+    <p class="note" style="margin:6px 0 0">同じ視野角なら感度の値も同じなので、視野角ごとに1行にまとめています（レッドドット55.3°の行は上の表の1x、アイアン70.4°の行は上の表のアイアンと同じ値）。TPP・FPPスコープなしと2倍以上のスコープは、どの武器も上の表と同じ値を使います。</p>
     </details>
     <details class="adv" id="out3box" style="margin-top:12px"><summary>可変倍率スコープ（途中の倍率）</summary>
     <div class="tbl"><table>
@@ -302,6 +303,7 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
     </table></div>
     <p class="note" style="margin:6px 0 0">ゲームに入れる値は上の表の3倍・4倍・6倍・8倍だけです。6倍スコープは3倍〜6倍、8倍スコープは4倍〜8倍の枠を使い、途中の倍率では両端の値の間を視野角に合わせて直線的に変わります（10章-11）。「ゲーム」はそのとき実際にかかる感度、「計算値」はその視野角に合う感度です。8倍スコープを一番下げたときは4倍の枠を使いますが、視野角は4倍スコープより約5%広くなります。ジャイロの途中の倍率は測っていないので出していません。</p>
     </details>
+    <p class="note" style="margin:6px 0 0">アイアン（AR・DMR）の行は、AR・DMRなどのアイアンサイト（70.4°）に合う値です。ゲームではアイアンサイトもレッドドット（1x）の感度の枠を使うので、武器ごとの詳細感度で1xの欄に入れる値の目安にしてください。ほかの武器のアイアンサイトは下の「武器別」の表にあります。感度比較（ゲームの設定との比較）には入れていません。</p>
     <div class="detail" id="detail"></div>
   </section>
 </div>
@@ -364,7 +366,7 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
     <input type="number" id="devone" min="1" max="400" step="1" value="15" style="flex:0 0 90px">
     <span id="devoneout" style="font-family:var(--f-mono);font-weight:700"></span>
   </div>
-  <p class="note" style="margin:8px 0 0">・換算するのは指で操作する感度（カメラ・スコープ）だけです。ジャイロ感度は端末の傾きで動くため、画面のppiでは変わりません。<br>・水平スライド加速の境目も「px/秒」で決まっているため、ppiの高い端末ほど同じ指の速さで加速が強めにかかります。<br>・上の表は計算機の出力（AR・DMR）を換算したものです。数値の根拠はLegion Tab Y700 Gen3とGalaxy S25での実測で、iPhone・iPadでも同じ仕組みかは未検証です。</p>
+  <p class="note" style="margin:8px 0 0">・換算するのは指で操作する感度（カメラ・スコープ）だけです。ジャイロ感度は端末の傾きで動くため、画面のppiでは変わりません。<br>・水平スライド加速の境目も「px/秒」で決まっているため、ppiの高い端末ほど同じ指の速さで加速が強めにかかります。<br>・上の表は計算機の出力（AR・DMR。アイアンの行はAR・DMRなどのアイアンサイト70.4°）を換算したものです。数値の根拠はLegion Tab Y700 Gen3とGalaxy S25での実測で、iPhone・iPadでも同じ仕組みかは未検証です。</p>
 </section>
 
 <section class="panel ms m-acc" aria-label="水平スライド加速の換算">
@@ -527,7 +529,7 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
 
 <section class="panel ms m-sv" aria-label="感度保存">
   <h2>感度保存</h2>
-  <p class="note" style="margin:0 0 10px">ゲームの感度設定画面のスクショをまとめて選ぶと、「基本設定」の画面は基本感度に、「詳細設定」の画面は武器ごとに分けて値を読み取り、1枚の画像にまとめます。武器ごとのスクショは、武器名のタブが写る一番上から下へスクロールして撮り、ファイル名の順（撮った順）に並ぶようにしてください。画像はこの端末のブラウザ内だけで読み取り、どこにも送信しません。</p>
+  <p class="note" style="margin:0 0 10px">ゲームの感度設定画面のスクショをまとめて選ぶと、「基本設定」の画面は基本感度に、「詳細設定」の画面は武器ごとに分けて値を読み取り、1枚の画像にまとめます。武器ごとのスクショは、武器名のタブが写る一番上から下へスクロールして撮り、ファイル名の順（撮った順）に並ぶようにしてください。一度に選べない枚数のときは、何回かに分けて選べます（前に読み込んだスクショに足して、ファイル名の順につなげます）。最初からやり直すときは「消す」を押してください。画像はこの端末のブラウザ内だけで読み取り、どこにも送信しません。</p>
   <div class="saverow">
     <button class="btn" id="svbtn" type="button">スクショを選ぶ（まとめて）</button>
     <button class="btn ghost" id="svqrbtn" type="button">QRコードだけ保存</button>
@@ -1081,6 +1083,7 @@ OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
       <tr><td>11月10日</td><td>感度比較に「スクショから読み込む」を追加。ゲームの感度設定画面（基本設定・武器ごとの詳細設定）のスクショから項目名と%の値を読み取り、確認表で直してから比較表に入れる。列は見出し（カメラ感度／射撃時のカメラ感度／ジャイロセンサ感度(通常時)／(射撃時)）から決め、見出しのない画像は前の画像から引き継ぐ（前の画像と同じ行で始まれば重なりとして続き、項目の並びがTPPに戻れば次の見出しへ進む。つまみの範囲とも照合）。全画像をまとめた一覧で空き・食い違いを表示。画像はブラウザ内だけで処理（%の数字・項目名・見出しはLegionのスクショから作った見本と照合、6と8は形で見分け、つまみ位置との食い違いを警告）。計算は変更なし。</td></tr>
       <tr><td>11月10日</td><td>「感度比較」タブをなくし、感度計算の中（出力の下）に折りたたみで入れた（初期は閉じる）。比較の画像保存は折りたたみの中のボタンから。計算は変更なし。</td></tr>
       <tr><td>11月10日</td><td>「感度保存」タブを追加。ゲームの感度設定画面のスクショをまとめて選ぶと、基本設定の画面は基本感度、詳細設定の画面は武器ごと（武器名のタブで区切り、スクロールした続きはファイル名の順でつなぐ）に分けて読み取り、1枚の画像にまとめる（基本感度と違う値は赤字）。読み取りは感度比較のスクショ読み込みと同じ方法。武器種はタブの位置、武器名は見本と照合（ARの一部のみ。読めないときはダメージ計算の武器一覧から武器種で絞った候補を選ぶか入力し、端末に覚える）。保存する画像には右上の隅にQRコード、基本感度の右にTPP視野角・FPP視野角・水平スライド加速（感度保存タブで入力、感度計算の設定から入れるボタンあり）とメモ（保存前に入力した文字）を入れる。QRコードは（「QRコードだけ保存」でQRコードだけの画像も作れる（データ量に合わせて大きさが変わり、画像に印刷の解像度を記録。100%で印刷するとQRコード本体が最小15mm角、1マス0.4mm以上）。QRコードの中身は設定をビットに詰めて数字だけにしたもの（URLの後ろに数字が続く形。前の形式のQRコードも読める）で、文字のままより約半分の面積になる。中身はサイトのURL＋基本感度と、武器ごとに基本感度と違う値だけ。読み込むと省いた値は基本感度で埋める）。スマホのカメラで読むとサイトが開いて感度保存に入り、「画像から読み込む」でもQRコードを読む（LINEなどで送ってPNGのデータが消えた画像・JPEGでも可）。QRコードを作る・読む処理もサイト内に自前で書いた（外部ライブラリなし）。計算は変更なし。</td></tr>
+      <tr><td>11月14日</td><td>感度計算の出力と端末換算・加速換算の表に「アイアン（AR・DMR）」（アイアンサイト70.4°）の行を追加。基礎スコープにアイアンサイトも選べるように。ゲームではアイアンサイトもレッドドットの感度の枠を使うので、感度比較には入れていません。ほかの値の計算は変更なし</td></tr>
       <tr><td>11月10日</td><td>10章-12「端末による視野角の違い」を追加。Mk14のスコープ別スクショをLegionとGalaxy S25で比べ、横の視野角は端末によらず同じ（S25は上下が切れる形）、各スコープの視野角は両端末とも計算に使っている値と0.07°以内で一致。3章・12章に追記。計算は変更なし</td></tr>
     </tbody></table></div>
   </details>
@@ -1110,10 +1113,12 @@ const WEP=[
 const HIPK=1.0062; // 11/4：レッドドット55.3°（方位帯で直接測定）を基準に、10章-8の拡大率から
 const SCOPES=[["1x","レッドドット・ホロ・キャンテッド（1x）",55.3],["2x","2倍",44.7],["3x","3倍",26.8],["4x","4倍",20.2],["6x","6倍",13.5],["8x","8倍",11.2]];
 const SCF={}; SCOPES.forEach(([k,,f])=>SCF[k]=f);
+// アイアンサイト（AR・DMRなど 70.4°、10章-10）。ゲームではレッドドット（1x）の感度の枠を使う。ジャイロはレッドドットと同じ（GYRO_REL.IR=1）
+const IRF=70.4, IRNAME="アイアンサイト（AR・DMRなど 70.4°）";
 const VZ8MIN=21.06/19.96; // 8倍スコープを一番下げたときの視野角 ÷ 4倍スコープ（可変倍率スコープ検証1）
 const $=id=>document.getElementById(id);
 const sel=$("base");
-[["TPP","TPPスコープなし"],["FPP","FPPスコープなし"],...SCOPES].forEach(([k,n])=>{const o=document.createElement("option");o.value=k;o.textContent=n;sel.appendChild(o)});
+[["TPP","TPPスコープなし"],["FPP","FPPスコープなし"],SCOPES[0],["IR",IRNAME],...SCOPES.slice(1)].forEach(([k,n])=>{const o=document.createElement("option");o.value=k;o.textContent=n;sel.appendChild(o)});
 sel.value="1x";
 // 指の速さの測定：視点の選択肢を武器別の視野角から作る
 (()=>{ const m=new Map(); WEP.forEach(w=>{ if(w[3]===55.3) return; const k=w[3]; if(!m.has(k)) m.set(k,[]); m.get(k).push(w[0]==="武器専用"?w[2]:`${w[2]}：${w[1]}`); });
@@ -1128,7 +1133,7 @@ function calc(){
   const th=f=>Math.atan(md*Math.tan(rad(f/2)));
   // スコープなしの視野角：設定値Fに対し、実際の横幅は tan(半角)=HIPK·tan(F/2)（視野角検証3）
   const thh=f=>Math.atan(md*HIPK*Math.tan(rad(f/2)));
-  const R={FPP:thh(fpp),TPP:thh(tpp)}; SCOPES.forEach(([k,,f])=>R[k]=th(f));
+  const R={FPP:thh(fpp),TPP:thh(tpp),IR:th(IRF)}; SCOPES.forEach(([k,,f])=>R[k]=th(f));
   WEP.forEach((w,i)=>{ R["w"+i]=th(w[3]); GYRO_REL["w"+i]=w[5]||(w[4]?GYRO_REL[w[4]]:1); });
   const tc=thh(tpp), ch=tc+Math.asin(Math.min(1,2.35*Math.sin(tc)/D)), m=ch/tc;
   // TPPディスタンス：TPPはそのまま、FPPを 1/m 倍してTPPに合わせる（11/9変更）。基礎がFPPのときは入力値からその倍率を外して基準に戻す。
@@ -1136,9 +1141,10 @@ function calc(){
   const bm=base==="FPP"?1/m:1, gf=x=>gfix?1/(GYRO_REL[x]||1):1;
   const v=(s,k,b,ns,isG)=>(b/bm/(isG?gf(base):1))*Math.pow(R[s]/R[base],k)*(isG?gf(s):1);
   const rows=[["TPP No","TPP",true,1],["FPP No","FPP",true,1/m],...SCOPES.map(([k])=>[k==="1x"?"1x（AR・DMR）":k,k,false,1])];
+  rows.splice(3,0,["アイアン（AR・DMR）","IR",false,1]);
   const cell=(s)=>`<td class="c">${v(s,kc,S,false,false).toFixed(2)}</td><td class="a">${v(s,ka,S,false,false).toFixed(2)}</td><td class="g">${v(s,kc,G,false,true).toFixed(2)}</td><td class="g">${v(s,ka,G,false,true).toFixed(2)}</td>`;
   let lastT=""; $("out2").innerHTML=WEP.map((w,i)=>{ const t=w[0]!==lastT; lastT=w[0]; return `<tr class="${t?"wtop":""}"><td><b class="wh">${w[2]} ${w[3]}°</b><span class="wsp">｜</span><small>${w[1]}</small></td>${cell("w"+i)}</tr>`; }).join("");
-  $("out").innerHTML=rows.map(([lab,s,ns,mul])=>`<tr class="${s===base?"base":""}"><td>${lab}</td>
+  $("out").innerHTML=rows.map(([lab,s,ns,mul])=>`<tr class="${[s===base?"base":"",s==="IR"?"ir":""].join(" ").trim()}"><td>${lab}</td>
     <td class="c">${(v(s,kc,S,false,false)*mul).toFixed(2)}</td><td class="a">${(v(s,ka,S,false,false)*mul).toFixed(2)}</td>
     <td class="g">${(v(s,kc,G,ns,true)*mul).toFixed(2)}</td><td class="g">${(v(s,ka,G,ns,true)*mul).toFixed(2)}</td></tr>`).join("");
   // 可変倍率スコープ：両端の枠の値を視野角で直線的に内挿（可変倍率スコープ検証1・11/6）
@@ -1165,7 +1171,7 @@ calc();
 
 /* ---- 画像保存まわりの共通処理 ---- */
 const IN_IDS=["base","sens","gsens","md","dist","fpp","tpp","kc","ka","gfix","accel"];
-const BASE_NAMES={TPP:"TPPスコープなし",FPP:"FPPスコープなし"}; SCOPES.forEach(([k,n])=>BASE_NAMES[k]=n);
+const BASE_NAMES={TPP:"TPPスコープなし",FPP:"FPPスコープなし",IR:IRNAME}; SCOPES.forEach(([k,n])=>BASE_NAMES[k]=n);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function readInputs(){const o={};IN_IDS.forEach(id=>{const e=$(id);o[id]=e.type==="checkbox"?e.checked:e.value});return o}
 function readTable(id){return [...$(id).querySelectorAll("tr")].map(tr=>[...tr.children].map(td=>td.textContent))}
@@ -1194,7 +1200,8 @@ function drawHead(g,r,W,P,title){
   const lx=[P,P+330,P+610], vx=[P+140,P+460,P+710];
   infoRows(i).forEach(row=>{ y+=19; row.forEach((c,j)=>{ if(!c) return;
     g.font=`400 11.5px ${IMGF}`; g.fillStyle=IC.mu; g.fillText(c[0],lx[j],y);
-    g.font=`600 12px ${/^[\d.%°m—ONF]+$/.test(String(c[1]))?IMGM:IMGF}`; g.fillStyle=IC.fg; g.fillText(String(c[1]),vx[j],y); }); });
+    const ff=/^[\d.%°m—ONF]+$/.test(String(c[1]))?IMGM:IMGF, mw=(j<2?lx[j+1]:W-P)-vx[j]-8; let z=12; g.font=`600 ${z}px ${ff}`; while(z>8&&g.measureText(String(c[1])).width>mw){ z-=0.5; g.font=`600 ${z}px ${ff}`; }
+    g.fillStyle=IC.fg; g.fillText(String(c[1]),vx[j],y); }); });
   return y;
 }
 function newCanvas(W,H){const sc=2,cv=document.createElement("canvas");cv.width=W*sc;cv.height=H*sc;const g=cv.getContext("2d");g.scale(sc,sc);g.fillStyle=IC.bg;g.fillRect(0,0,W,H);return [cv,g]}
@@ -1445,7 +1452,7 @@ const CK="pubg-sens-compare";
 $("cmpbody").innerHTML=CR.map((r,i)=>`<tr><td>${r}</td>${CC.map((c,j)=>`<td><input type="number" inputmode="decimal" min="0" max="400" step="1" id="cmp_${i}_${j}" aria-label="${r} ${c}"></td>`).join("")}</tr>`).join("");
 try{const v=JSON.parse(localStorage.getItem(CK)||"null"); if(v) v.forEach((row,i)=>row.forEach((x,j)=>{if(x!==""&&x!=null)$(`cmp_${i}_${j}`).value=x}))}catch(e){}
 const gameVals=()=>CR.map((_,i)=>CC.map((_,j)=>{const t=$(`cmp_${i}_${j}`).value;return t===""?null:+t}));
-const calcVals=()=>readTable("out").map(r=>r.slice(1).map(Number));
+const calcVals=()=>[...$("out").querySelectorAll("tr:not(.ir)")].map(tr=>[...tr.children].slice(1).map(td=>+td.textContent));
 function saveCmp(){try{localStorage.setItem(CK,JSON.stringify(gameVals().map(r=>r.map(x=>x==null?"":x))))}catch(e){}}
 const tip=document.createElement("div"); tip.className="tip"; tip.hidden=true; document.body.appendChild(tip);
 function renderCompare(){
@@ -1562,7 +1569,8 @@ SS.hscale=(v,s,w)=>{const a=new Float32Array(SS.HH*w);for(let y=0;y<SS.HH;y++)fo
 SS.headClass=function(v){const H=SS.HT;let gy=-1,cam=-1;// 文字の高さの測り誤差で横の倍率がずれるので、倍率を少し振って一番合うものを使う
  for(const s of [0.94,0.96,0.98,1,1.02,1.04,1.06]){gy=Math.max(gy,SS.ncc(SS.hscale(v,s,H.gyro.w),H.gyro.v));cam=Math.max(cam,SS.ncc(SS.hscale(v,s,H.cam.w),H.cam.v))}
  let sh=-1;for(const T of H.shoot){for(let x=0;x+T.w<=SS.HW;x++){const s=SS.ncc(SS.hwin(v,x,T.w),T.v);if(s>sh)sh=s}}
- const shoot=sh>=0.62;const col=gy>=0.7?(shoot?3:2):cam>=0.8?0:shoot?1:-1;return {col,gy,cam,sh}};
+ let fr=-1;if(H.free)for(const s of [0.94,0.96,0.98,1,1.02,1.04,1.06])fr=Math.max(fr,SS.ncc(SS.hscale(v,s,SS.HW),H.free));
+ const shoot=sh>=0.62;const col=fr>=0.8&&fr>cam?4:gy>=0.7?(shoot?3:2):cam>=0.8?0:shoot?1:-1;return {col,gy,cam,sh,fr}};
 // 6と8の見分け：上半分の右側に縦線があれば8（左側の縦線との明るさの比）
 SS.r68=function(g,W,x0,x1,y0,y1){const w=x1-x0+1,h=y1-y0+1;const m=(a,b,c,d)=>{let s=0,n=0;for(let y=Math.round(y0+c*h);y<=Math.round(y0+d*h);y++)for(let x=Math.round(x0+a*w);x<=Math.round(x0+b*w);x++){s+=g[y*W+x];n++}return s/n};
  const bg=Math.min(m(0.35,0.65,0.22,0.38),m(0.75,1,0.22,0.38),m(0,0.25,0.22,0.38));return (m(0.75,1,0.22,0.38)-bg)/(m(0,0.25,0.22,0.38)-bg+1e-6)};
@@ -1581,15 +1589,18 @@ const SS_KEYS=["TPP","FPP","1x","2x","3x","4x","6x","8x"];
 SS.read=function(img){// img: HTMLImageElement/ImageBitmap → {rows,gyroHint,canvas}
  let W=img.width,H=img.height;const k=W>3200?3200/W:1;W=Math.round(W*k);H=Math.round(H*k);
  const cv=document.createElement("canvas");cv.width=W;cv.height=H;const cx=cv.getContext("2d",{willReadFrequently:true});cx.drawImage(img,0,0,W,H);
- const d=cx.getImageData(0,0,W,H).data,g=SS.gray(d,W,H);const rows=SS.layout(g,W,H);
+ const d=cx.getImageData(0,0,W,H).data,g=SS.gray(d,W,H);let rows=SS.layout(g,W,H);
  const heads=SS.headings(d,g,W,H).map(h=>({y:h.y,...SS.headClass(h.v)})).filter(h=>h.col>=0);
- rows.forEach(r=>{const a=heads.filter(h=>h.y<r.y).pop();r.hcol=a?a.col:null});
+ rows.forEach(r=>{const a=heads.filter(h=>h.y<r.y).pop();if(a&&a.col===4){r.xhead=true;r.hcol=null}else r.hcol=a?a.col:null});
  // 項目名：見本と照合。弱いときは並び順で補う
  rows.forEach(r=>{const m=r.label?SS.matchLabel(r.label.v):[];r.sc={};m.forEach(x=>r.sc[x.key]=x.score);
   // 「6x」「8x」は先頭の数字の右上に縦線があるか（8）で見分ける
   if(r.label&&Math.max(r.sc["6x"]||0,r.sc["8x"]||0)>=0.8){const is8=r.label.r68>0.5;r.sc[is8?"8x":"6x"]+=0.3}
   {let b=null;for(const k in r.sc)if(!b||r.sc[k]>r.sc[b])b=k;r.top=b&&r.sc[b]>=0.7?b:null}
   r.val=+r.dig.map(d=>d.ch).join("");r.dscore=Math.min(...r.dig.map(d=>d.score));r.dmargin=Math.min(...r.dig.map(d=>d.margin))});
+ // フリールック・パラシュートの行（XT/XP/XF）は先に分けておく
+ rows.forEach(r=>{const L=r.label,ra=L?(L.xr-L.x0)/(L.y1-L.y0+1):0,s=r.sc;if(!(r.xhead||ra>9.5)||(s["1x"]||0)>=0.8)return;r.xkey=(s.XP||0)>=0.75&&(s.XP||0)>Math.max(s.TPP||0,s.FPP||0)?"XP":(s.TPP||0)>=(s.FPP||0)?"XT":"XF"});
+ const ALL=rows;rows=rows.filter(r=>!r.xkey);
  // 画面の並びは TPP→FPP→1x→…→8x なので、上から順に増える組み合わせで一番合うものを選ぶ
  const n=rows.length,K=SS_KEYS.length,S=(i,k)=>Math.max(0,rows[i].sc[SS_KEYS[k]]||0);
  if(n&&n<=K){const dp=[...Array(n+1)].map(()=>Array(K+1).fill(-1e9));for(let k=0;k<=K;k++)dp[0][k]=0;
@@ -1598,8 +1609,9 @@ SS.read=function(img){// img: HTMLImageElement/ImageBitmap → {rows,gyroHint,ca
   rows.forEach(r=>{r.byOrder=r.key!==r.top})}
  else rows.forEach(r=>{r.key=r.top;r.byOrder=false});
  // つまみ位置から範囲（0〜300%か0〜400%か）を推定
- const q=rows.filter(r=>r.knob&&r.val>=20&&r.knob.frac>0.03).map(r=>(r.val-6)/r.knob.frac).sort((a,b)=>a-b);
+ const q=ALL.filter(r=>r.knob&&r.val>=20&&r.knob.frac>0.03).map(r=>(r.val-6)/r.knob.frac).sort((a,b)=>a-b);
  const gyroHint=q.length?q[q.length>>1]>350:null;
+ rows=ALL;rows.forEach(r=>{if(r.xkey){r.key=r.xkey;r.byOrder=false}});
  return {rows,gyroHint,heads,canvas:cv}};
 SS.knobEst=(frac,gyro)=>gyro?426*frac-5:300*frac+6;
 (()=>{
@@ -1863,13 +1875,13 @@ SV.QURL=SV.URL+"#q";
 SV.QCAT=n=>{for(const c in SV.NAMES)if(SV.NAMES[c].includes(n))return c;return null};
 SV.qrSegs=function(S,title){const bits=[];const put=(x,l,a)=>{a=a||bits;for(let i=l-1;i>=0;i--)a.push((x/2**i|0)&1)};const E=new TextEncoder();
  const B=S.groups.find(g=>g.kind==="basic"),o=S.opt||{};const val=v=>Math.max(0,Math.min(511,Math.round(v)));
- put(4,4);let tb=E.encode(title||"");if(tb.length>63){let t=[...(title||"")];while(E.encode(t.join("")).length>63)t.pop();tb=E.encode(t.join(""))}put(tb.length,6);tb.forEach(b=>put(b,8));
+ put(5,4);let tb=E.encode(title||"");if(tb.length>63){let t=[...(title||"")];while(E.encode(t.join("")).length>63)t.pop();tb=E.encode(t.join(""))}put(tb.length,6);tb.forEach(b=>put(b,8));
  put(o.tpp>=80&&o.tpp<=90?o.tpp-79:0,4);put(o.fpp>=80&&o.fpp<=103?o.fpp-79:0,5);put(o.acc==="ON"?1:o.acc==="OFF"?2:0,2);
  const cells=g=>g.M.flat().map(v=>v==null?null:val(v));const mask=c=>c.map(v=>v!=null);
  const putMask=(m,rm,a)=>{if(rm){if(m.every((x,i)=>x===rm[i])){put(0,1,a);return}put(1,1,a)}
   const rows=[...Array(8)].map((_,r)=>m.slice(r*4,r*4+4).some(x=>x)),cols=[0,1,2,3].map(c=>rows.some((x,r)=>m[r*4+c]));
   if(m.every((x,i)=>x===(rows[i>>2]&&cols[i&3]))){put(1,1,a);rows.forEach(x=>put(x?1:0,1,a));cols.forEach(x=>put(x?1:0,1,a))}else{put(0,1,a);m.forEach(x=>put(x?1:0,1,a))}};
- const BC=B?cells(B):null;put(B?1:0,1);if(B){putMask(mask(BC),null);BC.forEach(v=>{if(v!=null)put(v,9)})}
+ const BC=B?cells(B):null;put(B?1:0,1);if(B){putMask(mask(BC),null);BC.forEach(v=>{if(v!=null)put(v,9)});const X=SV_XN(B);X.forEach(v=>put(v!=null?1:0,1));X.forEach(v=>{if(v!=null)put(val(v),9)})}
  let Ws=S.groups.filter(g=>g.kind==="wpn").slice(0,63);put(Ws.length,6);
  const idx=w=>SV.QN.indexOf(w.name),known=Ws.filter(w=>idx(w)>=0&&idx(w)<64);const dup=new Set(known.map(idx)).size<known.length;
  const useSet=!dup&&known.length*7>64;put(useSet?1:0,1);
@@ -1887,10 +1899,10 @@ SV.qrSegs=function(S,title){const bits=[];const put=(x,l,a)=>{a=a||bits;for(let 
   best.forEach(b=>bits.push(b));done.push(C)});
  while(bits.length%13)bits.push(0);let dg="";for(let i=0;i<bits.length;i+=13){let x=0;for(let j=0;j<13;j++)x=x*2+bits[i+j];dg+=String(x).padStart(4,"0")}
  return [{m:"b",d:E.encode(SV.QURL)},{m:"n",d:dg}]};
-SV.unpack4=function(get,rd){const name=rd(get(6));const t=get(4),f=get(5),a=get(2);const opt={tpp:t?t+79:null,fpp:f?f+79:null,acc:a===1?"ON":a===2?"OFF":""};
+SV.unpack4=function(get,rd,ver){const name=rd(get(6));const t=get(4),f=get(5),a=get(2);const opt={tpp:t?t+79:null,fpp:f?f+79:null,acc:a===1?"ON":a===2?"OFF":""};
  const getMask=rm=>{if(rm&&!get(1))return rm.slice();if(get(1)){const rows=[...Array(8)].map(()=>get(1)),cols=[0,1,2,3].map(()=>get(1));return [...Array(32)].map((_,i)=>!!(rows[i>>2]&&cols[i&3]))}return [...Array(32)].map(()=>!!get(1))};
  const toM=C=>SV_ROWS.map((_,r)=>SV_COLS.map((_,c)=>C[r*4+c]));const groups=[];let BC=null;
- if(get(1)){const m=getMask(null);BC=m.map(x=>x?get(9):null);groups.push({kind:"basic",name:"",cat:"",M:toM(BC)})}
+ if(get(1)){const m=getMask(null);BC=m.map(x=>x?get(9):null);const X=[null,null,null];if(ver>=5){const xm=[get(1),get(1),get(1)];xm.forEach((x,k)=>{if(x)X[k]=get(9)})}groups.push({kind:"basic",name:"",cat:"",M:toM(BC),X})}
  const n=get(6),useSet=get(1);const names=[];
  if(useSet){const m=[...Array(64)].map(()=>get(1));m.forEach((x,i)=>{if(x)names.push(SV.QN[i]||"")});const k=n-names.length;for(let i=0;i<k;i++)names.push(rd(get(5)))}
  else for(let i=0;i<n;i++){const ni=get(7);names.push(ni<127?(SV.QN[ni]||""):rd(get(5)))}
@@ -1903,7 +1915,7 @@ SV.unpack4=function(get,rd){const name=rd(get(6));const t=get(4),f=get(5),a=get(
  return {name,groups,opt}};
 SV.unpack3=function(dg){if(!/^\d+$/.test(dg)||dg.length%4)return null;const bits=[];for(let i=0;i<dg.length;i+=4){const x=+dg.slice(i,i+4);if(x>8191)return null;for(let j=12;j>=0;j--)bits.push((x>>j)&1)}
  let p=0;const get=l=>{let x=0;for(let i=0;i<l;i++)x=x*2+(bits[p++]||0);return x};const D=new TextDecoder(),rd=n=>D.decode(Uint8Array.from({length:n},()=>get(8)));
- const ver=get(4);if(ver===4){const o=SV.unpack4(get,rd);return o&&p<=bits.length?o:null}if(ver!==3)return null;const name=rd(get(6));const t=get(4),f=get(5),a=get(2);const opt={tpp:t?t+79:null,fpp:f?f+79:null,acc:a===1?"ON":a===2?"OFF":""};
+ const ver=get(4);if(ver===4||ver===5){const o=SV.unpack4(get,rd,ver);return o&&p<=bits.length?o:null}if(ver!==3)return null;const name=rd(get(6));const t=get(4),f=get(5),a=get(2);const opt={tpp:t?t+79:null,fpp:f?f+79:null,acc:a===1?"ON":a===2?"OFF":""};
  const groups=[];let B=null,bm=0;const fill=(m,fn)=>SV_ROWS.map((_,r)=>SV_COLS.map((_,c)=>{const k=r*4+c;return Math.floor(m/2**k)%2?fn(k,r,c):null}));
  if(get(1)){bm=get(32);B={kind:"basic",name:"",cat:"",M:fill(bm,()=>get(9))};groups.push(B)}
  const n=get(6);for(let i=0;i<n;i++){const ni=get(7);const wn=ni<127?(SV.QN[ni]||""):rd(get(5));const ci=get(4);const m=get(1)?bm:get(32);const dn=get(6),dv={};for(let j=0;j<dn;j++){const c=get(5);dv[c]=get(9)}
@@ -1923,11 +1935,14 @@ SV.readQR=async function(file){const u=URL.createObjectURL(file);try{const im=ne
   let r=null;if(im.height>im.width*1.3)r=tryR(Math.round(im.width*1.15));if(!r)r=tryR(im.height);
   return r?new TextDecoder().decode(r):null}catch(e){return null}finally{URL.revokeObjectURL(u)}};
 // 列（カメラ／射撃時／ジャイロ通常時／射撃時）の決め方は感度比較のスクショ読み取りと同じ
+/* フリールック・パラシュートの見本（見出しと「降下カメラ」の項目名）。Legionの基本設定スクショ（2026-11-13）から */
+{const dec=b=>Float32Array.from(atob(b),c=>c.charCodeAt(0));SS.HT.free=dec("QkFBQUFBQD8/QEFBQUFAPz8/QEBAQD8/Pz8/Pz8/Pz8/Pz9AQEBAPz8/P0FEREJAQUFBQUFBQUFBQUFBQT8/P0BBQUFBQUFBQUFBQUFCRENCQD4/QUJCQUFBQUFBQUA/Pz9AQUFBQT8/Pz9AQUFBQ3HD4r9yQUFBQUFBQD8/Pz9BQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQD8/P0BBQUFBQUFBQUFBQUFBQUFBQD9BQkA/QEFBPz9BQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFDREJAQEFBQUFBQUFBQUFBQUFCQkJBQUFBQUFBQmO24s+NQkFBQUFBQUFBQUFBQUBAQkJCQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFCQkJCQkJCQUFBQUFBQUFCREJBQUFCQkJCQkJCQkFBQUFCQkJCQkFBQUFBQD8/QEFBQUFAPz8/QEBBQUA/Pz8/Pz8/Pz8/Pz9AQUFBQD8/P0BDQ0JAQUFBQUFBQUFBQUFBQT8/P0BBQUFBQUFBQUFBQUFCRENCQD4+QEFCQkJCQUFBQUA/Pz9AQUFBQT8/Pz9AQUFBUaHv9bVcQUFBQD8/Pz8/Pz9BQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQD8/P0BBQUFBQUFBQUFBQUFBQUFBQD9BQkA/QEFBPz9BQkFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFDREJAQEFBQUFBQUFBQUFBQUFCQkJBQUFBQUFBQVWc+/bDUkFBQUFBQUFBQUFBQUBAQkJCQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFCQkJCQUFBQUJDQ0NDQkJBQUFBQUFCQkJCQkFBQUFCQkJCQkFBQUFBQD8/QEFBQUFAPz8/QEFBQUBAPz8/Pz8/Pz8/Pz9AQUFBQT8/P0BBQkE/QUFBQUFBQUFBQUFBQT8/P0BBQUFBQUFBQUFBQUFCREZEQD4+P0BBQkJCQUFBQUA/Pz9AQUFBQT8/Pz9AQUFBc8z+5YtJQUFBPz8/Pz8/Pz9BQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQD8/P0BBQUFBQUFBQUFBQUFBQUFBQD9BQkA/QEFBPz9AQ0JBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFDREJAQEFBQUFBQUFBQUFBQUFCQkJBQUFBQUFBQUVq7fvsbUJBQUFBQUFBQUFBQUBAQkJCQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFCQkJCQUFBQkNERERCQEFBQUFBQUFCQkJCQkFBQUFCQkJCQUBAQEBFVldQQUBAQEBAPz8/QEBAQEA/Pz8/QEA/Pz8/QUhJQkBAQEBAQEBBQUFAQUFBQUBAQEBBQUFBQT9AQEBBQUFBQEBAQEFBYbDDjLLFflNBP0BBQUFBQUFBQUFAl7WKQ0BAQD8/QEBBQUFFtvP9vWFCQUFBQEBAQEBAQEBBQUFBQUFBQUFBQUFBQEFKVlRKQUFBQUFBTFRVSUJAQEFBQEBAQEFBQUFBQUFBQUFBQUFBQUFBQD9AQEBAQUFBQEBAQkFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQkE/QEBAQEFBQUFBQEBDVlpRRUJBQUFBQUFBQUFPt/T+pVtBQUFBQUFBQUFBQUBAQkJCQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQkNDQ0NCQEBBQUFBQUFBQUFBQUFBQUFBQUFBPz8/Pz9asbiUST8/Pz8/Pz8/Pz8/Pz8/Pz8/QUA/Pz8/S3iHZ1FAQEBBQUFBQUxbXl1dXVxcXFxdXl5VQUBAQUFBSVldXFxcXF1df9LmuNv00o1dQ0FBQUZWXV1dXV1dvt6uX1xcXFxcWk5DQkNa1v36klFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQEZzr6NtQkFBQUFBe6erbEc/P0BBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQD8/P0BHXFxUQ0VSXVlOQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQD8/Pz8/P0BBQUFBPz9Pp7idX0dBQUFBQUFBQUFGj+b/03dDQUFBQUFBQUFBQUFBQkJCQkFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFCQkFBQUFBQUFBQUJCQkJBQUFBQUJCQkFBQUFBQUFBQUFBQUFBPz8/Pz9l4u63TT8/Pz8/Pz8/Pz8/Pz8/Pz8/QUFAPz8/WbXjyYFDQEFBQUFBQW6pt7W0tLS0tLS0t7ORQUJCQUFCYaG0tLS0tLS0xOv00uD59cykS0NBQVWWtLS0tLS04/LbtbS0tLS0qXVJQkV07P7zaUZBQUJLVVZWVlZWVlZWVlZWVlNMQkFBQUFBQEmP7tuFQ0FBQUFBmuHohks/P0BBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQD8/P0BbsK+OS1CFs6FyQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAPz8/Pz8/Pz9BQUFBP0Fl4vTphE9BQUFBQUFBQUFCcdD/85VKQUFBQUFBQUFBQUFBQkJCQkFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUJCQkJBQUFBQUFBQUFCQkJBQUFBQkJCQkJBQUFBQUFBQUFBQUFCPz8/Pz9j4/O3TT8/Pz8/Pz8/Pz8/Pz8/Pz8/QUFAPz8/d9z/6Y1BQEFBQUFAQIXi//////////////O8QkRDQkFCdd/55eLi4uLi5fL76ePi4uLIT0NBQmLN+urj4uLi4uLi4uLi4uLi0opMQk2U/fnbUUFBQUmDy8/Pz8/Pz8/Pz8/Pz8eqZ0tBQUFBQEqU+OOHQ0FBQUFBmujyiUs/P0BBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQD8/Pz9n8fW6Tlin/NuJQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAPz8/Pz8/Pz9BQUFBQVqk//vffmppaWllTEJBQUFCWbT/+7dcQUFBQUFBQUFBQUFBQkJCQkFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUJCQkJBQUFBQUFBQUFCQkJBQUFBQkJCQkJBQUFBQUFBQUFBQUFCaHBwcHCL6vbKenBwcHBnSUA/Pz8/Pz8/RWJtSEJAPz9Apez+yGtCQEFBQUA/P2+uw8PDw8LCwsLCw7uVQkJCQUFCdd/mo7C2tra1tNHzqJe8vJ99RkJBQmLN6KaHhaDDsJGFhJCwxJ+EfmBGQlyr//PATUFBQUuW8fX19fX19fX19fX19/bwnltBQUFBQEqU+OOHQ0FBQUFBmOfyiUs/P0BBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQD8/Pz9l7fS0TFai/NeDQUFBQUFBQUFBQUFBQUFBQUFBQkFBQUFAPz8/Pz8/Pz9BQUFBTYzd//3tzcjIyMjDnW5JQUFCS6L8/ctoQUFBQUFBQUFBQUFBQkJCQkFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUJCQkJBQUFBQUFBQUFCQkJBQUFBQkJCQkJBQUFBQUFBQUFBQUFCssnJycnT+PzrzcnJyci9glM/Pz8/Pz8/YKnDeFFAP0FI0fr4oVNDQkFBQUA/P01gZ2dnZ2ZlZWVmZ2VZQUBAQUFCdt/Yh7fKysnJucTygnfJyYBIQUFBQmLN23NEQX/RpVxAP12l1X4/QUFBQmq+/+6oSUFBQUmEy8/Pz8/Pz8/Pz8/U9P3/oVhBQUFBQEqU+OOHQ0FBQUFBmOfyiUs/P0BBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQD8/Pz9l7fSyS1ah/NaCQUFBQUFBQUFBQUFBQUFBQUJFVEhBQUFAPz8/Pz8/P0BBQUFCcMX6////////////9KdVQUFCQpL0/ttyQUFBQUFBQUFBQUFBQkJCQkFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUJCQkJBQUFBQUFBQUFCQkJBQUFBQ0NDQkJBQUFBQUFBQUFBQUFB3Pv7+/v8///8+/v7+/3/03Q/Pz8/QEBCr+3+67d0Q0yF8f7jX0ZCQUFBQUBKbG9vcHBxcXBwcHBwcG9mR0JAQUFCeODWh8LX19fXv7Xnrrz32XJCQUFBQWLN3peUmL7w1qmYl6nV8r2XjWJFQXbQ/+qWRkFBQUJLVVZWVlZWVlZWVlZv6/v2d0NBQUFAP0qU+OOGQkFBQUFBmOfyiUs/P0BBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQD8/Pz9n7/SwSlah/NaCQUFBQUFBQUFBQUFCSEpFQ3q8yHhFQUFYhGdKQEBBQUFAQUdi0vf7za+rqqqqxPL/85hIQUFBQobk/+V/Q0FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFCQkFBQUFBQUFBQUFCQkFBQUFBQkJCQkFBQUFBQUFBQUFBQUFBo7WzsbLJ/vbMsbCwu+H/0XM/Pz9AQUBBgb3n/e/JfXa8+/K6RkBAQEFBQUBexcvMzc3Nzc3Nzc3NzczFkl1BQUFDf+HTe7LFxcXFsJ7L4Oj9rFpAQUFAQGHN4LDQ2ef68N/Z2N/w+ufYx3tHP3vY/+iORUFBQUFBQUFBQUFBQUFBQUZw+PziYj8/Pz8/P0qU+OOFQT9AQUBAmefxiEo/Pz8/Q0pMTExMTExLSkpKS0xMTExKREA/Pz8/P0Bo8fSuSVWg/NaCQEBBQUFBQD8/P0Vgmp1wQYvm86FRQUJw1sGQSUFCQkJASW+w9/fXe2JeXFxhpu3/zHRBQUFBQYDd/+eHREFBQUFBQD8/Pz8/P0BBQUFBQUFBP0BBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBVlpZWV2S/uaNV1dXbb//zXA/Pz9AQUBAR2ig8Pz72s3q/tt/Pz8/QEFBQUBp8vv8+/v7/Pz8/Pz8/f/+0XZBQUFDieLMhdDo5ubozpap/fz0dk9HQUFAQGHN36e7w9n36dHIx9Hp+NnDs3NGP37c/+eGREFBQUFBQUFBQUFBQUFBQVCO//zKUT8/Pz8/P0qU+OOFQT9AQUBAm+jwhEo/Pz8/TXB9fn5+fn18fHx8fH1+fn15W0M/Pz8/P0Bp8/StSVWg/NaCQD9BQUFBQD8/P02G6OemQHbR+sViQUiF/vKvTEJCQkJDbrfy/dyQR0NBPj5MvPP+nlRBQUFBQXvW/+iNRUFBQUFBPz8/Pz8/Pz9BQUFBQUFBP0BBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBP0BAQFeg/85rPz8/Wrj/yW4/Pz9AQUBAP0FJfMPy//3+76BQPz8/QEBAQEBYqaqmpaWmpqampqam3fn8t1xBQUFFn962i+DlrrPe34qI/fKvVoGoXkVAQGLN2nZPTY7l27WmprXb6Y1MSkRAP3/d/+aDQ0FBQUFBQEBAQEFBQUFBQ2vJ/++lQT8/Pz8/P0qU+OOFQT9AQUBAo+vufEg/Pz8/Zszx8/Pz8/Pz8/Pz8/Pz8/Prk0w/Pz8/P0Bu+vSnRlWg/NaCQD9BQUFBQUBAQEVh6PzZWVWk++SOQ2Kx/+KBQkBBQVKH5Pn7zYJLQkJBPkRp8P3pbkNBQUFBQXnT/+iNRUFBQUFBPz8/Pz8/Pz9BQUFBQUFBP0BBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFAQEBBQUFBQUFBQUFBQUFBQUFBQUFBQUFBPz8/P2vD/7tdPz8/XLn/xmw/Pz9AQUBAPz9AS3W7/f//7ZxTPz8/Pz8/Pz9FV1ZVVVVXV1dXV1lh1vryjE5BQUBHvNmai97VfoXK35+r/vClV5nckE1AQGTO2XBDQYTd7+Xi4uXv4YM/Pz8/P3vY/+eHREFBQUFBPz8/QEBBQUFBUJbo/893Pz8/Pz8/P0qU+OOGQT9AQUBAsO/rc0c/Pz8/adb+///////////////////3mU0/Pz8/P0N1/vOgQ1Wg/NaCQD9BSldIQUFBQUFLxfXuf1F+18aIRXzY/8dmQD8/P1ub7/HPelJCQkJBP1ij+/nKVEJBQUFBQXzX/+eIREFBQUFBPz8/Pz8/Pz9BQUFBQUFBP0BBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUA/P0BAQUFBQUFBQUFBQUFBQUFBQUFBQUFBPz8/Qobn/KdOPz8/Xbv/w2s/Pz9AQUA/Pz8/P1if/P//+tCERkA/Pz8/Pz8/Pz8/Pz9BQUFBQUlw6f3iYUZBQUJS2tB5i+Dlr7Pf5svk//fQeLLokU1AQGfQ2G5DQXCuwcHBwcHBsW8/Pz8/P3bR/+mPRUFBQUFBPz8/QEBBQUFBccr6+KlPPz8/QEA/P0qS9eGGQT9AQUFCxfbnZUU/Pz8/Z83y9PT09PT09PT09PT09PTslEw/Pz8/P0qF//CYQVWg/NaCQEBBcZVnQUFBQUBDl+f2llFZi3RQTZ72/alQPz8/P0VhvLp7SEJBQUJBRX/a/+OZQ0FBQUFBQYHf/+WAQ0FBQUFBPz8/Pz8/Pz9BQUFBQUFAP0BBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUBAQEBAQUFBQUFBQUFBQUFBQUFBQUFBQUFBPz8/WbX8231APz8/YcD/vWc/Pz9AQUA/Pz9AWanw//Xx/f3skVY/Pz8/Pz8/Pz8/Pz8/QUFBQW/J/e2qQUFCQlCN7LFTgtHr6+747vP0zeP+4e/lZkY/QW/V1XNjZWRjY2NjY2NjY1tJPz8/P2m//+2hSEFBQUFAPz8/P0BBQUZhzvf+y24/P0BAQUFAP0Rol45iQD9AQUZf5f3cSUE/Pz8/T3mIiIiIiIiIiIiIiIiJiYiFYUQ/Pz8/P1yp/+CHQVWg/NaCQUht2O7BSkJBQUA/W5aWYkhBQEBCeNT+2HtAPz8/Pz8/SkdBQEBBQUFBf9H78qZSQUFBQUFBQY3w/txyQUFBQUFAPz8/Pz8/Pz9BQUFBQUBAP0BBQUFBQUFBQUFBQUFBQkFBQUFBQUFBQUFBQUFBQEBBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQ0NCPz9Ehdv8q1w/Pz8/aMj/s2E/Pz8/QD8/P0RXqOL98Lub3/j83ZVWQD8/Pz8/Pz8/Pz8/QEBDabHv98ZwQEJCQk+Ev4ZQYIykqs3y3s+7c5bQ49OnSUE/Qnfa0Iuzv7+/v76+vr6+v7aYTD8/P1us//G2S0FAQEA/Pz8/Pz9AR26v9P3tjVA/P0BBQUFBQEBFSklDPz9AQlmc9fO7QT8/Pz8/QUZIR0dHR0dHR0dHR0dISEdHQ0A/Pz8/QXPQ/85zQVWg/NaDUH3A9vG+SUFAQD8/RlFMREFAQENWuPD5nlc/Pz8/Pz8/QEA/P0BAQElqyvP7xnJEQUBAQEBARJr6/cxoQEBAQEA/Pz8/Pz8/Pz9BQUFBQEA/P0BBQUFBQEBAQEBAQEBBQkFAQEFBQUFBQUFBQEBAQEBBQUFBQUFBQUFBQUFBQUFBQUFBQUBAQkJCP0FUxvXzfkU/Pz8/cNL/p1o/Pz8/Pz8/Ql6b8P38vG5JmN38/tyURz8/Pz8/Pz8/Pz8/P0Rduuz/4YxKQEJCQkVSdoOJWHKmlbXt6sOKRXC5uoVZPz8/Q4LgyJjh8vX8+PPy8vL1//fLUz8/P0yV/ffQT0A/Pz8/Pz8/Pz9Dd7rx//K9UkI/P0BBQUFBQEBBQUA/Pz9ASobc/uGJPz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/TJbv/7ZZQVWg/NeQkc74+tCAPz8/Pz8/Pz9AQUBAQFSP8P3jZ0I/Pz8/Pz8/Pz8/Pz8/RHC5+P3rgU1BQT8/Pz8/UKv/+7lcPz8/Pz8/Pz8/Pz8/Pz9BQUFBQD8/P0BBQUFBQD8/Pz8/Pz9BQkFAQEFBQUFBQUFBPz8/QEBBQUFBQUFBQUFBQUFBQUFBQUFBQUA/QEBCQ2Ou+vK6TEFERENEjOj/k08/Pz8/P0NMjc31/vC/WEI/SXzN/vbATz8/Pz8/Pz8/QERLaKHZ+vnlfExAQEBBQUA/X7/vq6rprHOE479sT5vs3IlMPz8/RZjqsWVjbbD04ZtxdZ3Y/dh/Qj8/P0J17v7wY0Q/Pz8/P0JHU3iv6vr/6KZdPz8/P0BBQUFBQEBBQUBARUxituf97KJTPz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz9Cf9b944hCQVag/Pbn8/z4tW1FPz8/Pz8/Pz9AQUFFaq/r/NaLQz8/Pz8/Pz8/Pz8/QEZYo9z6+teLR0JBQT8/Pz8/a8v/9ZdJP0BAQEBAPz8/P0BAQEBBQUFBQEBAQEBAQEBAPz8/Pz8/Pz9BQkFAQEFBQUFAQEBAPz8/P0BAQEBAQUFBQUFBQUFBQUFBQUFBQUA+Pj5Aaarn+MV1QE1yfHR5wfX6fUU/Pz8/SWyd3Pf+57FvQj8/QE+B3caCRT8/P0BBPz9AXHiYyef89NKVTUA/Pz8/Pz9Aedr6o5/pqV1OiX1ggJrT9cZ0Pz8/S6rynVM/Q3bE7MKPoszt4JtUPz8/P0Bb2P35ik8/Pz8/Q16FstLu//jnm2NEPz8/P0BBQUFBQEBBQURSfqDD8Pz1s2lDPz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/P0dhxfP7tGJAQVaj/P///Oi9aUg/Pz8/Pz8/Pz9ASFt6wur725RUPz8/Pz8/Pz8/P0JKX4Oy6Pr6z45VQUFBQT8/Pz9CiOP/13pBP0BBQUFAPz8/QEBBQUFBQUFBQUFBQUBAPz8/Pz8/Pz8/Pz9BQkFAQEFBQUFAPz8/Pz8/Pz8/P0BAQUFBQUFBQUFBQUFBQUFBQUBAPz5Auuv72YdIP1uy4Nze9PzsakA/Pz8/ZLDr/fzupGREPz8/P0BMiHpKPz8/P0FDQEBEodXr/fz1xYNPQD8/Pz8/P0BGp+zvf5HnrmBETE1mz7el8O6xQ0A/X8H3iE5BRVaG6vbo8Pv4pmRHQT8/Pz9FuvX9t11APz8/SYrS9v3+9tWaU0I/Pz8/P0BBQUFBQEBBQUx72O77/e/IZkY/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/QFyl9f3oe0lAQVio/P/85ahmQz8/Pz8/Pz8/P0JNcqjZ+fvrlFhAPz8/Pz8/Pz8/Qlh9ut71/vTZe09BQUFBQUA/Pz9LrvL+ql0/P0BBQUFBPz8/QEFBQUFBQUFBQUFBQUBAPz8/Pz8/Pz8/Pz9BQkFAQEFBQUFAPz8/Pz8/Pz8/Pz9AQUFBQUFBQUFBQUFBQUFBQUJCQD9AvN7Nakg/P1S3+Pn59uWvTT8/Pz8/R4HP6MKERkA/Pz8/Pz8/QkE/QEBBQUJDQD8/a7/y48ORT0I/Pz8/Pz8/P0dt7PfLUYDZ26mQi4yp9rdgxvbobEY/muPvbm5/l7HP9/z4/v/72rebfmBFQUFBedD+4YRHQUFBQVid8OfRkV1EQUFBQUFBQEBAQEBAPz8/QEFPsOPpwopTQT8/Pz8/Pz8/QEBBQUA/Pz8/Pz8/QEBBQUFBQUFBQVqW39qcQz8/QE6E4+G8Z0lAPz8/Pz8/P0BAQFST8fv/7cKARUFAPz8/P0BBQUFBUZ7n/f7305pdQUBAQUFBQUFBQUNk5/vucUNBQUFBQUFBQUFBQUFCQkFBQUFBQUFBQUBAPz8/Pz8/Pz8/Pz9BQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFCQkFBQEBCQkJCQkFBZYF1SUJAP0p/p6mppIxkQj8/Pz4+QVN7kW5QQD8/Pz4+Pj4/Pz8/QEFBQUFAPz8/SnWfhmZPQT8/Pz8/Pz8/P0hw1s2JRGSs7O3q6enu55VMjtTLa0U/mdrOaKfg6+7r07upvtjv+PLs0INJQUFBU6bx9LBYQUFBQUZcnY1uT0RAQUFBQUFBQUBAPz8/Pz8/P0BDZpCRY09EQD8/Pz8/Pz8/QEFBQUA/Pz8/Pz8/QEFBQUFBQUFBQUZUhYVaPz8/P0JRioVjR0FAPz8/Pz8/P0BBQUVmzefWnG5OQUFAPz8/QEFBQUFBRWil49GudFVEPz9AQUFBQUFCQlOU+/jHVUJCQUFBQUFBQUFBQUJCQkJBQUFBQUFBQUBAPz8/Pz8/Pz8/Pz9BQUFBQUFBQUFCQkJCQUFBQUFCQkFBQUFBQUFBQUJDQ0JBQEBCQ0FBQkJCQENDQUFBP0BCQ0RFRENAPz8/Pz4+QEJGR0VDPz8/Pz4+Pj4/Pz8/QEFBQUA/Pz8/P0FFQkA/Pz8/Pz8/Pz8/P0BJi4NPQUhqscPIycnHoGRCW498Qz8/ZpyVVZHZ1siyfllIW4Ssy9bhuWVCQUFBRHfJ58BuQUFBQUFCRkNBPz9AQUFBQUFBQUBAPz8/Pz8/P0BBQkVFQkFBQD8/Pz8/Pz8/QEFBQUA/Pz8/Pz8/QEFBQUFBQUFBQUFBRENAPz8/Pz8/Q0NCQUFAPz8/Pz8/P0BCQUBDgJ+BTENBQUFAPz8/QEFBQUFBQUVXmHpQQT8/Pz9AQUFBQUFCQmK159WTQ0JCQUFBQUFBQUFBQkNDQkJBQUFBQUFBQUBAPz8/Pz8/Pz8/Pz9BQUFBQUFBQUJDQkJCQUFBQUFCQkFBQUFBQUFBQUJDQ0JBQEBCREE/QEBB");SS_HEADN[4]="カメラ感度(フリールック)";SS.LT.push({key:"XP",v:dec("MzMzMzMzMzMzMzM0NDQ0NDMzMzMzMzQ0NDQ0NDQ0NDQ0NDMzMzMzMzMzMzMzMzMzMzM0NDQ2PEA7NzQzMzM0NDQ0NDQ0NDQ0NDQ0MzMzMzM0NDQ0NDQ0MzM0NDQ0O1NjVEQ4MzMzMzQ0NDQ0NDQ0NDQ0NDQzMzMzYWFhYWFfWEo0NDQ0OE2Dp4tkPzMzMzMzMzMzMzQ0NDQ0NDQ0NDMzM6+vr6+vq55/PjQ0NUZzu+nHk2BPT09OSjs2NDM0NjpCSkpKSklJSUno5+fm5+bgxVg2NTlhp+P+5MSon5+dmYpTPjUzNDpKaIiIiIiIiIiI//jr5Ov5/+ViOD5alNb3//Lp4+Li4NzOb0Q3MzM+W5LMzMzMzMzMzP/pwrHI7v/aVkNflc3v/fjo5efw9/j27HdDNjMzP2Gi5OTk5OTk5OT/0H5upeP2w3el1vT///3ggn2k2vv888RJMzMzMzhGY4CAgICAgICA/9CCgbzn46+i2O/x6ur264aAs+X88NOVOjMzMzM0Nz1ERERERERERP/QhpXU6cuOkM3k0bO03PbCwN/29tSXXTQzMzMzMzM0NDQ0NDQ0NDT/0o6p6OuybGGNo45vd7Dm8vL7/N2gYDszMzMzMzQ0NDQ0NDQ0NDQ0/9abufTqnlQ9TVtWUmqh2fz8/vrRkGRNPDc0MzQ0NDQ0NDQ0NDQ0NP/bp8P155dNOT9LWnafzu77+vz868moiVpKPjc0NDQ0NDQ0NDQ0NDT/2Z606OeraV93iqC82/T82tTl9v725MyllXlQODU0NDQ0NDQ0NDQ0/9KJj8nm0ZeNv9vq7+/p2aSmyOfy7u/w7NinYjo1NDQ0NDQ0NDQ0NP/QeE5+1fzLf7HW1sCnjG9+rtLavZ6hscWcXz40NDQ0NDQ0NDQzMzP/0HZDbsr50mmNxMWtnpaRr9Tt6sejmqCwh004NDQ0NDQ0NDQ0MzMz/9B1QGbA89drjtTo4NvZ2eXy+/nr3dna259TODQ0NDQ0NDQ0NDMzM//QdUBlvvLYbpLd/f///vz8/v///fv7+/KuWDk0NDQ0NDQ0NDQzMzP/04FUesv312R5tuH2+OvX2Ov49uHLxcW/jU44NDQ0NDQ0NDQ0MzMz/9ybg6jh+9JQS22u5OvIk5XJ7OSudGNkYlE9NTQ0NDQ0NDQ0NDMzM//kuLjZ8/nEPzRKldzlt3J1uebclUo0NDQ0NDQ0NDQ0NDQ0NDQzMzP/5r/N7OvYokNCV53f57x8fr7n351WQkNCQT43NDQ0NDQ0NDQ0MzMz/9aMdn5zW1ynusPc9Pfn0dHo9/Tcw7y8u7GOVDQ0NDQ0NDQ0NDMzM//QeEc+OzhZ2PP2+fz9+/j4/P7++vb19fPmtGE0NDQ0NDQ0NDQzMzP/0HVANTMzVMnh4+Pj4+Pj7Pb8+/Hm4+Pi1qhcNDQ0NDQ0NDQ0MzMz/9B1QDUzM0N7h4iIiIiIiK7W8OvBlYiIiIJsRzQ0NDM0NDQ0MzMzM//QdUA0MzM0Ojw8PDw8PDx6vOfdmVE8PDw8OTY0NDMzNDQ0MzMzMzP/0HU/NDIyMjIzMzMzMzMzdLnm3JVJMzMzMzMzMzMzMzMzMzMzMzMz/9B1PzQyMjIyMzMzMzMzM3S55tyVSTMzMzMzMzMzMzMzMzMzMzMzM8+rZTwzMjIyMjMzMzMzMzNkmby0fkMzMzMzMzMzMzMzMzMzMzMzMzM=")});}
 SS.assign=function(RES){
   const KI=r=>SS_KEYS.indexOf(r.key);let cur=null,prev=null;
   for(const R of RES){const rs=R.rows;let k=0;
    if(prev)for(let n=Math.min(prev.length,rs.length);n>0;n--){let ok=true;for(let j=0;j<n;j++){const a=prev[prev.length-n+j],b=rs[j];if(a.key!==b.key||a.val!==b.val){ok=false;break}}if(ok){k=n;break}}
    rs.forEach((r,j)=>{
+    if(r.xkey){r.col=null;r.colSrc=null;return}
     if(r.hcol!=null){cur=r.hcol;r.colSrc="head"}
     else if(cur==null){cur=R.gyroHint?2:0;r.colSrc="knob"}
     else{const p=j>0?rs[j-1]:(k>0?null:prev&&prev[prev.length-1]);
@@ -1942,6 +1957,7 @@ SV.warn=function(R,r){const why=[],gyro=r.col>=2;
  if(R.gyroHint!=null&&R.gyroHint!==gyro&&r.colSrc!=="knob")why.push("見出しとつまみの範囲が合わない");
  if(r.knob){const e=SS.knobEst(r.knob.frac,gyro);if(Math.abs(e-r.val)>Math.max(15,0.15*e))why.push(`つまみ位置では約${Math.round(e)}%`)}
  if(r.val>(gyro?400:300))why.push("範囲外の値");return why};
+const SV_XROWS=["TPPカメラ（フリールック）","降下カメラ（パラシュート）","FPPカメラ（フリールック）"],SV_XN=g=>{const X=g&&g.X||[];return [0,1,2].map(k=>X[k]==null||X[k]===""||!isFinite(X[k])?null:+X[k])};/* 基本感度だけの項目（値は1つずつ） */
 const SV_ROWS=["TPPスコープなし","FPPスコープなし","レッドドット等","2倍","3倍","4倍","6倍","8倍"],SV_COLS=["カメラ","射撃時","ジャイロ通常時","ジャイロ射撃時"];
 (()=>{
  const SK="pubg-sens-save";let IMGS=[],G=[],MEMO="",OPTV={tpp:null,fpp:null,acc:""};// G: [{kind:"basic"|"wpn",name,cat,M:[8][4],alt,warn,crop,t}]
@@ -1958,21 +1974,22 @@ const SV_ROWS=["TPPスコープなし","FPPスコープなし","レッドドッ�
    if(n<2)s=[0];this.S=s;return s},setSlot(k,v){const s=this.slots().slice();s[k]=v;this.S=s},opts:sel=>slotOpts(sel)};
  const res=$("svres"),file=$("svfile");
  const blank=()=>SV_ROWS.map(()=>SV_COLS.map(()=>null));
- function save(){try{localStorage.setItem(SK,JSON.stringify({groups:G.map(g=>({kind:g.kind,name:g.name,cat:g.cat,M:g.M})),memo:MEMO,opt:OPTV}))}catch(e){}}
- function load(o){G=(o&&o.groups||[]).map(g=>({kind:g.kind==="basic"?"basic":"wpn",name:SV.fix(String(g.name||"")),cat:SV.QCAT(SV.fix(String(g.name||"")))||String(g.cat||""),M:SV_ROWS.map((_,i)=>SV_COLS.map((_,j)=>{const v=g.M&&g.M[i]&&g.M[i][j];return v==null||v===""||!isFinite(v)?null:+v})),alt:blank(),warn:blank()}));if(o&&"memo" in o){MEMO=String(o.memo||"");$("svmemo").value=MEMO}if(o&&o.opt){const n=x=>x!=null&&x!==""&&isFinite(x)?+x:null;OPTV={tpp:n(o.opt.tpp),fpp:n(o.opt.fpp),acc:o.opt.acc==="ON"||o.opt.acc==="OFF"?o.opt.acc:""};showOpt()}IMGS=[];render()}
+ function save(){try{localStorage.setItem(SK,JSON.stringify({groups:G.map(g=>({kind:g.kind,name:g.name,cat:g.cat,M:g.M,...(g.kind==="basic"?{X:SV_XN(g)}:{})})),memo:MEMO,opt:OPTV}))}catch(e){}}
+ function load(o){G=(o&&o.groups||[]).map(g=>({kind:g.kind==="basic"?"basic":"wpn",name:SV.fix(String(g.name||"")),cat:SV.QCAT(SV.fix(String(g.name||"")))||String(g.cat||""),M:SV_ROWS.map((_,i)=>SV_COLS.map((_,j)=>{const v=g.M&&g.M[i]&&g.M[i][j];return v==null||v===""||!isFinite(v)?null:+v})),X:SV_XN(g),alt:blank(),warn:blank()}));if(o&&"memo" in o){MEMO=String(o.memo||"");$("svmemo").value=MEMO}if(o&&o.opt){const n=x=>x!=null&&x!==""&&isFinite(x)?+x:null;OPTV={tpp:n(o.opt.tpp),fpp:n(o.opt.fpp),acc:o.opt.acc==="ON"||o.opt.acc==="OFF"?o.opt.acc:""};showOpt()}IMGS=[];render()}
  $("svmemo").addEventListener("input",()=>{MEMO=$("svmemo").value;save();preview()});
  function showOpt(){$("svtpp").value=OPTV.tpp??"";$("svfpp").value=OPTV.fpp??"";$("svacc").value=OPTV.acc||""}
  function readOpt(){const n=(id,lo,hi)=>{const t=$(id).value.trim();if(t==="")return null;const v=Math.round(+t);return isFinite(v)?Math.max(lo,Math.min(hi,v)):null};OPTV={tpp:n("svtpp",80,90),fpp:n("svfpp",80,103),acc:$("svacc").value};save();preview()}
  ["svtpp","svfpp"].forEach(id=>$(id).addEventListener("change",()=>{readOpt();showOpt()}));$("svacc").addEventListener("change",readOpt);
  $("svoptfill").addEventListener("click",()=>{$("svtpp").value=$("tpp").value;$("svfpp").value=$("fpp").value;$("svacc").value=$("accel").value;readOpt()});
- window.SV_API={snapshot:()=>({groups:G.map(g=>({kind:g.kind,name:g.name,cat:g.cat,M:g.M})),memo:MEMO,opt:OPTV}),load:o=>{load(o);save()},groups:()=>G};
+ window.SV_API={snapshot:()=>({groups:G.map(g=>({kind:g.kind,name:g.name,cat:g.cat,M:g.M,...(g.kind==="basic"?{X:SV_XN(g)}:{})})),memo:MEMO,opt:OPTV}),load:o=>{load(o);save()},groups:()=>G};
  try{const o=JSON.parse(localStorage.getItem(SK)||"null");if(o)load(o)}catch(e){}
  $("svbtn").addEventListener("click",()=>{file.value="";file.click()});
  $("svclear").addEventListener("click",()=>{IMGS=[];G=[];MEMO="";$("svmemo").value="";OPTV={tpp:null,fpp:null,acc:""};showOpt();save();render()});
- file.addEventListener("change",async()=>{const fs=[...file.files].sort((a,b)=>a.name.localeCompare(b.name));if(!fs.length)return;res.innerHTML='<p class="note">読み取り中…（0/'+fs.length+'）</p>';IMGS=[];
+ file.addEventListener("change",async()=>{const fs=[...file.files].sort((a,b)=>a.name.localeCompare(b.name));if(!fs.length)return;res.innerHTML='<p class="note">読み取り中…（0/'+fs.length+'）</p>';const NEW=[];/* 何回かに分けて選んだときは前のスクショに足す（同じ名前は新しい方） */
   for(const [i,f] of fs.entries()){let R;try{const img=await new Promise((ok,ng)=>{const u=URL.createObjectURL(f),im=new Image();im.onload=()=>ok(im);im.onerror=ng;im.src=u});
-    await new Promise(r=>setTimeout(r,20));R=SS.read(img);URL.revokeObjectURL(img.src);R.scr=SV.screen(R)}catch(e){R={rows:[],heads:[],err:true,scr:{kind:null}}}
-   R.name=f.name;IMGS.push(R);res.innerHTML='<p class="note">読み取り中…（'+(i+1)+'/'+fs.length+'）</p>'}
+    await new Promise(r=>setTimeout(r,20));R=SS.read(img);URL.revokeObjectURL(img.src);R.scr=SV.screen(R);R.canvas=null/* 画像は読み取り後に手放す（枚数が多いときのメモリ対策） */}catch(e){R={rows:[],heads:[],err:true,scr:{kind:null}}}
+   R.name=f.name;NEW.push(R);res.innerHTML='<p class="note">読み取り中…（'+(i+1)+'/'+fs.length+'）</p>'}
+  const nn=new Set(NEW.map(R=>R.name));IMGS=[...IMGS.filter(R=>!nn.has(R.name)),...NEW].sort((a,b)=>a.name.localeCompare(b.name));
   group();build();save();render()});
  // 振り分け：基本設定の画面→基本感度。詳細設定で武器のタブが写っていれば新しい武器、写っていなければ直前の武器の続き
  function group(){let cur=-1,lastW=-1;const gs=[];const findW=s=>gs.findIndex(g=>g.kind==="wpn"&&g.t&&s.t&&SS.ncc(g.t.v,s.t.v)>0.9&&Math.abs(Math.log(g.t.asp/s.t.asp))<0.08);
@@ -1988,6 +2005,8 @@ const SV_ROWS=["TPPスコープなし","FPPスコープなし","レッドドッ�
    const vals=SV_ROWS.map(()=>SV_COLS.map(()=>[]));g.warn=blank();
    for(const R of Rs)for(const r of R.rows){const i=SS_KEYS.indexOf(r.key);if(i<0||!isFinite(r.val)||r.col==null)continue;vals[i][r.col].push(r.val);const w=SV.warn(R,r);if(w.length)g.warn[i][r.col]=(g.warn[i][r.col]?g.warn[i][r.col]+"、":"")+w.join("、")}
    g.alt=vals.map(row=>row.map(v=>{const u=[...new Set(v)];return u.length>1?u:null}));
+   {const xv=[[],[],[]];for(const R of Rs)for(const r of R.rows){const k=["XT","XP","XF"].indexOf(r.key);if(k>=0&&isFinite(r.val))xv[k].push(r.val)}const X0=SV_XN(g);
+    g.X=xv.map((v,k)=>{if(!v.length)return X0[k];const c={};v.forEach(x=>c[x]=(c[x]||0)+1);return +Object.keys(c).sort((a,b)=>c[b]-c[a])[0]})}
    g.M=vals.map(row=>row.map(v=>{if(!v.length)return null;const c={};v.forEach(x=>c[x]=(c[x]||0)+1);return +Object.keys(c).sort((a,b)=>c[b]-c[a])[0]}))})}
  const label=(g,gi)=>g.kind==="basic"?"基本感度":`武器${G.slice(0,gi+1).filter(x=>x.kind==="wpn").length}${g.name?"："+g.name:""}`;
  function render(){
@@ -1997,6 +2016,7 @@ const SV_ROWS=["TPPスコープなし","FPPスコープなし","レッドドッ�
   if(IMGS.length){h+=`<details class="adv" ${IMGS.some(R=>R.g<0)?"open":""}><summary>読み込んだ画像（${IMGS.length}枚）と振り分け</summary><div class="tbl"><table class="sstbl svimgs"><thead><tr><th>画像</th><th>画面</th><th>入れる先</th></tr></thead><tbody>${IMGS.map((R,ii)=>{const s=R.scr||{};
     const kind=R.err?"読めない画像":!R.rows.length?"感度の行なし":s.kind==="basic"?"基本設定":s.kind==="detail"?(s.wpn?"詳細設定（武器のタブあり）":"詳細設定（続き）"):"不明（前の続き）";
     return `<tr><td style="word-break:break-all">${esc(R.name)}</td><td>${kind}</td><td><select class="svto" data-i="${ii}">${opts(R.g)}</select></td></tr>`}).join("")}</tbody></table></div></details>`}
+  const xtbl=(g,gi)=>{const X=SV_XN(g);return `<div class="tbl"><table class="sstbl svtbl svxt"><tbody>${SV_XROWS.map((rn,k)=>`<tr><td>${rn}</td><td><input type="number" inputmode="numeric" min="0" max="400" step="1" class="svxv" data-g="${gi}" data-k="${k}" value="${X[k]==null?"":X[k]}" aria-label="${rn}"></td></tr>`).join("")}</tbody></table></div>`};
   const card=(g,gi,slot)=>{let h="";const nwarn=g.warn.flat().filter(Boolean).length+g.alt.flat().filter(Boolean).length;
    h+=`<div class="svgrp"><div class="svhead">${slot!=null?`<select class="svslot" data-s="${slot}" aria-label="表示する感度">${SV_VIEW.opts(gi)}</select>`:""}${g.kind==="basic"?(slot!=null?"":`<b>基本感度</b>`):`${slot!=null?"":`<b>武器${G.slice(0,gi+1).filter(x=>x.kind==="wpn").length}</b>`}
      ${g.crop?`<img class="svcrop" src="${g.crop}" alt="スクショの武器名">`:""}
@@ -2008,7 +2028,7 @@ const SV_ROWS=["TPPスコープなし","FPPスコープなし","レッドドッ�
     <div class="tbl"><table class="sstbl svtbl"><thead><tr><th>項目</th>${["カメラ<br>通常","カメラ<br>射撃時","ジャイロ<br>通常","ジャイロ<br>射撃時"].map(c=>`<th>${c}</th>`).join("")}</tr></thead><tbody>
     ${SV_ROWS.map((rn,i)=>`<tr><td>${rn}</td>${SV_COLS.map((_,j)=>{const a=g.alt[i][j],w=g.warn[i][j];const tip=[a?"画像ごとに違う値："+a.join("／"):"",w||""].filter(Boolean).join("。");
       return `<td class="${a?"svbad":w?"svwarn":""}" title="${esc(tip)}"><input type="number" inputmode="numeric" min="0" max="400" step="1" class="svv" data-g="${gi}" data-i="${i}" data-j="${j}" value="${g.M[i][j]==null?"":g.M[i][j]}"></td>`}).join("")}</tr>`).join("")}
-    </tbody></table></div></div>`;return h};
+    </tbody></table></div>${g.kind==="basic"?xtbl(g,gi):""}</div>`;return h};
   const vcard=(n,slot)=>{const B=G.find(g=>g.kind==="basic");return `<div class="svgrp"><div class="svhead"><select class="svslot" data-s="${slot}" aria-label="表示する感度">${SV_VIEW.opts("n:"+n)}</select></div>
     <p class="note">この武器は詳細感度が入っていません。ゲームでは基本感度が使われます（下は基本感度の値）。</p>
     <div class="saverow" style="margin:4px 0 8px"><button type="button" class="btn ghost svmk" data-n="${esc(n)}">この武器の詳細感度を作る（基本感度をコピー）</button></div>
@@ -2027,6 +2047,7 @@ const SV_ROWS=["TPPスコープなし","FPPスコープなし","レッドドッ�
   res.querySelectorAll(".svnsel").forEach(s=>s.addEventListener("change",()=>{const gi=+s.dataset.g,g=G[gi];if(s.value==="\u0001"){MAN.add(gi);render();const t=res.querySelector(`.svname[data-g="${gi}"]`);if(t)t.focus();return}
    MAN.delete(gi);g.name=s.value;if(g.name){const c=SV.QCAT(g.name);if(c)g.cat=c}if(g.t&&g.name)SV.learn(g.name,g.cat,g.t);save();render()}));
   res.querySelectorAll(".svmk").forEach(bt=>bt.addEventListener("click",()=>{const n=bt.dataset.n,B=G.find(g=>g.kind==="basic");G.push({kind:"wpn",name:n,cat:SV.QCAT(n)||"",M:B?B.M.map(r=>r.slice()):blank(),alt:blank(),warn:blank()});save();render()}));
+  res.querySelectorAll(".svxv").forEach(s=>s.addEventListener("change",()=>{const g=G[s.dataset.g],k=+s.dataset.k;const X=SV_XN(g);const t=s.value.trim();X[k]=t===""?null:Math.max(0,Math.min(400,Math.round(+t)));g.X=X;save();render()}));
   res.querySelectorAll(".svslot").forEach(s=>s.addEventListener("change",()=>{SV_VIEW.setSlot(+s.dataset.s,/^\d+$/.test(s.value)?+s.value:s.value);render()}));
   res.querySelectorAll('input[name="svview"]').forEach(s=>s.addEventListener("change",()=>{SV_VIEW.set(s.value);render()}));
   res.querySelectorAll(".svcat").forEach(s=>s.addEventListener("change",()=>{const g=G[s.dataset.g];g.cat=s.value;if(g.t&&g.name)SV.learn(g.name,g.cat,g.t);save();render()}));
@@ -2048,7 +2069,8 @@ function drawSave(r){const S=r.sv||{groups:[]};const B=S.groups.find(g=>g.kind==
  const H1=["カメラ","カメラ","ジャイロ","ジャイロ"],H2=["通常","射撃時","通常","射撃時"];
  const W=900,P=28,RH=25,HH=34,GAP=16,cw=(W-2*P-GAP)/2;
  const used=g=>SV_ROWS.map((_,i)=>i).filter(i=>g.M[i].some(v=>v!=null));
- const ch=g=>40+HH+Math.max(1,used(g).length)*RH+6;
+ const xu=g=>g.kind==="basic"?SV_XN(g).map((v,k)=>[k,v]).filter(x=>x[1]!=null):[];
+ const ch=g=>40+HH+Math.max(1,used(g).length)*RH+6+(xu(g).length?8+xu(g).length*RH:0);
  // QRコード（基本感度＋基本と違う値だけ。読み込むと基本で埋める）。メモ（利用者が入力）はQRの横
  const q=QR.encode(SV.qrSegs(S,r.name||""));const memo=String(S.memo||"").trim();
  const MF=`400 13px ${IMGF}`,ML=19;
@@ -2090,7 +2112,10 @@ function drawSave(r){const S=r.sv||{groups:[]};const B=S.groups.find(g=>g.kind==
    cols.forEach((j,k)=>{const v=c.M[i][j],cx=tx+lw+cwid*k+cwid/2;g.textAlign="center";
     if(v==null){g.fillStyle=IC.mu;g.font=`400 12px ${IMGF}`;g.fillText("—",cx,yy+17)}
     else{const diff=!isB&&B&&B.M[i][j]!=null&&B.M[i][j]!==v;g.fillStyle=diff?IC.cam:IC.fg;g.font=`${diff?800:600} 14px ${IMGM}`;g.fillText(v+"%",cx,yy+18)}g.textAlign="left"});yy+=RH});
-  if(!rs.length){g.fillStyle=IC.mu;g.font=`400 12px ${IMGF}`;g.fillText("値なし",tx+4,yy+17)}};
+  if(!rs.length){g.fillStyle=IC.mu;g.font=`400 12px ${IMGF}`;g.fillText("値なし",tx+4,yy+17);yy+=RH}
+  const xr=xu(c);if(xr.length){yy+=4;g.strokeStyle=isB?IC.ac:IC.ln;g.lineWidth=1;g.beginPath();g.moveTo(tx,yy+0.5);g.lineTo(x+cw-8,yy+0.5);g.stroke();yy+=4;
+   xr.forEach(([k,v],n)=>{if(n<xr.length-1){g.strokeStyle=IC.ln;g.beginPath();g.moveTo(tx,yy+RH-0.5);g.lineTo(x+cw-8,yy+RH-0.5);g.stroke()}
+    g.fillStyle=IC.fg;g.font=`500 12.5px ${IMGF}`;g.fillText(SV_XROWS[k],tx+4,yy+17);const cx=tx+lw+cwid*(cols.length-1)+cwid/2;g.textAlign="center";g.font=`600 14px ${IMGM}`;g.fillText(v+"%",cx,yy+18);g.textAlign="left";yy+=RH})}};
  for(let i=0;i<items.length;i+=2){const h=rows[i/2];[items[i],items[i+1]].forEach((c,k)=>{if(c)drawCard(c,P+k*(cw+GAP),y,h)});y+=h+GAP}
  g.fillStyle=IC.mu;g.font=`400 11px ${IMGF}`;g.fillText("PUBGモバイル計算機「感度保存」で作成（ゲームの設定画面のスクショから読み取り）",P,H-14);
  return cv}
