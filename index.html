@@ -445,7 +445,7 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
       <small>実測データは、Legion Tab Y700 Gen3での普段のエイム（約5分）の指の速さの分布です。</small>
       <input type="hidden" id="accmy" value=""></div>
     <div class="f" id="accspdbox" hidden><label for="accspd">指の速さ <output id="accspdo"></output></label>
-      <input type="range" id="accspd" min="1" max="40" step="0.5" value="6">
+      <input type="range" id="accspd" min="1" max="40" step="0.1" value="6">
       <small>目安：ゆっくり 2〜4 ／ 普通 5〜9 ／ 速いフリック 15以上（cm/秒）</small></div>
   </div>
   <details class="spdbox" id="spdbox">
@@ -473,6 +473,9 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
         <small>ゲームと同じ向きを選んでください。測定中はこの向きで固定され、端末を大きく傾けても画面は回りません。</small></div>
       <div class="f"><label for="spddur">時間</label>
         <select id="spddur"><option value="30">30秒</option><option value="60">60秒</option></select></div>
+      <div class="f"><label for="spdrange">的が出る範囲（%）</label>
+        <input type="number" id="spdrange" min="5" max="100" step="1" value="50" inputmode="numeric">
+        <small>画面の中央から左右の端までを100%として、的が出る横の範囲です（モニターディスタンスと同じ考え方）。50なら中央から画面の半分の50%以内に出ます。</small></div>
     </div>
     <ol class="note spdhow">
       <li>ゲームで使う端末で開き、上の「使う端末」をその端末に合わせます。</li>
@@ -733,7 +736,7 @@ OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
   <p>加速の換算に使う「自分の指の速さ」を測る機能です。視点の回り方はゲームの実測値を再現しています。</p>
   <div class="eq">回転量 = 指の移動(端末px) × 0.0641°（右）／0.0705°（左） × (感度 / 36) × 加速倍率(ONのとき)
 ジャイロ = 端末の回転(°) × 0.645 × (ジャイロ感度 / 100) ÷ R(TPP) × R(視点)</div>
-  <p class="note">指の横方向の動きを約1/60秒ごとに速さにして、動いた距離で重みをつけた分布を作ります（録画の解析と同じ考え方）。ジャイロは、ブラウザがセンサーを読める https のページ（GitHub Pagesなど）でだけ動きます。</p>
+  <p class="note">指の横方向の動きを約1/60秒ごとに速さにして、動いた距離で重みをつけた分布を作ります（録画の解析と同じ考え方）。的は、画面の中央から左右の端までを100%としたときの「的が出る範囲（%）」（初期値50%）の中に出ます（モニターディスタンスと同じく画面上の距離で決めるので、視野角によらず画面の同じ割合に出ます）。ジャイロは、ブラウザがセンサーを読める https のページ（GitHub Pagesなど）でだけ動きます。</p>
   </details>
 
   <details class="adv thsec" id="th-10"><summary>10. 実測データ一覧</summary>
@@ -1154,6 +1157,7 @@ OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
       <tr><td>11月10日</td><td>「感度保存」タブを追加。ゲームの感度設定画面のスクショをまとめて選ぶと、基本設定の画面は基本感度、詳細設定の画面は武器ごと（武器名のタブで区切り、スクロールした続きはファイル名の順でつなぐ）に分けて読み取り、1枚の画像にまとめる（基本感度と違う値は赤字）。読み取りは感度比較のスクショ読み込みと同じ方法。武器種はタブの位置、武器名は見本と照合（ARの一部のみ。読めないときはダメージ計算の武器一覧から武器種で絞った候補を選ぶか入力し、端末に覚える）。保存する画像には右上の隅にQRコード、基本感度の右にTPP視野角・FPP視野角・水平スライド加速（感度保存タブで入力、感度計算の設定から入れるボタンあり）とメモ（保存前に入力した文字）を入れる。QRコードは（「QRコードだけ保存」でQRコードだけの画像も作れる（データ量に合わせて大きさが変わり、画像に印刷の解像度を記録。100%で印刷するとQRコード本体が最小15mm角、1マス0.4mm以上）。QRコードの中身は設定をビットに詰めて数字だけにしたもの（URLの後ろに数字が続く形。前の形式のQRコードも読める）で、文字のままより約半分の面積になる。中身はサイトのURL＋基本感度と、武器ごとに基本感度と違う値だけ。読み込むと省いた値は基本感度で埋める）。スマホのカメラで読むとサイトが開いて感度保存に入り、「画像から読み込む」でもQRコードを読む（LINEなどで送ってPNGのデータが消えた画像・JPEGでも可）。QRコードを作る・読む処理もサイト内に自前で書いた（外部ライブラリなし）。計算は変更なし。</td></tr>
       <tr><td>11月14日</td><td>感度計算の出力と端末換算・加速換算の表に「アイアン（AR・DMR）」（アイアンサイト70.4°）の行を追加。基礎スコープにアイアンサイトも選べるように。ゲームではアイアンサイトもレッドドットの感度の枠を使うので、感度比較には入れていません。ほかの値の計算は変更なし</td></tr>
       <tr><td>11月14日</td><td>スクショの読み取りを改善：1枚に見出しが何個も入る画面（VSS・Win94・SMG・SG・ハンドガンなど、1つの見出しに3行だけ）で項目がずれていたのを、見出しや間隔ごとに並びを読み直すように。オン/オフのある見出し（黄色い線がない）や、FPS表示が重なった・上が切れた見出しも判定。「…キャンテッドサイト398%」のように数字の先頭が項目名と重なるときは、つまみ位置から補正（警告を出す）。武器名の見本をAR以外の27武器にも追加（ゲームの表記：Skorpion・M79スモークグレネード・迫撃砲。Sawed-off・Skorpion・デュアルMP7・スタンガン・M79・迫撃砲はゲームと同じくハンドガンに）</td></tr>
+      <tr><td>11月15日</td><td>指の速さの測定に「的が出る範囲（%）」（画面の中央から左右の端までを100%、初期値50%）を追加。加速換算の「速さを指定する」を0.1 cm/秒刻みに</td></tr>
       <tr><td>11月15日</td><td>タイトルの下に「はじめての方へ：使い方」（折りたたみ、初期は閉じる）を追加。感度保存の説明から「今はARの一部の武器だけ」を削除（読み取れる武器が増えたため）。計算は変更なし</td></tr>
       <tr><td>11月15日</td><td>感度比較の「記録した設定（10/14）を入れる」ボタンを削除</td></tr>
       <tr><td>11月15日</td><td>感度保存タブに「この感度をほかのタブで使う」（感度計算・端末換算・加速換算）ボタンを追加。押すとそのタブに移り、画像から読み込んだときと同じように使える</td></tr>
@@ -2313,7 +2317,7 @@ function renderSpdRes(){
   const slow=my.h.filter(x=>x[0]*pc<610).reduce((s,x)=>s+x[1],0)/tot;
   const fast=my.h.filter(x=>x[0]*pc>=1330).reduce((s,x)=>s+x[1],0)/tot;
   const c=my.cfg, vn={tpp:"TPP",rd:"レッドドット 55.3°"}; if(c&&/^f/.test(c.view)) vn[c.view]=`視野角 ${c.view.slice(1)}°`;
-  el.innerHTML=`<b>測定結果</b>（合計 ${my.sec.toFixed(0)}秒・${my.n}回分、測定時の端末 ${my.ppi}ppi${c?`、${vn[c.view]||c.view}・感度${c.sens}・加速${c.acc}`:""}${my.shots?`、命中 ${my.hits}/${my.shots}`:""}）<br>`+
+  el.innerHTML=`<b>測定結果</b>（合計 ${my.sec.toFixed(0)}秒・${my.n}回分、測定時の端末 ${my.ppi}ppi${c?`、${vn[c.view]||c.view}・感度${c.sens}・加速${c.acc}${c.range?`・的の範囲${c.range}%`:""}`:""}${my.shots?`、命中 ${my.hits}/${my.shots}`:""}）<br>`+
     `平均の加速倍率 <b>${histMul(my.h,pc).toFixed(2)}倍</b>　参考：作者の実測データ ${histMul(SPD_HIST,pc).toFixed(2)}倍<br>`+
     `速さの中央値 約${med.toFixed(1)} cm/秒　加速なしの範囲 ${(slow*100).toFixed(0)}%・最大近くまで加速 ${(fast*100).toFixed(0)}%（動いた距離の割合）　`+
     `<button class="btn ghost" id="spdclear" type="button" style="padding:3px 10px;font-size:.78rem">結果を消す</button>`;
@@ -2424,8 +2428,10 @@ function renderSpdRes(){
     return [W/2+F*Math.tan(dy), H/2-F*Math.tan(dp)/Math.cos(dy)]; }
   function spawn(){ // 現在の視界の中（端から少し内側）に出す。照準のすぐ近く〜画面の端まで
     const vf=2*Math.atan(Math.tan(rad(hfov/2))*H/W)*180/Math.PI;
-    for(let k=0;k<30;k++){ const a=yaw+(Math.random()*2-1)*hfov/2*0.85, b=Math.max(-40,Math.min(40,pitch+(Math.random()*2-1)*vf/2*0.7));
-      if(Math.hypot(a-yaw,b-pitch)<TR*3) continue; if(tg.some(t=>Math.hypot(t[0]-a,t[1]-b)<TR*4)) continue; tg.push([a,b]); return; } }
+    const P=(cfg&&cfg.range||50)/100, th=Math.tan(rad(hfov/2)); let c=null; // 横は画面上の距離で中央から画面の半分×P以内
+    for(let k=0;k<30;k++){ const a=yaw+Math.atan((Math.random()*2-1)*P*th)*180/Math.PI, b=Math.max(-40,Math.min(40,pitch+(Math.random()*2-1)*vf/2*0.7)); c=[a,b];
+      if(Math.hypot(a-yaw,b-pitch)<TR*3) continue; if(tg.some(t=>Math.hypot(t[0]-a,t[1]-b)<TR*4)) continue; tg.push([a,b]); return; }
+    if(c) tg.push(c); }
   function draw(){
     g.fillStyle="#26354a"; g.fillRect(0,0,W,H);
     const hz=H/2+F*Math.tan(rad(pitch)); g.fillStyle="#3a4a3a"; g.fillRect(0,Math.max(0,hz),W,H);
@@ -2490,12 +2496,12 @@ function renderSpdRes(){
   function start(){ ppiNow=ppiOf($("accdev"),$("accppi")); const sens=+$("spdsens").value;
     if(!ppiNow){ $("spdres").textContent="先に「使う端末」を選ぶか、ppiを入力してください。"; return }
     if(!(sens>0)){ $("spdres").textContent="ゲーム内のカメラ感度を入れてください。"; return }
-    cfg={view:$("spdview").value,sens,acc:$("spdacc").value,gyro:$("spdgyro").value,gsens:+$("spdgsens").value||0,ginvx:$("spdginvx").checked,ginvy:$("spdginvy").checked};
+    cfg={view:$("spdview").value,sens,acc:$("spdacc").value,gyro:$("spdgyro").value,gsens:+$("spdgsens").value||0,ginvx:$("spdginvx").checked,ginvy:$("spdginvy").checked,range:Math.max(5,Math.min(100,Math.round(+$("spdrange").value||50)))}; $("spdrange").value=cfg.range;
     gLast=0; gMon={yaw:0,pit:0,a:0}; gOK=false; $("spdgst").textContent="";
     if(cfg.gyro==="ON"){ startSensors(); setTimeout(()=>{ if(run) $("spdgst").textContent=gyroDiag(); },1500); } hfov=fovOf(cfg.view); DUR=+$("spddur").value;
     run=true; started=false; yaw=0; pitch=0; tg=[]; hits=0; shots=0; bins={}; moved=0; pid=null;
     $("spdhits").textContent=0; $("spdshots").textContent=0; $("spdtime").textContent=DUR.toFixed(1);
-    $("spdcfg").textContent=`${$("spdview").selectedOptions[0].textContent}・感度${sens}・加速${cfg.acc}`+(cfg.gyro==="ON"?`・ジャイロ${cfg.gsens}%`:"");
+    $("spdcfg").textContent=`${$("spdview").selectedOptions[0].textContent}・感度${sens}・加速${cfg.acc}・的の範囲${cfg.range}%`+(cfg.gyro==="ON"?`・ジャイロ${cfg.gsens}%`:"");
     msg.textContent="画面をスライドすると開始します"; try{document.activeElement&&document.activeElement.blur()}catch(e){} fs.hidden=false; document.body.style.overflow="hidden";
     holdA=curAngle(); flip=false; fs.style.transform=""; enterLand();
     resize(); spawn(); raf=requestAnimationFrame(loop); }
