@@ -42,6 +42,7 @@ header p.unof{margin-top:2px;font-size:.78rem}
 .f small{display:block;color:var(--muted);font-size:.75rem;line-height:1.4;margin-top:2px}
 input[type=range]{width:100%;accent-color:var(--accent)}
 .rngnum{display:flex;align-items:center;gap:8px}
+.gsep{border-left:3px solid var(--line);padding-left:10px}
 .rngnum input[type=range]{flex:1;min-width:0;width:auto}
 .rngnum input[type=number]{width:5.5em;flex:none;padding:4px 6px;font-size:.9rem}
 .spdedit .rngnum{display:inline-flex}
@@ -319,29 +320,42 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
         <input type="number" id="sens" value="50" min="1" max="300" step="1"></div>
       <div class="f"><label for="gsens">基礎スコープ感度（ジャイロ）</label>
         <input type="number" id="gsens" value="52" min="1" max="400" step="1"></div>
-      <div class="f"><label for="accel">水平スライド加速（指）</label>
-        <select id="accel"><option value="OFF">OFF</option><option value="ON">ON</option></select>
-        <small>計算には影響しません。保存・画像に記録するための項目です。</small></div>
-      <details class="adv"><summary>詳細設定（MD・視野角・感度調整・武器別の視野角）</summary>
+      <div class="f"><label for="tpp">TPP視野角 <output id="tppo"></output></label>
+        <input type="range" id="tpp" min="80" max="90" value="80"></div>
+      <div class="f"><label for="fpp">FPP視野角 <output id="fppo"></output></label>
+        <input type="range" id="fpp" min="80" max="103" value="80"></div>
+      <details class="adv"><summary>詳細設定（MD・TPPディスタンス・感度調整・ジャイロ補正・水平スライド加速）</summary>
       <div class="fields" style="margin-top:12px">
       <div class="f"><label for="md">モニターディスタンス <output id="mdo"></output></label>
         <input type="range" id="md" min="1" max="100" value="1">
         <small>画面中心から端までを100%として、エイムを合わせたい敵の位置</small></div>
-      <div class="f"><label for="dist">TPPディスタンス（m）</label>
+      <div class="f"><label for="tppbase"><span>TPPディスタンスの基準<span class="lnkg">（指）</span></span></label>
+        <select id="tppbase"><option value="TPP">TPP基準（TPPはそのまま）</option><option value="FPP">FPP基準（FPPはそのまま）</option></select>
+        <small>TPP基準：TPP腰撃ちの感度は変えず、FPP腰撃ちを下げてそろえる。FPP基準：FPP腰撃ちの感度は変えず、TPP腰撃ちを上げてそろえる（5章）。スコープの値はどちらでも同じ</small></div>
+      <div class="f"><label for="dist"><span>TPPディスタンス<span class="lnkg">（指）</span>（m）</span></label>
         <input type="number" id="dist" value="10" min="4" max="300" step="1">
         <small>TPP腰撃ちとFPP腰撃ちの感覚がそろう敵までの距離</small></div>
-      <div class="f"><label for="fpp">FPP視野角 <output id="fppo"></output></label>
-        <input type="range" id="fpp" min="80" max="103" value="80"></div>
-      <div class="f"><label for="tpp">TPP視野角 <output id="tppo"></output></label>
-        <input type="range" id="tpp" min="80" max="90" value="80"></div>
-      <div class="f"><label for="kc">感度調整（カメラ） <output id="kco"></output></label>
+      <label class="check" style="grid-column:1/-1"><input type="checkbox" id="distlink" checked><span>ジャイロのTPPディスタンス（基準・距離）を指と同じにする（外すとジャイロだけ別に設定）</span></label>
+      <div class="f gsep" data-link="distlink"><label for="tppbaseg">TPPディスタンスの基準（ジャイロ）</label>
+        <select id="tppbaseg"><option value="TPP">TPP基準（TPPはそのまま）</option><option value="FPP">FPP基準（FPPはそのまま）</option></select></div>
+      <div class="f gsep" data-link="distlink"><label for="distg">TPPディスタンス（ジャイロ）（m）</label>
+        <input type="number" id="distg" value="10" min="4" max="300" step="1"></div>
+      <div class="f"><label for="kc"><span>感度調整（カメラ）<span class="lnkk">（指）</span></span> <output id="kco"></output></label>
         <input type="range" id="kc" min="0.5" max="1.5" step="0.01" value="1.00">
         <small>上げると高倍率が遅く・腰撃ちが速くなる（精密寄り）</small></div>
-      <div class="f"><label for="ka">感度調整（スコープ＝射撃中） <output id="kao"></output></label>
+      <div class="f"><label for="ka"><span>感度調整（スコープ＝射撃中）<span class="lnkk">（指）</span></span> <output id="kao"></output></label>
         <input type="range" id="ka" min="0.5" max="1.5" step="0.01" value="1.00">
         <small>下げると高倍率が速くなる（倍フルの縦ブレを抑えやすい）</small></div>
+      <label class="check" style="grid-column:1/-1"><input type="checkbox" id="klink" checked><span>ジャイロの感度調整（カメラ・スコープ）を指と同じにする（外すとジャイロだけ別に設定）</span></label>
+      <div class="f gsep" data-link="klink"><label for="kcg">感度調整（カメラ）（ジャイロ） <output id="kcgo"></output></label>
+        <input type="range" id="kcg" min="0.5" max="1.5" step="0.01" value="1.00"></div>
+      <div class="f gsep" data-link="klink"><label for="kag">感度調整（スコープ＝射撃中）（ジャイロ） <output id="kago"></output></label>
+        <input type="range" id="kag" min="0.5" max="1.5" step="0.01" value="1.00"></div>
       <p class="note" style="grid-column:1/-1;margin:4px 0">武器別のレッドドット・アイアンサイトなどの視野角は、武器ごとの実測値（10章-10）を使います。基礎感度はAR・DMRのレッドドット（55.3°）の値で入力してください（基礎スコープで「アイアンサイト」を選んだときは、AR・DMRなどのアイアンサイト（70.4°）の値）。</p>
       <label class="check"><input type="checkbox" id="gfix" checked><span>ジャイロを実測値で補正（TPP・FPP ×0.43、エクスプローシブボウ ×0.41。スコープ・アイアンはレッドドットと同じ）</span></label>
+      <div class="f"><label for="accel">水平スライド加速（指）</label>
+        <select id="accel"><option value="OFF">OFF</option><option value="ON">ON</option></select>
+        <small>計算には影響しません。保存・画像に記録するための項目です（端末換算・加速換算・指の速さの測定の初期値にも使います）。</small></div>
       </div></details>
     </div>
   </section>
@@ -633,7 +647,7 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
   <ol class="steps">
     <li>MD（モニターディスタンス）の位置にいる敵が、クロスヘアから何度離れているかをスコープごとに求める（2章）</li>
     <li>その角度の比で感度を割り振り、好みに応じて感度調整 k で強弱をつける（2・4章）</li>
-    <li>TPPはカメラがキャラの後ろにあるので、TPPディスタンスの敵でTPPと同じ感覚になるようにFPPスコープなしを補正する（5章）</li>
+    <li>TPPはカメラがキャラの後ろにあるので、TPPディスタンスの敵でTPPとFPPのスコープなしが同じ感覚になるように補正する（TPP基準ならFPPを、FPP基準ならTPPを合わせる。5章）</li>
     <li>ジャイロは、スコープごとに実測した「端末1°あたりの回転量」の差を打ち消す（6章）</li>
     <li>必要なら、端末の画面の細かさ（7章）や水平スライド加速（8章）の違いを換算する</li>
   </ol>
@@ -682,7 +696,7 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
   </details>
 
   <details class="adv thsec" id="th-4"><summary>4. 感度調整 k</summary>
-  <p>2章の式の指数 k です。k=1 なら全スコープで同じ感覚になります。k を上げると倍率の差が強調されて、高倍率は遅く、腰撃ちは速くなります。カメラ（射撃していないとき）とスコープ（射撃中）で別々に設定でき、初期値はどちらも 1.00 です。スコープを1より下げると高倍率が少し速くなり、倍率スコープでフルオートを撃つときの縦の反動を抑えやすくなります。</p>
+  <p>2章の式の指数 k です。k=1 なら全スコープで同じ感覚になります。k を上げると倍率の差が強調されて、高倍率は遅く、腰撃ちは速くなります。カメラ（射撃していないとき）とスコープ（射撃中）で別々に設定でき、初期値はどちらも 1.00 です。初期は指とジャイロで同じ k を使います。詳細設定の「ジャイロの感度調整を指と同じにする」を外すと、ジャイロのカメラ・スコープの k を別に設定できます（11/17）。スコープを1より下げると高倍率が少し速くなり、倍率スコープでフルオートを撃つときの縦の反動を抑えやすくなります。</p>
   </details>
 
   <details class="adv thsec" id="th-5"><summary>5. TPPスコープなし（カメラ位置の補正）</summary>
@@ -700,9 +714,17 @@ td.pos{color:var(--ok)} td.neg{color:var(--bad)}
   </svg>
   <div class="eq">θcam  = atan( MD × tan(TPP視野角 / 2) )
 θchar = θcam + asin( d·sinθcam / D )    d = 2.35m（実測）
-S(TPP) = S(基礎) × ( θcam / θ(基礎) ) ^ k
-S(FPP) = S(基礎) × ( θ(FPP) / θ(基礎) ) ^ k × θcam / θchar</div>
-  <p>D は「TPP腰撃ちとFPP腰撃ちの感覚がそろう敵までの距離」です。初期値は10mです。TPPの感度は変えず、FPPの感度を θcam/θchar 倍に下げて、D の距離の敵をTPPと同じ指の量で狙えるようにします。TPP視野角とFPP視野角が同じなら S(FPP) = S(TPP) × θcam/θchar になります（11/9変更：以前はFPPを基準にしてTPPを θchar/θcam 倍に上げていました。TPPとFPPの比は同じで、TPPを変えないかFPPを変えないかの違いです。スコープの値は変わりません）。基礎スコープをFPPスコープなしにしたときは、入力したFPPの値からこの補正を外してから計算します。</p>
+m = θchar / θcam
+TPP基準（初期）: S(TPP) = S(基礎) × ( θcam / θ(基礎) ) ^ k
+                 S(FPP) = S(基礎) × ( θ(FPP) / θ(基礎) ) ^ k ÷ m
+FPP基準        : S(TPP) = S(基礎) × ( θcam / θ(基礎) ) ^ k × m
+                 S(FPP) = S(基礎) × ( θ(FPP) / θ(基礎) ) ^ k</div>
+  <p>D は「TPP腰撃ちとFPP腰撃ちの感覚がそろう敵までの距離」です。初期値は10mです。どちらの基準でも、D の距離の敵をTPPとFPPで同じ指の量で狙えるようにします。TPP視野角とFPP視野角が同じなら、どちらの基準でも S(FPP) = S(TPP) ÷ m で、<b>TPPとFPPの比は同じ</b>です。違うのは、どちらの感度を変えずに残すかだけで、スコープ（レッドドット〜8倍・アイアン・武器別）の値はどちらでも同じです。</p>
+  <ul class="steps">
+    <li><b>TPP基準（初期）</b>：TPPスコープなしの感度は2章の式のまま変えず、FPPスコープなしを ÷m（下げる）してTPPに合わせます。11/9〜11/16の計算機と同じ結果です。</li>
+    <li><b>FPP基準</b>：FPPスコープなしの感度は2章の式のまま変えず、TPPスコープなしを ×m（上げる）してFPPに合わせます。11/9より前の計算機と同じ結果です。例：MD1%・TPP視野角80°・D=10m では m ≈ 1.23 で、TPPスコープなしが約1.23倍になります。</li>
+  </ul>
+  <p>基礎スコープをTPPやFPPのスコープなしにしたときは、入力した値からその基準の補正（×m や ÷m）を外してから計算します（入力した視点の値は出力でもそのままです）。基準と D は、初期は指とジャイロで同じものを使います。詳細設定の「ジャイロのTPPディスタンスを指と同じにする」を外すと、ジャイロだけ別の基準・距離にできます（例：指はTPP基準、ジャイロはFPP基準にして、TPPのジャイロだけを上げる）。11/17に追加。</p>
   <p class="note">元の計算式は d = 3m でした。自分の録画で4つの距離（10・25・50・100m）を測って求めた値に置き換えています（10章-4）。10/18にスコープなしの視野角の補正（10章-8）を反映して 1.95m にしたあと、10/19にFPP→TPPの切り替えで同じ的の位置を直接比べる方法で測り直し（10章-4の検証4）、2.45m に更新しました。11/4にスコープなしの視野角を実測値（10章-9）に直したのに合わせて同じデータを計算し直し、2.38m にしました。11/7に5・10・15・25mで置き直しを繰り返して測り直し（10章-4の検証5）、<b>2.35m</b> にしています（距離表示が整数であることを考えると約2.31〜2.40m）。あわせて、D を「キャラ〜敵」の距離として正しく扱う式に直しています（前の式は D を「カメラ〜敵」として扱っていました）。カメラはキャラの真後ろではなく、約0.22m右にずれています。左右で補正量が少し変わりますが、計算機では左右の平均（ずれなし）を使っています。</p>
   </details>
 
@@ -1164,6 +1186,7 @@ OFFの感度 = ONの感度 × M      （OFF → ON は ÷ M）</div>
       <tr><td>11月15日</td><td>感度計算・端末換算・加速換算で「画像から読み込む」に感度保存の画像（QRコードだけの画像も）を選ぶと、そのタブで使えるように。最初は基本感度が入り、入力の上の「使う感度」で武器を切り替え。感度計算は基礎スコープの値を基礎スコープ感度に、全部の値を感度比較の表に入れる。端末換算・加速換算は計算結果の代わりにその感度を換算する。視野角・水平スライド加速の設定も入れる</td></tr>
       <tr><td>11月15日</td><td>タイトルの下に「非公式」の注記を追加し、説明文の「（モニターディスタンス方式）」を削除。計算は変更なし</td></tr>
       <tr><td>11月10日</td><td>10章-12「端末による視野角の違い」を追加。Mk14のスコープ別スクショをLegionとGalaxy S25で比べ、横の視野角は端末によらず同じ（S25は上下が切れる形）、各スコープの視野角は両端末とも計算に使っている値と0.07°以内で一致。3章・12章に追記。計算は変更なし</td></tr>
+      <tr><td>11月17日</td><td>TPPディスタンスに「TPP基準／FPP基準」の選択を追加（初期はTPP基準＝これまでと同じ。FPP基準はFPPスコープなしをそのままにしてTPPスコープなしを上げる形）。TPPディスタンス（基準・距離）と感度調整（カメラ・スコープ）は、初期は指とジャイロで連動し、チェックを外すとジャイロだけ別に設定できるように。FPP視野角・TPP視野角を詳細設定の外に出し、計算に使わない水平スライド加速（指）を詳細設定の中に移動。5章・4章・1章を更新。初期設定のままなら計算結果は変わりません</td></tr>
     </tbody></table></div>
   </details>
 </section>
@@ -1205,27 +1228,34 @@ sel.value="1x";
 const rad=d=>d*Math.PI/180, deg=r=>r*180/Math.PI;
 function calc(){
   const md=+$("md").value/100, D=Math.max(+$("dist").value||10,3.5), fpp=+$("fpp").value, tpp=+$("tpp").value;
+  syncLinks();
   const kc=+$("kc").value, ka=+$("ka").value, S=+$("sens").value||0, G=+$("gsens").value||0, gfix=$("gfix").checked;
+  const kcg=+$("kcg").value, kag=+$("kag").value, Dg=Math.max(+$("distg").value||10,3.5), tbF=$("tppbase").value, tbG=$("tppbaseg").value;
   const base=sel.value;
   $("mdo").textContent=Math.round(md*100)+"%"; $("fppo").textContent=fpp+"°"; $("tppo").textContent=tpp+"°";
-  $("kco").textContent=kc.toFixed(2); $("kao").textContent=ka.toFixed(2);
+  $("kco").textContent=kc.toFixed(2); $("kao").textContent=ka.toFixed(2); $("kcgo").textContent=kcg.toFixed(2); $("kago").textContent=kag.toFixed(2);
   const th=f=>Math.atan(md*Math.tan(rad(f/2)));
   // スコープなしの視野角：設定値Fに対し、実際の横幅は tan(半角)=HIPK·tan(F/2)（視野角検証3）
   const thh=f=>Math.atan(md*HIPK*Math.tan(rad(f/2)));
   const R={FPP:thh(fpp),TPP:thh(tpp),IR:th(IRF)}; SCOPES.forEach(([k,,f])=>R[k]=th(f));
   WEP.forEach((w,i)=>{ R["w"+i]=th(w[3]); GYRO_REL["w"+i]=w[5]||(w[4]?GYRO_REL[w[4]]:1); });
-  const tc=thh(tpp), ch=tc+Math.asin(Math.min(1,2.35*Math.sin(tc)/D)), m=ch/tc;
-  // TPPディスタンス：TPPはそのまま、FPPを 1/m 倍してTPPに合わせる（11/9変更）。基礎がFPPのときは入力値からその倍率を外して基準に戻す。
+  const tc=thh(tpp), mOf=d=>(tc+Math.asin(Math.min(1,2.35*Math.sin(tc)/d)))/tc, ch=tc*mOf(D), m=ch/tc, mg=mOf(Dg);
+  // TPPディスタンス（11/17：TPP基準/FPP基準を選べる。指とジャイロで別にも設定できる）
+  //  TPP基準：TPPスコープなしはそのまま、FPPを 1/m 倍してTPPに合わせる（11/9〜の形）
+  //  FPP基準：FPPスコープなしはそのまま、TPPを m 倍してFPPに合わせる（11/9より前の形）
+  //  基礎がTPP/FPPスコープなしのときは、入力値からその倍率を外して基準に戻す。
+  const MUL={f:tbF==="FPP"?{TPP:m,FPP:1}:{TPP:1,FPP:1/m}, g:tbG==="FPP"?{TPP:mg,FPP:1}:{TPP:1,FPP:1/mg}};
+  const mulOf=(s,isG)=>MUL[isG?"g":"f"][s]||1;
   // ジャイロは実測の回転量の比で補正：回りやすいスコープほど数値を下げる（値 × 基礎の比 ÷ そのスコープの比）
-  const bm=base==="FPP"?1/m:1, gf=x=>gfix?1/(GYRO_REL[x]||1):1;
-  const v=(s,k,b,ns,isG)=>(b/bm/(isG?gf(base):1))*Math.pow(R[s]/R[base],k)*(isG?gf(s):1);
-  const rows=[["TPP No","TPP",true,1],["FPP No","FPP",true,1/m],...SCOPES.map(([k])=>[k==="1x"?"1x（AR・DMR）":k,k,false,1])];
-  rows.splice(3,0,["アイアン（AR・DMR）","IR",false,1]);
-  const cell=(s)=>`<td class="c">${v(s,kc,S,false,false).toFixed(2)}</td><td class="a">${v(s,ka,S,false,false).toFixed(2)}</td><td class="g">${v(s,kc,G,false,true).toFixed(2)}</td><td class="g">${v(s,ka,G,false,true).toFixed(2)}</td>`;
+  const gf=x=>gfix?1/(GYRO_REL[x]||1):1;
+  const v=(s,k,b,ns,isG)=>(b/mulOf(base,isG)/(isG?gf(base):1))*Math.pow(R[s]/R[base],k)*(isG?gf(s):1);
+  const rows=[["TPP No","TPP",true],["FPP No","FPP",true],...SCOPES.map(([k])=>[k==="1x"?"1x（AR・DMR）":k,k,false])];
+  rows.splice(3,0,["アイアン（AR・DMR）","IR",false]);
+  const cell=(s)=>`<td class="c">${v(s,kc,S,false,false).toFixed(2)}</td><td class="a">${v(s,ka,S,false,false).toFixed(2)}</td><td class="g">${v(s,kcg,G,false,true).toFixed(2)}</td><td class="g">${v(s,kag,G,false,true).toFixed(2)}</td>`;
   let lastT=""; $("out2").innerHTML=WEP.map((w,i)=>{ const t=w[0]!==lastT; lastT=w[0]; return `<tr class="${t?"wtop":""}"><td><b class="wh">${w[2]} ${w[3]}°</b><span class="wsp">｜</span><small>${w[1]}</small></td>${cell("w"+i)}</tr>`; }).join("");
-  $("out").innerHTML=rows.map(([lab,s,ns,mul])=>`<tr class="${[s===base?"base":"",s==="IR"?"ir":""].join(" ").trim()}"><td>${lab}</td>
-    <td class="c">${(v(s,kc,S,false,false)*mul).toFixed(2)}</td><td class="a">${(v(s,ka,S,false,false)*mul).toFixed(2)}</td>
-    <td class="g">${(v(s,kc,G,ns,true)*mul).toFixed(2)}</td><td class="g">${(v(s,ka,G,ns,true)*mul).toFixed(2)}</td></tr>`).join("");
+  $("out").innerHTML=rows.map(([lab,s,ns])=>`<tr class="${[s===base?"base":"",s==="IR"?"ir":""].join(" ").trim()}"><td>${lab}</td>
+    <td class="c">${(v(s,kc,S,false,false)*mulOf(s,false)).toFixed(2)}</td><td class="a">${(v(s,ka,S,false,false)*mulOf(s,false)).toFixed(2)}</td>
+    <td class="g">${(v(s,kcg,G,ns,true)*mulOf(s,true)).toFixed(2)}</td><td class="g">${(v(s,kag,G,ns,true)*mulOf(s,true)).toFixed(2)}</td></tr>`).join("");
   // 可変倍率スコープ：両端の枠の値を視野角で直線的に内挿（可変倍率スコープ検証1・11/6）
   const VZ=[["6倍スコープ（3〜6倍）","3x","6x",SCF["3x"],SCF["6x"],"3倍側","6倍側"],["8倍スコープ（4〜8倍）","4x","8x",SCF["4x"]*VZ8MIN,SCF["8x"],"4倍側","8倍側"]];
   let o3="";
@@ -1242,14 +1272,28 @@ function calc(){
   });
   $("out3").innerHTML=o3;
   $("detail").innerHTML=`<div>どのスコープでもクロスヘアから <b>${Math.round(md*100)}%</b> 離れた敵に同じ感覚でエイムできます。</div>
-    <div>TPP: カメラから <b>${deg(tc).toFixed(2)}°</b>、キャラクターから <b>${deg(ch).toFixed(2)}°</b> → TPP腰撃ち感度はそのままで、FPP腰撃ち感度を <b>${(1/m).toFixed(2)}倍</b>にしてTPPに合わせます</div>
+    <div>${tppMsg(tbF,D,m,$("distlink").checked?"":"指")}</div>${$("distlink").checked?"":`<div>${tppMsg(tbG,Dg,mg,"ジャイロ")}</div>`}
     <div>実際のゲームの設定は整数なので、四捨五入して入れてください。</div>`;
+}
+// 指とジャイロの連動（チェックが入っている間は、ジャイロの値を指の値にそろえて隠す）
+function syncLinks(){
+  const dl=$("distlink").checked, kl=$("klink").checked;
+  if(dl){ $("tppbaseg").value=$("tppbase").value; $("distg").value=$("dist").value; }
+  if(kl){ $("kcg").value=$("kc").value; $("kag").value=$("ka").value; }
+  document.querySelectorAll(".gsep").forEach(e=>{ e.hidden=$(e.dataset.link).checked; });
+  document.querySelectorAll(".lnkg").forEach(e=>e.hidden=dl); document.querySelectorAll(".lnkk").forEach(e=>e.hidden=kl);
+}
+function tppMsg(tb,D,m,who){
+  const tc=Math.atan(+$("md").value/100*HIPK*Math.tan(rad(+$("tpp").value/2))), w=who?`（${who}）`:"";
+  return `TPP${w}: ${D}m の敵がカメラから <b>${deg(tc).toFixed(2)}°</b>、キャラクターから <b>${deg(tc*m).toFixed(2)}°</b> → `+
+    (tb==="FPP"?`<b>FPP基準</b>：FPP腰撃ち感度はそのままで、TPP腰撃ち感度を <b>${m.toFixed(2)}倍</b>にしてFPPに合わせます`
+               :`<b>TPP基準</b>：TPP腰撃ち感度はそのままで、FPP腰撃ち感度を <b>${(1/m).toFixed(2)}倍</b>にしてTPPに合わせます`);
 }
 document.querySelectorAll(".grid input,.grid select").forEach(e=>e.addEventListener("input",calc));
 calc();
 
 /* ---- 画像保存まわりの共通処理 ---- */
-const IN_IDS=["base","sens","gsens","md","dist","fpp","tpp","kc","ka","gfix","accel"];
+const IN_IDS=["base","sens","gsens","md","dist","fpp","tpp","kc","ka","gfix","accel","tppbase","distlink","tppbaseg","distg","klink","kcg","kag"];
 const BASE_NAMES={TPP:"TPPスコープなし",FPP:"FPPスコープなし",IR:IRNAME}; SCOPES.forEach(([k,n])=>BASE_NAMES[k]=n);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function readInputs(){const o={};IN_IDS.forEach(id=>{const e=$(id);o[id]=e.type==="checkbox"?e.checked:e.value});return o}
@@ -1259,11 +1303,15 @@ function msg(t){$("savemsg").textContent=t}
 /* ---- 画像で保存（入力の要点＋2つの表だけをPNGに描く） ---- */
 const IMGF='"Noto Sans JP","Hiragino Sans","Yu Gothic",system-ui,sans-serif', IMGM='"JetBrains Mono",ui-monospace,Menlo,monospace';
 const IC={bg:"#ffffff",fg:"#1d2420",mu:"#5d6a62",ln:"#d3dad4",ac:"#4f6b2c",soft:"#eef1ec",cam:"#b2363a",ads:"#1f6f8b",gy:"#7a5a10",calc:"#0b74a8",game:"#b0651a",ok:"#2f7a3a",warn:"#9a6a00",bad:"#b2363a"};
-function infoRows(i){return [
+function infoRows(i){
+  const tb=x=>(x||"TPP")+"基準", dl=i.distlink!==false&&i.distlink!=="false", kl=i.klink!==false&&i.klink!=="false";
+  const dist=dl?`${i.dist}m ${tb(i.tppbase)}`:`指 ${i.dist}m ${tb(i.tppbase)}／ジャイロ ${i.distg}m ${tb(i.tppbaseg)}`;
+  const kf=(a,b)=>kl?(+a).toFixed(2):`指 ${(+a).toFixed(2)}／ジャイロ ${(+b).toFixed(2)}`;
+  return [
   [["基礎スコープ",BASE_NAMES[i.base]||i.base],["MD",i.md+"%"],["TPP視野角",i.tpp+"°"]],
-  [["基礎感度（カメラ）",i.sens],["TPPディスタンス",i.dist+"m"],["FPP視野角",i.fpp+"°"]],
-  [["基礎感度（ジャイロ）",i.gsens],["感度調整（カメラ）",(+i.kc).toFixed(2)],["ジャイロ適正化",i.gfix?"ON":"OFF"]],
-  [["水平スライド加速（指）",i.accel||"—"],["感度調整（スコープ）",(+i.ka).toFixed(2)],null]]}
+  [["基礎感度（カメラ）",i.sens],["TPPディスタンス",dist],["FPP視野角",i.fpp+"°"]],
+  [["基礎感度（ジャイロ）",i.gsens],["感度調整（カメラ）",kf(i.kc,i.kcg)],["ジャイロ適正化",i.gfix?"ON":"OFF"]],
+  [["水平スライド加速（指）",i.accel||"—"],["感度調整（スコープ）",kf(i.ka,i.kag)],null]]}
 const HEAD_H=r=>40+(r.name?20:0)+14+19*4;
 // 保存した日時（端末のローカル時刻）をファイル名に入れる 例 20261109_0058
 const p2=n=>String(n).padStart(2,"0");
@@ -1491,7 +1539,8 @@ $("imgfile").addEventListener("change",async ev=>{
     if(d&&d.mode==="sv"&&d.sv){ if(window.SV_API) SV_API.load(d.sv); if(d.name) $("savename").value=d.name; setMode("sv"); msg(`画像「${d.name||f.name}」の感度を読み込みました。`); window.scrollTo({top:0,behavior:"smooth"}); return; }
     if(d&&d.mode==="bag"&&d.bag){ if(window.BAG_API) BAG_API.load(d.bag); if(d.name) $("savename").value=d.name; setMode("bag"); msg(`画像「${d.name||f.name}」のバッグの中身を反映しました。`); window.scrollTo({top:0,behavior:"smooth"}); return; }
     if(!d||!d.inputs){msg("この画像には入力データが入っていません。計算機の「画像で保存」で作った画像を選んでください（SNSやLINEで送り直した画像はデータが消えることがあります）。");return}
-    IN_IDS.forEach(id=>{const e=$(id),v=d.inputs[id]; if(v===undefined) return; if(e.type==="checkbox") e.checked=!!v; else e.value=v});
+    const OLDDEF={tppbase:"TPP",distlink:true,klink:true};
+    IN_IDS.forEach(id=>{const e=$(id); let v=d.inputs[id]; if(v===undefined) v=OLDDEF[id]; if(v===undefined) return; if(e.type==="checkbox") e.checked=!!v; else e.value=v});
     if(d.name) $("savename").value=d.name;
     if(d.settings&&SET_IDS[d.mode]){ Object.entries(d.settings).forEach(([id,v])=>{const e=$(id); if(e) e.value=v}); }
     if(d.mode==="dev"||d.mode==="acc") setMode(d.mode);
